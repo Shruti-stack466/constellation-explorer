@@ -942,8 +942,8 @@ const CONSTELLATIONS=[
     why:"It is named after a proud queen from old Greek stories. Her five stars make a W or M shape, like the queen sitting on her throne.",
     img:"Visuals/cassiopeia.png",
     unified:true,                                              // single-screen "discover" experience
-    coachImg:"Visuals/Meera with cassiopeia.png",              // transparent Meera-with-book cutout
-    figureImg:"Visuals/cassiopeia figure cutout.png",         // reclining figure (bg removed), fitted onto the W
+    coachImg:"Visuals/Meera with cassiopeia.webp",              // transparent Meera-with-book cutout
+    figureImg:"Visuals/cassiopeia figure cutout.webp",         // reclining figure (bg removed), fitted onto the W
     figureAspect:1.334, figureScale:1.7,                       // point-fit: her body spans + covers the whole W (50% + glow)
     // where each W-star sits on her body (shoulder, chin, waist, knee, shin; image fractions, star order)
     figurePts:[{x:0.36,y:0.25},{x:0.49,y:0.18},{x:0.48,y:0.42},{x:0.63,y:0.53},{x:0.60,y:0.73}],
@@ -960,10 +960,10 @@ const CONSTELLATIONS=[
     edges:[[0,1],[1,2],[1,5],[5,4],[4,3],[5,3]], bright:[0,3] },
   { id:"scorpius", name:"Scorpius", desc:"a curling scorpion",
     why:"Its long curved line of stars looks just like a scorpion with a tail and a sting. In old stories, this is the scorpion that chased the hunter Orion.",
-    img:"Visuals/scorpion.png",
+    img:"Visuals/scorpion.webp",
     unified:true,                                              // single-screen "discover" experience
-    coachImg:"Visuals/Meera holding scorpion cutout.png",
-    figureImg:"Visuals/scorpion cutout.png",                  // scorpion figure (bg removed) overlaid when traced
+    coachImg:"Visuals/Meera holding scorpion cutout.webp",
+    figureImg:"Visuals/scorpion cutout.webp",                  // scorpion figure (bg removed) overlaid when traced
     figureAspect:1.5,                                         // image is 1536x1024
     // where each star sits INSIDE the scorpion image (x=frac of width, y=frac of height; star order)
     figurePts:[{x:0.60,y:0.10},{x:0.82,y:0.33},{x:0.70,y:0.42},{x:0.55,y:0.45},{x:0.66,y:0.55},{x:0.14,y:0.62},{x:0.38,y:0.53},{x:0.22,y:0.58},{x:0.60,y:0.66},{x:0.15,y:0.74},{x:0.27,y:0.70}],
@@ -976,10 +976,10 @@ const CONSTELLATIONS=[
     edges:[[0,1],[1,2],[2,3],[2,4],[4,8],[3,6],[6,10],[10,9],[9,5],[5,7]], bright:[0,2,5,8,10] },
   { id:"orion", name:"Orion", desc:"a mighty hunter",
     why:"Orion is named after a brave hunter. Three stars in a neat row make his belt, and two bright stars mark his shoulder and his foot.",
-    img:"Visuals/orion.png",
+    img:"Visuals/orion.webp",
     unified:true,                                              // single-screen "discover" experience
-    coachImg:"Visuals/Meera holding orion cutout.png",
-    figureImg:"Visuals/orion hunter cutout.png",            // hunter figure (bg removed), draped over the stars
+    coachImg:"Visuals/Meera holding orion cutout.webp",
+    figureImg:"Visuals/orion hunter cutout.webp",            // hunter figure (bg removed), draped over the stars
     figureAspect:1.223, figureScale:1.05,                   // content-cover (adapts to any traced size/position)
     figureContent:{x0:0.182,y0:0.031,x1:0.808,y1:0.873},    // non-transparent box of the hunter inside the image
     findNarr:"This constellation is called Orion. Find it in the night sky!",
@@ -2092,6 +2092,28 @@ function toggleNarration(){
   else Speech.speak("Narration on.");
 }
 document.getElementById("narrToggle").onclick=toggleNarration;
+
+/* ---- background asset preloader: warms the cache while the title screen shows,
+   so every scene's image/video is ready before the child reaches it ---- */
+(function preloadAssets(){
+  var imgs=[
+    "Visuals/Meera with cassiopeia.webp",
+    "Visuals/cassiopeia figure cutout.webp",
+    "Visuals/scorpion.webp",
+    "Visuals/Meera holding scorpion cutout.webp",
+    "Visuals/scorpion cutout.webp",
+    "Visuals/orion.webp",
+    "Visuals/Meera holding orion cutout.webp",
+    "Visuals/orion hunter cutout.webp"
+  ];
+  imgs.forEach(function(u){ var im=new Image(); im.src=encodeURI(u); });   // images are tiny — fetch all at once
+  var vids=["videos/video-11.mp4","videos/video-12.mp4","videos/video-13.mp4"];
+  var i=0;                                                                  // videos one-at-a-time so they don't fight for bandwidth
+  (function next(){
+    if(i>=vids.length) return;
+    fetch(encodeURI(vids[i++])).then(function(r){return r.blob();}).then(next).catch(next);
+  })();
+})();
 
 /* boot */
 show("start");
