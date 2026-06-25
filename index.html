@@ -418,8 +418,8 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 /* ---------- Unified discover screen ---------- */
 .discover-stage{position:relative;overflow:hidden}
 .discover-coach{position:absolute;left:8px;bottom:0;z-index:6;display:flex;flex-direction:column;align-items:flex-start;gap:0;pointer-events:none;max-width:42vw}
-.discover-coach .dc-fig{height:min(40vh,360px);width:auto;flex:0 0 auto;filter:drop-shadow(0 8px 20px rgba(0,0,0,.55))}
-.discover-coach .dc-say{position:relative;margin-left:64px;margin-bottom:-3vh;max-width:min(22vw,230px);
+.discover-coach .dc-fig{height:min(56vh,520px);width:auto;flex:0 0 auto;filter:drop-shadow(0 8px 20px rgba(0,0,0,.55))}
+.discover-coach .dc-say{position:relative;margin-left:64px;margin-bottom:1.5vh;max-width:min(22vw,230px);
   background:rgba(255,255,255,.97);color:#1a1c3a;border-radius:13px;padding:9px 12px;font-weight:700;
   font-size:clamp(12px,1.25vw,14.5px);line-height:1.3;box-shadow:0 5px 16px rgba(0,0,0,.45);pointer-events:auto}
 .discover-coach .dc-say .who{color:#5a3bd0;font-weight:800;font-size:11.5px;margin-bottom:1px}
@@ -631,7 +631,7 @@ const Speech = (()=>{
     try{ if(synth.speaking){ synth.resume(); } }catch(e){}
     keepTimer=setTimeout(keepAlive,4000);
   }
-  function flushAndSpeak(utterances){
+  function flushAndSpeak(utterances,onDone){
     const myToken=++speakToken;
     stopKeepAlive();
     if(speakTimer){ clearTimeout(speakTimer); speakTimer=null; }
@@ -645,6 +645,8 @@ const Speech = (()=>{
       utterances[0].addEventListener("start",()=>{ if(myToken===speakToken){ stopKeepAlive(); keepAlive(); } });
       last.addEventListener("end",stopKeepAlive);
       last.addEventListener("error",stopKeepAlive);
+      // notify the caller when this line finishes (only if it wasn't superseded)
+      if(onDone){ last.addEventListener("end",()=>{ if(myToken===speakToken) onDone(); }); }
       utterances.forEach(u=>{
         // a late-arriving line must win even if these were queued first
         u.addEventListener("start",()=>{ if(myToken!==speakToken){ try{synth.cancel();}catch(e){} } });
@@ -655,9 +657,9 @@ const Speech = (()=>{
   return {
     available:!!synth,
     // who: "Kabir" → young-boy voice, "Meera" → young-girl voice, else → neutral narrator
-    speak(text,rate,who){
+    speak(text,rate,who,onDone){
       if(!synth || !state.narrationOn || !text) return;
-      try{ flushAndSpeak(buildUtterances(text,rate,who)); }
+      try{ flushAndSpeak(buildUtterances(text,rate,who),onDone); }
       catch(e){/* graceful fallback — text stays readable */}
     },
     // speak a sequence of parts [{t, rate, who}] back-to-back (e.g. slow name, then normal info)
@@ -1682,8 +1684,8 @@ SCENES.discover=()=>{
   screen.appendChild(s);
 
   // strip emoji / symbols before speaking so the voice never reads "party popper" etc.
-  function setSay(t,speak){ say.innerHTML='<div class="who">Meera</div>'+t;
-    if(speak!==false) Speech.speak(t.replace(/[^\w\s.,!?'"’-]/g," ").replace(/\s+/g," ").trim(), null, "Meera"); }
+  function setSay(t,speak,onDone){ say.innerHTML='<div class="who">Meera</div>'+t;
+    if(speak!==false) Speech.speak(t.replace(/[^\w\s.,!?'"’-]/g," ").replace(/\s+/g," ").trim(), null, "Meera", onDone); }
   const FIND="Spot this pattern in the stars.";
   setSay(FIND);
 
@@ -1822,14 +1824,18 @@ SCENES.discover=()=>{
   function afterGuess(ans){
     const art=/^[aeiou]/i.test(ans)?"an":"a";
     const line1="Interesting! I can see why you thought of "+art+" "+esc(ans)+".";
-    setSay(line1);
-    const delay=Math.max(2800, line1.length*65);              // let the first line finish before the reveal
-    setTimeout(()=>{
+    let advanced=false;
+    const reveal=()=>{
+      if(advanced) return; advanced=true;                     // run once, whether triggered by speech-end or the safety timer
       if(state.currentScene!=="discover") return;             // child navigated away meanwhile
       overlayFigure();                                         // the figure now drapes over the stars
       setSay("Many years ago, people looked at these same stars too. They thought it looked like "+c.name+".");
       showNext();
-    }, delay);
+    };
+    setSay(line1, true, reveal);                              // wait until Meera finishes line 1, then reveal
+    // safety net: still advance if narration is off or the speech 'end' event is missed
+    const wait = state.narrationOn ? Math.max(7000, line1.length*130) : Math.max(2600, line1.length*60);
+    setTimeout(reveal, wait);
   }
 
   // prompt to move on to the next constellation
