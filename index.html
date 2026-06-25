@@ -1820,22 +1820,39 @@ SCENES.discover=()=>{
     input.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); submit(); } });
   }
 
-  // Meera reacts to the child's guess, then reveals the real figure + its historic name
+  // speak a Meera line and call onDone once she finishes (safety net for muted / missed end events)
+  function sayThen(text, onDone){
+    let did=false;
+    const go=()=>{ if(did) return; did=true; onDone(); };
+    setSay(text, true, go);
+    const wait = state.narrationOn ? Math.max(7000, text.length*130) : Math.max(2600, text.length*60);
+    setTimeout(go, wait);
+  }
+
+  // After the child names the shape, Meera asks WHY; once she finishes, a reason box appears.
   function afterGuess(ans){
-    const art=/^[aeiou]/i.test(ans)?"an":"a";
-    const line1="Interesting! I can see why you thought of "+art+" "+esc(ans)+".";
-    let advanced=false;
-    const reveal=()=>{
-      if(advanced) return; advanced=true;                     // run once, whether triggered by speech-end or the safety timer
-      if(state.currentScene!=="discover") return;             // child navigated away meanwhile
-      overlayFigure();                                         // the figure now drapes over the stars
-      setSay("Many years ago, people looked at these same stars too. They thought it looked like "+c.name+".");
-      showNext();
-    };
-    setSay(line1, true, reveal);                              // wait until Meera finishes line 1, then reveal
-    // safety net: still advance if narration is off or the speech 'end' event is missed
-    const wait = state.narrationOn ? Math.max(7000, line1.length*130) : Math.max(2600, line1.length*60);
-    setTimeout(reveal, wait);
+    const q="Interesting! Can you also tell me the reason? Why do you think this shape or pattern looks like "+esc(ans)+"?";
+    sayThen(q, ()=>{ if(state.currentScene==="discover") askReason(); });
+  }
+
+  // a centred text box for the child to type the reason behind their guess
+  function askReason(){
+    const box=document.createElement("div"); box.className="guess-box";
+    box.innerHTML='<input type="text" class="guess-input" placeholder="Type your reason…" maxlength="80" autocomplete="off" spellcheck="false">'+
+      '<button type="button" class="btn small pulse guess-go">Tell Meera ➜</button>';
+    s.appendChild(box);
+    const input=box.querySelector(".guess-input"), go=box.querySelector(".guess-go");
+    setTimeout(()=>{ try{ input.focus(); }catch(e){} }, 60);
+    function submit(){ box.remove(); revealFigure(); }
+    go.onclick=submit;
+    input.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); submit(); } });
+  }
+
+  // Meera tells the historic name; the figure overlay + Next button appear once she finishes
+  function revealFigure(){
+    if(state.currentScene!=="discover") return;
+    sayThen("Many years ago, people looked at these same stars too. They thought it looked like "+c.name+".",
+      ()=>{ if(state.currentScene!=="discover") return; overlayFigure(); showNext(); });
   }
 
   // prompt to move on to the next constellation
