@@ -1843,16 +1843,21 @@ SCENES.discover=()=>{
     s.appendChild(box);
     const input=box.querySelector(".guess-input"), go=box.querySelector(".guess-go");
     setTimeout(()=>{ try{ input.focus(); }catch(e){} }, 60);
-    function submit(){ box.remove(); revealFigure(); }
+    function submit(){ const reason=((input.value||"").trim()); box.remove(); revealFigure(reason); }
     go.onclick=submit;
     input.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); submit(); } });
   }
 
-  // Meera tells the historic name; the figure overlay + Next button appear once she finishes
-  function revealFigure(){
+  // Meera praises the child's reasoning, tells the historic name, then the figure overlay + Next appear
+  function revealFigure(reason){
     if(state.currentScene!=="discover") return;
-    sayThen("Many years ago, people looked at these same stars too. They thought it looked like "+c.name+".",
-      ()=>{ if(state.currentScene!=="discover") return; overlayFigure(); showNext(); });
+    const ack = reason ? "What a thoughtful reason! I love how you look at the stars."
+                       : "What a thoughtful answer! I love how you look at the stars.";
+    sayThen(ack, ()=>{
+      if(state.currentScene!=="discover") return;
+      sayThen("Many years ago, people looked at these same stars too. They thought it looked like "+c.name+".",
+        ()=>{ if(state.currentScene!=="discover") return; overlayFigure(); showNext(); });
+    });
   }
 
   // prompt to move on to the next constellation
