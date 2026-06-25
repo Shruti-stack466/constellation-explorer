@@ -1451,6 +1451,8 @@ SCENES.hunt=()=>{
   controls.appendChild(mkBtn("↶ Undo","small",()=>field.undo()));
   controls.appendChild(mkBtn("⟲ Clear","small",()=>field.clear()));
   controls.appendChild(done);
+  // Skip lets the child move on without finding all 7 shapes
+  controls.appendChild(mkBtn("Skip ➜","small",()=>{ stopHuntAudio(); revealConstellation(); }));
 
   function tryFind(t){
     if(found.has(t.type)) return;
