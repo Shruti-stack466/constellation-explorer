@@ -1159,8 +1159,8 @@ function twinkles(host,n){
 
 /* ---------- OPENING STORY ----------
    The opening (old scene 1–8 picture story) has been replaced by a single video,
-   played in SCENES.story below: videos/Untitled video (11).mp4                  */
-/* closing sequence is now a single video, played in SCENES.reward: videos/Untitled video (12).mp4 */
+   played in SCENES.story below: videos/video-11.mp4                  */
+/* closing sequence is now a single video, played in SCENES.reward: videos/video-12.mp4 */
 let storyAudio=null;
 function stopStoryAudio(){
   if(storyAudio){ try{ storyAudio.pause(); storyAudio.currentTime=0; }catch(e){}
@@ -1246,7 +1246,7 @@ function videoScene(src, doneLabel, onAdvance){
 
 SCENES.story=()=>{
   state.currentScene="story";
-  videoScene("videos/Untitled video (11).mp4","Let's explore ➜",()=>show("hunt"));
+  videoScene("videos/video-11.mp4","Let's explore ➜",()=>show("hunt"));
 };
 
 /* ---------- SCENE 5: PATTERN HUNT (free discovery) ---------- */
@@ -1483,7 +1483,7 @@ SCENES.hunt=()=>{
 /* After Activity 1: a single video where Meera explains constellations
    (replaces the old two explaining/gesturing picture pages). */
 function revealConstellation(){
-  videoScene("videos/Untitled video (13).mp4","Let's Go! ➜",()=>gotoStep(0));
+  videoScene("videos/video-13.mp4","Let's Go! ➜",()=>gotoStep(0));
 }
 
 /* ---------- SCENE 6: SPOT (full-screen constellation image + Meera) ---------- */
@@ -1993,7 +1993,7 @@ function shapesMatch(refStars,refEdges, drawnStars,drawnEdges, tol){
 /* ---------- SCENE 8: FINAL SCENES (3 narrated closing pictures) ---------- */
 SCENES.reward=()=>{
   state.currentScene="reward";
-  videoScene("videos/Untitled video (12).mp4","↻ Play Again",()=>{ state=NEW_STATE(); show("start"); });
+  videoScene("videos/video-12.mp4","↻ Play Again",()=>{ state=NEW_STATE(); show("start"); });
 };
 
 /* ---------- SCENE 9: FINALE (closing scene with the park images) ---------- */
