@@ -1846,6 +1846,13 @@ SCENES.discover=()=>{
     input.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); submit(); } });
   }
 
+  // a centred row of tappable choice buttons at the bottom of the screen
+  function choicePrompt(options){
+    const box=document.createElement("div"); box.className="guess-box";
+    options.forEach(o=>{ box.appendChild(mkBtn(o.label,"small pulse",()=>{ box.remove(); o.pick(); })); });
+    s.appendChild(box);
+  }
+
   // After the child names the shape, Meera asks WHY; once she finishes, a reason box appears.
   function afterGuess(ans){
     const q="Interesting! Can you also tell me the reason? Why do you think this shape or pattern looks like "+esc(ans)+"?";
@@ -1859,7 +1866,10 @@ SCENES.discover=()=>{
                        : "What a thoughtful answer! I love how you look at the stars.";
     sayThen(ack, guard(()=>
       sayThen("Do you think everyone looking at these same stars would imagine the same shape, or could they imagine something different?",
-        guard(()=>textPrompt("Type your answer…",60,resp=>revealFigure(ans,resp))))));
+        guard(()=>choicePrompt([
+          {label:"The same shape",      pick:()=>revealFigure(ans,"same")},
+          {label:"Something different", pick:()=>revealFigure(ans,"different")}
+        ])))));
   }
 
   // Reveal the figure, then Meera's closing teaching — branching on the child's answer
