@@ -1830,35 +1830,58 @@ SCENES.discover=()=>{
     setTimeout(go, wait);
   }
 
-  // After the child names the shape, Meera asks WHY; once she finishes, a reason box appears.
-  function afterGuess(ans){
-    const q="Interesting! Can you also tell me the reason? Why do you think this shape or pattern looks like "+esc(ans)+"?";
-    sayThen(q, ()=>{ if(state.currentScene==="discover") askReason(); });
-  }
+  // run a callback only while we're still on the discover screen
+  function guard(fn){ return ()=>{ if(state.currentScene==="discover") fn(); }; }
 
-  // a centred text box for the child to type the reason behind their guess
-  function askReason(){
+  // a centred text box; calls onSubmit(trimmedValue) when the child answers
+  function textPrompt(placeholder, maxlen, onSubmit){
     const box=document.createElement("div"); box.className="guess-box";
-    box.innerHTML='<input type="text" class="guess-input" placeholder="Type your reason…" maxlength="80" autocomplete="off" spellcheck="false">'+
+    box.innerHTML='<input type="text" class="guess-input" placeholder="'+placeholder+'" maxlength="'+maxlen+'" autocomplete="off" spellcheck="false">'+
       '<button type="button" class="btn small pulse guess-go">Tell Meera ➜</button>';
     s.appendChild(box);
     const input=box.querySelector(".guess-input"), go=box.querySelector(".guess-go");
     setTimeout(()=>{ try{ input.focus(); }catch(e){} }, 60);
-    function submit(){ const reason=((input.value||"").trim()); box.remove(); revealFigure(reason); }
+    function submit(){ const v=((input.value||"").trim()); box.remove(); onSubmit(v); }
     go.onclick=submit;
     input.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); submit(); } });
   }
 
-  // Meera praises the child's reasoning, tells the historic name, then the figure overlay + Next appear
-  function revealFigure(reason){
+  // After the child names the shape, Meera asks WHY; once she finishes, a reason box appears.
+  function afterGuess(ans){
+    const q="Interesting! Can you also tell me the reason? Why do you think this shape or pattern looks like "+esc(ans)+"?";
+    sayThen(q, guard(()=>textPrompt("Type your reason…",80,reason=>afterReason(ans,reason))));
+  }
+
+  // Meera acknowledges the reason, then asks whether everyone would imagine the same shape
+  function afterReason(ans,reason){
     if(state.currentScene!=="discover") return;
     const ack = reason ? "What a thoughtful reason! I love how you look at the stars."
                        : "What a thoughtful answer! I love how you look at the stars.";
-    sayThen(ack, ()=>{
-      if(state.currentScene!=="discover") return;
-      sayThen("Many years ago, people looked at these same stars too. They thought it looked like "+c.name+".",
-        ()=>{ if(state.currentScene!=="discover") return; overlayFigure(); showNext(); });
-    });
+    sayThen(ack, guard(()=>
+      sayThen("Do you think everyone looking at these same stars would imagine the same shape, or could they imagine something different?",
+        guard(()=>textPrompt("Type your answer…",60,resp=>revealFigure(ans,resp))))));
+  }
+
+  // Reveal the figure, then Meera's closing teaching — branching on the child's answer
+  function revealFigure(ans,resp){
+    if(state.currentScene!=="discover") return;
+    const ancient="Many years ago, people looked at these same stars too. They thought it looked like "+c.name+".";
+    const ansClean=(ans||"").trim();
+    const phrase = !ansClean ? "something"
+                 : (/^(a|an|the)\s/i.test(ansClean) ? ansClean
+                    : (/^[aeiou]/i.test(ansClean)?"an ":"a ")+ansClean);
+    const last=step>=HUNT_SEQ.length-1;
+    overlayFigure();                                  // the figure drapes onto the stars as Meera explains
+    if(/differ/i.test(resp)){
+      // child said people could imagine something DIFFERENT
+      sayThen("Yes! "+ancient, guard(()=>
+        sayThen(last?"You have found them all!":"Let's move to the next constellation.", guard(showNext))));
+    } else {
+      // child said everyone would see the SAME shape (or answer was unclear)
+      sayThen(ancient, guard(()=>
+        sayThen("You imagined "+esc(phrase)+".", guard(()=>
+          sayThen("Different people can see different shapes and patterns in the same group of stars.", guard(showNext))))));
+    }
   }
 
   // prompt to move on to the next constellation
