@@ -743,12 +743,13 @@ function renderCoins(anim){
   if(anim){ c.classList.remove("earn","spend"); void c.offsetWidth; c.classList.add(anim); }
 }
 
+// Milestones mirror the ACTUAL flow: start/story → hunt → discover (trace the 3
+// real constellations) → reward. (The old separate spot/trace scenes are unused.)
 const MILESTONES=[
-  {key:"Story",   scenes:["start","story"]},
-  {key:"Patterns",scenes:["hunt"]},
-  {key:"Spot",    scenes:["spot"]},
-  {key:"Trace",   scenes:["trace"]},
-  {key:"Star Explorer",scenes:["reward"]},
+  {key:"Story",          scenes:["start","story"]},
+  {key:"Patterns",       scenes:["hunt"]},
+  {key:"Constellations", scenes:["discover"]},
+  {key:"Star Explorer",  scenes:["reward"]},
 ];
 function renderProgress(){
   const p=document.getElementById("progress");
