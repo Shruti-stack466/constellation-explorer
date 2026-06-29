@@ -509,7 +509,7 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 .discover-head{position:absolute;top:14px;left:14px;z-index:7;display:flex;flex-direction:column;gap:7px;align-items:flex-start;animation:huntFieldIn .6s ease .2s both}
 .discover-badge{display:flex;align-items:center;gap:9px;padding:7px 15px 7px 10px;border-radius:16px;
   background:linear-gradient(180deg,rgba(30,17,56,.76),rgba(48,26,76,.56));
-  border:1px solid rgba(255,234,185,.42);backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+  border:1px solid rgba(255,234,185,.42);backdrop-filter:blur(10px) saturate(1.05);-webkit-backdrop-filter:blur(10px) saturate(1.05);
   box-shadow:0 14px 32px rgba(0,0,0,.28),0 0 12px rgba(255,233,180,.24),inset 0 1px 0 rgba(255,255,255,.10)}
 .discover-badge .db-ico{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:10px;flex:0 0 auto;font-size:15px;
   background:linear-gradient(180deg,rgba(168,139,250,.30),rgba(232,121,249,.20));border:1px solid rgba(200,150,255,.42);
@@ -528,7 +528,7 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 /* bottom-centre segmented control: [Back | Reset | Hint] — soft floating control deck */
 .discover-dock{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);z-index:7;display:flex;align-items:stretch;padding:5px;border-radius:16px;
   background:linear-gradient(180deg,rgba(30,17,56,.78),rgba(48,26,76,.58));border:1px solid rgba(255,234,185,.42);
-  backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+  backdrop-filter:blur(10px) saturate(1.05);-webkit-backdrop-filter:blur(10px) saturate(1.05);
   box-shadow:0 16px 40px rgba(0,0,0,.36),0 0 13px rgba(255,233,180,.26),0 0 26px rgba(168,85,247,.20),inset 0 1px 0 rgba(255,255,255,.13);
   animation:huntFieldIn .6s ease .2s both,dockFloat 6s ease-in-out 1s infinite}
 @keyframes dockFloat{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
@@ -623,7 +623,7 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 .choice-tray{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);z-index:9;display:flex;align-items:stretch;gap:2px;
   padding:5px;border-radius:16px;
   background:linear-gradient(180deg,rgba(30,17,56,.78),rgba(48,26,76,.58));border:1px solid rgba(255,234,185,.42);
-  backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+  backdrop-filter:blur(10px) saturate(1.05);-webkit-backdrop-filter:blur(10px) saturate(1.05);
   box-shadow:0 16px 40px rgba(0,0,0,.36),0 0 13px rgba(255,233,180,.26),0 0 26px rgba(168,85,247,.20),inset 0 1px 0 rgba(255,255,255,.13);
   animation:guessUp .42s cubic-bezier(.2,.9,.2,1) both}
 .choice-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:120px;height:58px;padding:0 20px;border:0;cursor:pointer;
@@ -895,8 +895,8 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 /* .nebula-layer (wisps) — TWO crossing layers of soft lavender/magenta cloud filaments.
    Each layer's puffs are placed along a gentle ARC (not a straight line) and the two
    layers sit at different angles, so they read as flowing, overlapping mist — not stripes. */
-.huntfield::before,.tracefield::before{content:"";position:absolute;inset:-16%;pointer-events:none;z-index:0;
-  opacity:.62;transform:rotate(-7deg);filter:blur(11px);
+.huntfield.amb::before,.tracefield.amb::before{content:"";position:absolute;inset:-8%;pointer-events:none;z-index:0;
+  opacity:.62;transform:rotate(-7deg);filter:blur(8px);
   background:
     radial-gradient(22% 6%   at 6% 30%,  rgba(220,196,255,.17), transparent 73%),   /* upper-left wisp (curve start) */
     radial-gradient(20% 5.5% at 18% 16%, rgba(255,196,238,.14), transparent 74%),    /* upper-left wisp (curve up) */
@@ -906,8 +906,8 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
     radial-gradient(26% 6%   at 76% 40%, rgba(245,202,246,.14), transparent 73%),
     radial-gradient(22% 5.5% at 93% 32%, rgba(226,198,255,.12), transparent 74%);
   animation:nebWispA 70s ease-in-out infinite}
-.huntfield::after,.tracefield::after{content:"";position:absolute;inset:-18%;pointer-events:none;z-index:0;
-  opacity:.5;transform:rotate(-26deg);filter:blur(13px);
+.huntfield.amb::after,.tracefield.amb::after{content:"";position:absolute;inset:-8%;pointer-events:none;z-index:0;
+  opacity:.5;transform:rotate(-26deg);filter:blur(9px);
   background:
     radial-gradient(22% 6%   at 13% 10%, rgba(226,200,255,.14), transparent 74%),   /* upper-left corner wisp */
     radial-gradient(24% 6%   at 10% 18%, rgba(244,206,250,.14), transparent 74%),
@@ -983,7 +983,7 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   width:235px;max-height:calc(100% - 30vh - 110px);
   display:flex;flex-direction:column;gap:9px;padding:13px 15px;border-radius:18px;overflow:hidden;
   background:linear-gradient(180deg,rgba(30,17,56,.80),rgba(48,26,76,.60));
-  border:1px solid rgba(190,140,255,.26);backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+  border:1px solid rgba(190,140,255,.26);backdrop-filter:blur(10px) saturate(1.05);-webkit-backdrop-filter:blur(10px) saturate(1.05);
   box-shadow:0 16px 38px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.08),0 0 18px rgba(168,85,247,.14);
   animation:journalIn .7s cubic-bezier(.2,.8,.2,1) both}
 /* spaceship-console flourishes: a glowing gradient ring around the WHOLE boundary + a soft scanline glow up top */
@@ -1114,7 +1114,7 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   display:flex;flex-direction:row;gap:7px;align-items:center;justify-content:center;flex-wrap:nowrap;max-width:94%;
   padding:8px;border-radius:999px;
   background:linear-gradient(180deg,rgba(30,17,56,.76),rgba(48,26,76,.54));
-  border:1px solid rgba(190,140,255,.24);backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+  border:1px solid rgba(190,140,255,.24);backdrop-filter:blur(10px) saturate(1.05);-webkit-backdrop-filter:blur(10px) saturate(1.05);
   box-shadow:0 16px 38px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.08),0 0 18px rgba(168,85,247,.30);
   animation:huntFieldIn .6s ease .2s both}
 .hunt-controls .btn{min-height:40px;border-radius:999px;box-shadow:none;
@@ -1139,7 +1139,7 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 .hunt-nav{position:absolute;right:16px;bottom:18px;z-index:8;
   display:flex;flex-direction:row;gap:7px;align-items:center;justify-content:flex-end;padding:8px;border-radius:999px;
   background:linear-gradient(180deg,rgba(30,17,56,.76),rgba(48,26,76,.54));
-  border:1px solid rgba(190,140,255,.24);backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+  border:1px solid rgba(190,140,255,.24);backdrop-filter:blur(10px) saturate(1.05);-webkit-backdrop-filter:blur(10px) saturate(1.05);
   box-shadow:0 16px 38px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.08),0 0 18px rgba(168,85,247,.30)}
 .hunt-nav .btn{min-height:44px;border-radius:999px;box-shadow:none;
   transition:transform .14s ease,border-color .2s,background .25s,opacity .2s}
@@ -1179,7 +1179,7 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 .hunt-stars{display:flex;align-items:center;gap:7px;
   background:linear-gradient(180deg,rgba(15,23,42,.74),rgba(30,41,59,.52));border:1px solid rgba(125,211,252,.20);
   padding:6px 13px;border-radius:999px;font-weight:900;color:var(--gold);
-  backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+  backdrop-filter:blur(10px) saturate(1.05);-webkit-backdrop-filter:blur(10px) saturate(1.05);
   box-shadow:0 14px 32px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.09),0 0 12px rgba(255,212,94,.08)}
 .hunt-stars .ico{font-size:15px}
 .hunt-stars .hl{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.3px}
@@ -1187,7 +1187,7 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 .hunt-stars.bump{animation:doneBump .5s ease}
 .hunt-audio{width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;
   color:var(--text);background:linear-gradient(180deg,rgba(15,23,42,.7),rgba(30,41,59,.5));border:1px solid rgba(125,211,252,.20);
-  backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+  backdrop-filter:blur(10px) saturate(1.05);-webkit-backdrop-filter:blur(10px) saturate(1.05);
   box-shadow:0 10px 24px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.09);
   transition:transform .15s,box-shadow .2s}
 .hunt-audio:hover{transform:scale(1.06);box-shadow:0 0 20px rgba(150,170,255,.4)}
@@ -2466,6 +2466,7 @@ SCENES.hunt=()=>{
   //      instead of stalling on a few hundred extra nodes. ----
   const buildAmbient=()=>{
     if(state.currentScene!=="hunt" || !wrap.isConnected) return;
+    wrap.classList.add("amb");                             // enable the blurred nebula wisps now (off the entry path)
     addHuntDeco(wrap);                                     // faint background stars + Milky Way, behind the field
     // gentle decorative dust in the empty right strip below the mission tablet
     const glow=document.createElement("div"); glow.className="hunt-dustglow";
@@ -2953,7 +2954,7 @@ SCENES.discover=()=>{
       }
     } else { attemptScored=false; setSay("Keep connecting to match the picture!",false); }
   }});
-  setTimeout(()=>{ if(state.currentScene==="discover" && fieldBox.isConnected) addSkyAtmosphere(fieldBox); },0);   // build atmosphere after first paint (avoids entry lag)
+  setTimeout(()=>{ if(state.currentScene==="discover" && fieldBox.isConnected){ fieldBox.classList.add("amb"); addSkyAtmosphere(fieldBox); } },0);   // build atmosphere + wisps after first paint (avoids entry lag)
 
   // segmented control: Back | Reset | Hint
   dock.appendChild(segBtn("↶","Back",()=>{ if(!solved) field.undo(); }));
