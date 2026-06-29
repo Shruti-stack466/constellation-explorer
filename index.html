@@ -35,7 +35,6 @@ body{
     radial-gradient(1000px 760px at 12% 22%, rgba(118,66,206,.15), transparent 60%),
     radial-gradient(1100px 800px at 50% 56%, rgba(4,3,14,.45), transparent 70%),
     linear-gradient(160deg,#160e30 0%,#0b0922 45%,#060512 78%,#000 100%);
-  background-attachment:fixed;
   font-size:18px;
   line-height:1.55;
   -webkit-font-smoothing:antialiased;
@@ -2172,12 +2171,12 @@ function videoScene(src, doneLabel, onAdvance){
   screen.appendChild(s);
 
   let done=false;
-  // fully release the video (pause + drop source + free the decoder) BEFORE building the
-  // next scene — otherwise the big MP4 keeps buffering/decoding in the background and
-  // competes with the heavy mission build, causing a noticeable lag on skip.
+  // fully release the video (pause + drop source + free the decoder) and swap straight to the
+  // next scene in the SAME tick — the video frame stays visible until the new scene is ready,
+  // so there's no blank flash; releasing the MP4 stops it buffering/decoding in the background.
   const advance=()=>{ if(done) return; done=true;
     try{ video.pause(); video.removeAttribute("src"); video.load(); }catch(e){}
-    requestAnimationFrame(()=>onAdvance());                          // let the browser paint once before the heavy build
+    onAdvance();
   };
   bar.appendChild(mkBtn("Skip ➜","small",advance));
   // leave just before the end so the clip never freezes on its (blurry) final frame
@@ -2462,14 +2461,15 @@ SCENES.hunt=()=>{
       if(edges.length===prevCount+1){ const e=edges[edges.length-1]; travelParticle(e[0],e[1]); }
       prevCount=edges.length;
     }});
-  addHuntDeco(wrap);                                     // faint background stars + Milky Way, behind the field
-
-  // ---- gentle decorative dust in the empty right strip below the mission tablet ----
-  // (no interactive stars live here — genHuntStars reserves this margin — so it only fills space)
-  (function addPanelDust(){
+  // ---- decorative layers (background star dust, ambient nebula, particles) are built
+  //      AFTER the first paint, so entering the scene shows the playable field + UI instantly
+  //      instead of stalling on a few hundred extra nodes. ----
+  const buildAmbient=()=>{
+    if(state.currentScene!=="hunt" || !wrap.isConnected) return;
+    addHuntDeco(wrap);                                     // faint background stars + Milky Way, behind the field
+    // gentle decorative dust in the empty right strip below the mission tablet
     const glow=document.createElement("div"); glow.className="hunt-dustglow";
-    glow.style.cssText+=";width:34vw;height:34vw;right:-5vw;top:54%";
-    wrap.appendChild(glow);
+    glow.style.cssText+=";width:34vw;height:34vw;right:-5vw;top:54%"; wrap.appendChild(glow);
     const box=document.createElement("div"); box.className="hunt-dustfield";
     box.style.cssText+=";top:52%;right:0;width:30%;height:46%";
     for(let i=0;i<13;i++){ const d=document.createElement("div"); d.className="hunt-dust";
@@ -2481,23 +2481,21 @@ SCENES.hunt=()=>{
       d.style.animationDelay=(Math.random()*5).toFixed(1)+"s";
       box.appendChild(d); }
     wrap.appendChild(box);
-  })();
-
-  // ---- ambient depth: nebula + floating particles + occasional shooting star ----
-  if(!reduceMotion){
-    const gal=document.createElement("div"); gal.className="hunt-galaxy"; wrap.appendChild(gal);
-    const na=document.createElement("div"); na.className="hunt-neb a"; wrap.appendChild(na);
-    const nb=document.createElement("div"); nb.className="hunt-neb b"; wrap.appendChild(nb);
-    const nc=document.createElement("div"); nc.className="hunt-neb c"; wrap.appendChild(nc);
-    const fly=document.createElement("div"); fly.style.cssText="position:absolute;inset:0;pointer-events:none;z-index:0"; wrap.appendChild(fly);
-    for(let i=0;i<16;i++){ const f=document.createElement("div"); f.className="hunt-fly";
-      f.style.left=(Math.random()*100).toFixed(1)+"%"; f.style.top=(Math.random()*100).toFixed(1)+"%";
-      f.style.setProperty("--dx",(Math.random()*50-25).toFixed(0)+"px");
-      f.style.setProperty("--dy",(-20-Math.random()*50).toFixed(0)+"px");
-      f.style.setProperty("--d",(7+Math.random()*7).toFixed(1)+"s");
-      f.style.animationDelay=(Math.random()*6).toFixed(1)+"s"; fly.appendChild(f); }
-    scheduleHuntShoot(wrap);
-  }
+    if(!reduceMotion){
+      const na=document.createElement("div"); na.className="hunt-neb a"; wrap.appendChild(na);
+      const nb=document.createElement("div"); nb.className="hunt-neb b"; wrap.appendChild(nb);
+      const nc=document.createElement("div"); nc.className="hunt-neb c"; wrap.appendChild(nc);
+      const fly=document.createElement("div"); fly.style.cssText="position:absolute;inset:0;pointer-events:none;z-index:0"; wrap.appendChild(fly);
+      for(let i=0;i<16;i++){ const f=document.createElement("div"); f.className="hunt-fly";
+        f.style.left=(Math.random()*100).toFixed(1)+"%"; f.style.top=(Math.random()*100).toFixed(1)+"%";
+        f.style.setProperty("--dx",(Math.random()*50-25).toFixed(0)+"px");
+        f.style.setProperty("--dy",(-20-Math.random()*50).toFixed(0)+"px");
+        f.style.setProperty("--d",(7+Math.random()*7).toFixed(1)+"s");
+        f.style.animationDelay=(Math.random()*6).toFixed(1)+"s"; fly.appendChild(f); }
+      scheduleHuntShoot(wrap);
+    }
+  };
+  setTimeout(buildAmbient,0);                              // run after the scene's first paint
 
   // ---- magic helpers (SVG sparkle / ripple / travelling line particle) ----
   const NS="http://www.w3.org/2000/svg";
@@ -2955,7 +2953,7 @@ SCENES.discover=()=>{
       }
     } else { attemptScored=false; setSay("Keep connecting to match the picture!",false); }
   }});
-  addSkyAtmosphere(fieldBox);   // same premium night-sky as the Mission Hunt screen
+  setTimeout(()=>{ if(state.currentScene==="discover" && fieldBox.isConnected) addSkyAtmosphere(fieldBox); },0);   // build atmosphere after first paint (avoids entry lag)
 
   // segmented control: Back | Reset | Hint
   dock.appendChild(segBtn("↶","Back",()=>{ if(!solved) field.undo(); }));
