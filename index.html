@@ -1746,8 +1746,18 @@ function gotoStep(step){
   state.huntStep=step;
   if(step>=HUNT_SEQ.length){ show("reward"); return; }
   const c=byId(HUNT_SEQ[step]);
-  show("discover");                                  // every hunt constellation uses the unified discover screen
+  show(c && c.unified ? "discover" : "spot");
 }
+const SPOT_NARR={
+  cassiopeia:"This constellation is called Cassiopeia. Let's spot it in the stars.",
+  orion:"The next constellation is called Orion. Let's spot it.",
+  scorpius:"The next constellation is called Scorpius. Let's spot it."
+};
+const REVEAL_NARR={
+  cassiopeia:"These five stars make a giant W. Long ago, people saw Queen Cassiopeia sitting on her throne — see how the zig-zag looks like a queen seated in her chair?",
+  orion:"Connect these stars and you get Orion the Hunter! The three stars in a row are his belt, and the bright stars are his shoulder and his foot. Can you see the mighty hunter?",
+  scorpius:"This long, curving line is Scorpius the Scorpion. The stars at the top are its claws and head, and the curl is its body and tail — ending in a sharp stinger!"
+};
 /* translucent figure SILHOUETTES drawn over the real stars (viewBox 0..100, x/y =
    star.x*100). fb = filled body part, fl = thick limb, fbody = thick curved body,
    fthin = thin legs — so the figure reads like a real shape, not stick lines. */
@@ -1780,6 +1790,15 @@ const CONSTELLATION_ART={
     '<path class="fthin" d="M54 80 L52 87 M64 78 L66 85"/>'        // legs (right)
 };
 /* build the reveal diagram: figure art behind, glowing constellation lines + stars on top */
+function buildRevealSVG(c){
+  const X=i=>(c.stars[i].x*100).toFixed(1), Y=i=>(c.stars[i].y*100).toFixed(1);
+  const edges=c.edges.map(([a,b])=>'<line x1="'+X(a)+'" y1="'+Y(a)+'" x2="'+X(b)+'" y2="'+Y(b)+'" class="rv-edge"/>').join("");
+  const stars=c.stars.map((st,i)=>'<circle cx="'+X(i)+'" cy="'+Y(i)+'" r="'+(st.bright?2.6:1.8)+'" class="rv-star'+(st.bright?" br":"")+'"/>').join("");
+  const art=c.noFigureOverlay ? "" : (CONSTELLATION_ART[c.id]||"");
+  return '<svg viewBox="0 0 100 100" class="revealsvg" preserveAspectRatio="xMidYMid meet">'+art+edges+stars+'</svg>';
+}
+
+
 /* ============================================================
    SYSTEM 3 — VALIDATION  (judges connections vs a target set)
    ============================================================ */
@@ -1842,6 +1861,31 @@ function show(name){
   renderProgress();
   screen.scrollTop=0;
   SCENES[name]();
+}
+
+/* generic dialogue runner: lines=[{who,text}], onDone() */
+function runDialogue(container, lines, onDone, primaryLabel){
+  let i=0;
+  const box=document.createElement("div");
+  box.className="dialogue";
+  container.appendChild(box);
+  function render(){
+    const ln=lines[i];
+    const whoCls=ln.who==="Kabir"?"kabir":ln.who==="Meera"?"meera":"narr";
+    box.innerHTML=
+      (ln.who!=="Narrator"?avatar(ln.who.toLowerCase()):'<div class="avatar" aria-hidden="true">📖</div>')+
+      '<div style="flex:1"><div class="who '+whoCls+'">'+ (ln.who==="Narrator"?"":ln.who) +'</div>'+
+      '<div class="line">'+ln.text+'</div></div>';
+    const btn=document.createElement("button");
+    btn.className="next";
+    const last=i===lines.length-1;
+    btn.textContent = last?"✓":"➜";
+    btn.setAttribute("aria-label", last?(primaryLabel||"Continue"):"Next line");
+    btn.onclick=()=>{ if(last){ onDone(); } else { i++; render(); } };
+    box.appendChild(btn);
+    Speech.speak(ln.text, null, ln.who);
+  }
+  render();
 }
 
 /* decorative twinkles */
@@ -1916,14 +1960,19 @@ function stopHuntAudio(){
   if(huntAudio){ try{ huntAudio.pause(); huntAudio.currentTime=0; }catch(e){}
     huntAudio.onended=null; huntAudio=null; }
 }
-/* shapes-left → dialogue-bubble text, shown after each shape is claimed */
+function playHunt(file){
+  stopHuntAudio(); Speech.stop();
+  const a=new Audio(); a.preload="auto"; a.src=encodeURI("Audio/"+file);
+  huntAudio=a; const p=a.play(); if(p&&p.catch) p.catch(()=>{});
+}
+/* shapes-left → dialogue-bubble text + the matching narration clip, played after each shape is claimed */
 const HUNT_CUES={
-  6:{t:"Yeah! 6 more shapes to find."},
-  5:{t:"Superb! 5 more shapes to find."},
-  4:{t:"Keep going! 4 more shapes to find."},
-  3:{t:"Keep going! Only 3 more left."},
-  2:{t:"Very close! Only 2 more left."},
-  1:{t:"Hurray! Just 1 left."},
+  6:{t:"Yeah! 6 more shapes to find.",       a:"6 more shapes to find.wav"},
+  5:{t:"Superb! 5 more shapes to find.",     a:"5 more shapes to find.wav"},
+  4:{t:"Keep going! 4 more shapes to find.", a:"4 more shapes to find.wav"},
+  3:{t:"Keep going! Only 3 more left.",      a:"3 more left.wav"},
+  2:{t:"Very close! Only 2 more left.",      a:"2 more left.wav"},
+  1:{t:"Hurray! Just 1 left.",               a:"1 left.wav"},
 };
 
 /* ---------- OPENING / TITLE PAGE — premium night-sky home screen ----------
@@ -2640,6 +2689,173 @@ function revealConstellation(){
   videoScene("videos/video-13.mp4","Let's Go! ➜",()=>gotoStep(0));
 }
 
+/* ---------- SCENE 6: SPOT (full-screen constellation image + Meera) ---------- */
+SCENES.spot=()=>{
+  Speech.stop();
+  screen.innerHTML="";
+  Rewards.setTitle("Star Spotter");
+  const step=state.huntStep||0;
+  const c=byId(HUNT_SEQ[step]);
+
+  const s=document.createElement("div"); s.className="scene spot-stage";
+  // full constellation image, shown whole (no crop) over a blurred fill of itself
+  const bg=document.createElement("img"); bg.className="spot-bg";
+  const pic=document.createElement("img"); pic.className="spot-pic"; pic.alt=c.name;
+  const src=encodeURI(c.img); bg.src=src; pic.src=src;
+  const fb=document.createElement("div"); fb.className="sky-bg"; twinkles(fb,70);
+  fb.style.cssText+=";position:absolute;inset:0;z-index:0;display:none";
+  pic.onerror=()=>{ pic.style.display="none"; bg.style.display="none"; fb.style.display=""; };
+  s.appendChild(fb); s.appendChild(bg); s.appendChild(pic);
+
+  // small, sophisticated floating dialogue box (Meera)
+  const NARR=SPOT_NARR[c.id]||("This constellation is called "+c.name+". Let's spot it.");
+  const bubble=document.createElement("div"); bubble.className="spot-bubble";
+  bubble.innerHTML=((typeof IMG!=="undefined"&&IMG.meera)?'<img class="face" src="'+IMG.meera+'" alt="Meera">':'')+
+    '<div class="say"><div class="who">Meera</div>'+NARR+'</div>';
+  s.appendChild(bubble);
+
+  // golden Next in the bottom-right corner → tracing page
+  const next=mkBtn("Next ➜","pulse spot-next",()=>show("trace"));
+  s.appendChild(next);
+
+  screen.appendChild(s);
+  Speech.speak(NARR, null, "Meera");
+};
+
+/* ---------- SCENE 7: TRACING (full-screen) ---------- */
+SCENES.trace=()=>{
+  Speech.stop();
+  const step=state.huntStep||0;
+  const c=byId(HUNT_SEQ[step]);
+  screen.innerHTML="";
+
+  const s=document.createElement("div"); s.className="scene trace-stage";
+  // full-screen star field — the tracing area
+  const fieldBox=document.createElement("div"); fieldBox.className="tracefield"; s.appendChild(fieldBox);
+
+  // left rail: reference image, Meera + floating bubble, controls
+  const rail=document.createElement("div"); rail.className="trace-rail";
+  const ref=document.createElement("div"); ref.className="trace-ref"; ref.innerHTML='<div class="rlabel">REFERENCE</div>';
+  if(c.img){ const im=document.createElement("img"); im.src=encodeURI(c.img); im.alt=c.name+" reference"; ref.appendChild(im); }
+  else { const d=document.createElement("div"); ref.appendChild(d); drawDiagram(d,c.stars,c.edges,"150"); }
+  rail.appendChild(ref);
+  const meera=document.createElement("div"); meera.className="trace-meera";
+  meera.innerHTML=((typeof IMG!=="undefined"&&IMG.meera)?'<img class="face" src="'+IMG.meera+'" alt="Meera">':'')+
+    '<div class="trace-bubble"><div class="who">Meera</div><span id="traceMsg"></span></div>';
+  rail.appendChild(meera);
+  const controls=document.createElement("div"); controls.className="trace-controls"; rail.appendChild(controls);
+  s.appendChild(rail);
+
+  // clue, top-right (golden)
+  const clueWrap=document.createElement("div"); clueWrap.className="trace-clue"; s.appendChild(clueWrap);
+
+  screen.appendChild(s);
+
+  function setMsg(t){ const m=document.getElementById("traceMsg"); if(m) m.textContent=t; Speech.speak(t,null,"Meera"); }
+  function setMsgQuiet(t){ const m=document.getElementById("traceMsg"); if(m) m.textContent=t; }
+
+  // build the busy sky after measuring, so the stars spread evenly across the screen
+  const aspect=Math.max(1.15,(fieldBox.clientWidth||window.innerWidth)/(fieldBox.clientHeight||window.innerHeight));
+  const lf=buildLevelFieldFS(c, aspect);
+  let solved=false, cuesUsed=0, failCount=0, attemptScored=false;
+  const MAXCLUES=5;
+  const targetCount=c.edges.length;                 // how many lines the shape has
+  const targetStars=new Set(c.edges.flat()).size;   // how many stars the shape uses
+  const SHAPE_TOL=(c.tol!=null)?c.tol:0.22;          // visual similarity tolerance
+
+  /* The child may connect ANY stars, but the traced figure must either match the
+     reference connections or strongly overlap the reference shape. */
+  function isMatch(){ return shapesMatch(c.stars,c.edges, lf.stars,field.edges(), SHAPE_TOL); }
+
+  const field=createStarField(fieldBox,lf.stars,{starScale:0.45, vbW:Math.round(100*aspect), onChange:()=>{
+    if(solved) return;
+    const n=field.edges().length;
+    if(isMatch()){ win(); return; }
+    if(n===0){ attemptScored=false; setMsgQuiet("Find the stars and connect them to make the shape in the picture."); return; }
+    // a full attempt (enough lines) that doesn't match → tell the child to redo
+    if(n>=targetCount){
+      if(!attemptScored){
+        attemptScored=true; failCount++; Sfx.retry();
+        if(failCount>=2) setMsg("That doesn't look like "+c.name+" yet. Tap the 💡 Clue button in the top-right corner for help.");
+        else setMsg("Hmm, that doesn't look like the picture. Tap Clear and try again.");
+      }
+    } else { attemptScored=false; setMsgQuiet("Keep connecting the stars to match the picture…"); }
+  }});
+
+  // small golden Undo / Clear / Continue (Continue unlocks when solved)
+  controls.appendChild(mkBtn("↶ Undo","small",()=>{ if(!solved) field.undo(); }));
+  controls.appendChild(mkBtn("⟲ Clear","small",()=>{ if(!solved){ field.clear(); setMsgQuiet("Find some stars and connect them to make the shape in the picture."); } }));
+  const cont=mkBtn("Continue ➜","small",()=>{ if(solved) show("reveal"); }); cont.disabled=true;
+  controls.appendChild(cont);
+
+  // clue button (golden), up to 5 hints
+  const cueBtn=mkBtn("💡 Clue ("+MAXCLUES+")","small",()=>{
+    if(solved||cuesUsed>=MAXCLUES) return;
+    cuesUsed++;
+    if(cuesUsed===1){ field.highlight(lf.brightIdx); setMsg("Start with the brightest stars — find them first."); }
+    else if(cuesUsed===2){ field.highlight(lf.constIdx); setMsg("These glowing stars make the shape. Connect them like the picture."); }
+    else {
+      const have=new Set(field.keys());
+      const ne=lf.edges.find(([a,b])=>!have.has(Math.min(a,b)+"-"+Math.max(a,b)));
+      if(ne){ field.highlight([ne[0],ne[1]]); field.ghost(ne[0],ne[1]); setMsg("Follow the dotted line next."); }
+      else { field.highlight(lf.constIdx); setMsg("Connect the glowing stars just like the picture."); }
+    }
+    cueBtn.textContent=cuesUsed>=MAXCLUES?"💡 No clues left":"💡 Clue ("+(MAXCLUES-cuesUsed)+")";
+    if(cuesUsed>=MAXCLUES) cueBtn.disabled=true;
+  });
+  clueWrap.appendChild(cueBtn);
+
+  function win(){
+    solved=true; Sfx.win();
+    if(!state.huntLevelsComplete.includes(c.id)) state.huntLevelsComplete.push(c.id);
+    Rewards.earn(4);
+    if(cuesUsed===0){ Rewards.earn(2); Rewards.giveBadge("IE","Independent Explorer","Solved with no clues","🧭"); }
+    Rewards.giveBadge("SW","Stargazer","Traced your first constellation","✨");
+    renderProgress();
+    cueBtn.disabled=true;
+    cont.disabled=false; cont.classList.add("pulse");
+    setMsg("Yes! You found "+c.name+"! Press Continue.");
+  }
+
+  setMsg("Find the stars that match the picture and connect them. Tap Clue if you get stuck.");
+};
+
+/* ---------- SCENE 7b: REVEAL (why it's called X — figure drawn around the stars) ---------- */
+SCENES.reveal=()=>{
+  Speech.stop();
+  const step=state.huntStep||0;
+  const c=byId(HUNT_SEQ[step]);
+  screen.innerHTML="";
+
+  const s=document.createElement("div"); s.className="scene reveal-stage";
+  const sky=document.createElement("div"); sky.className="sky-bg"; twinkles(sky,90); s.appendChild(sky);
+
+  const title=document.createElement("div"); title.className="reveal-title";
+  title.textContent="This is why it's called "+c.name;
+  s.appendChild(title);
+
+  // the constellation, with the figure line-art drawn around the real stars
+  const art=document.createElement("div"); art.className="reveal-art"; art.innerHTML=buildRevealSVG(c);
+  s.appendChild(art);
+
+  // Meera explains, in a floating dialogue box (bottom-left)
+  const why=REVEAL_NARR[c.id]||c.why;
+  const coach=document.createElement("div"); coach.className="reveal-coach";
+  coach.innerHTML=((typeof IMG!=="undefined"&&IMG.meera)?'<img class="face" src="'+IMG.meera+'" alt="Meera">':'')+
+    '<div class="say"><div class="who">Meera</div>'+why+'</div>';
+  s.appendChild(coach);
+
+  // golden Next / Finish in the bottom-right corner
+  const last=step>=HUNT_SEQ.length-1;
+  const next=mkBtn(last?"Finish ✓":"Next ➜","pulse reveal-next",()=>{
+    if(last){ show("reward"); } else { gotoStep(step+1); }
+  });
+  s.appendChild(next);
+
+  screen.appendChild(s);
+  Speech.speak(why, null, "Meera");
+};
+
 /* ---------- UNIFIED DISCOVER SCREEN (Meera + book, trace, in-place reveal) ---------- */
 SCENES.discover=()=>{
   Speech.stop();
@@ -3028,6 +3244,38 @@ function buildSharedField(aspect){
   }
   _sharedFieldCache={key, stars, map};
   return _sharedFieldCache;
+}
+
+/* build the full-screen tracing field: the constellation (placed in a central
+   region) among an EVENLY-SPREAD grid of decoy stars — no random clusters. */
+function buildLevelFieldFS(con, aspect){
+  // place the constellation in a central region, PRESERVING its true proportions
+  // (uniform scale) so it looks exactly like the reference picture.
+  const xs=con.stars.map(s=>s.x), ys=con.stars.map(s=>s.y);
+  const minx=Math.min.apply(null,xs), maxx=Math.max.apply(null,xs);
+  const miny=Math.min.apply(null,ys), maxy=Math.max.apply(null,ys);
+  const bw=Math.max(0.001,maxx-minx), bh=Math.max(0.001,maxy-miny);
+  const scale=Math.min((0.52*aspect)/bw, 0.52/bh);
+  const cxF=0.60*aspect, cyF=0.46, bcx=(minx+maxx)/2, bcy=(miny+maxy)/2;
+  const stars=con.stars.map(st=>({ x:cxF+(st.x-bcx)*scale, y:cyF+(st.y-bcy)*scale, bright:st.bright?1:0 }));
+  const constIdx=con.stars.map((_,i)=>i);     // constellation stars stay indices 0..n-1
+  const brightIdx=con.bright.slice();
+  // even grid of decoys; left margin clears the rail, minD keeps them off the answer
+  const rows=5, cols=Math.max(7, Math.round(7*aspect));
+  const mL=0.26*aspect, mR=0.05*aspect, my=0.12, minD=0.06*aspect;
+  for(let r=0;r<rows;r++){
+    for(let cc=0;cc<cols;cc++){
+      const i=r*cols+cc;
+      const x=mL+(aspect-mL-mR)*(cols<2?0.5:cc/(cols-1));
+      const y=my+(1-2*my)*(rows<2?0.5:r/(rows-1));
+      const px=x+(((i*37)%5)-2)*0.009*aspect, py=y+(((i*53)%5)-2)*0.010;
+      let ok=true;
+      for(let k=0;k<stars.length;k++){ if(Math.hypot(stars[k].x-px,stars[k].y-py)<minD){ ok=false; break; } }
+      if(ok) stars.push({x:px,y:py});
+    }
+  }
+  const edges=con.edges.map(e=>[e[0],e[1]]);
+  return {stars, edges, target:keyset(edges), constIdx, brightIdx};
 }
 
 /* ---- shape matching: does the traced figure REALLY match the reference? ----
