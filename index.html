@@ -2172,7 +2172,13 @@ function videoScene(src, doneLabel, onAdvance){
   screen.appendChild(s);
 
   let done=false;
-  const advance=()=>{ if(done) return; done=true; try{ video.pause(); }catch(e){} onAdvance(); };
+  // fully release the video (pause + drop source + free the decoder) BEFORE building the
+  // next scene — otherwise the big MP4 keeps buffering/decoding in the background and
+  // competes with the heavy mission build, causing a noticeable lag on skip.
+  const advance=()=>{ if(done) return; done=true;
+    try{ video.pause(); video.removeAttribute("src"); video.load(); }catch(e){}
+    requestAnimationFrame(()=>onAdvance());                          // let the browser paint once before the heavy build
+  };
   bar.appendChild(mkBtn("Skip ➜","small",advance));
   // leave just before the end so the clip never freezes on its (blurry) final frame
   video.addEventListener("timeupdate",()=>{
