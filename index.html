@@ -120,30 +120,7 @@ body{
 .btn.ghost:hover{border-color:var(--gold);background:rgba(255,212,94,.08)}
 .btn.small{font-size:16px;padding:11px 20px;min-height:48px}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,212,94,.55)}70%{box-shadow:0 0 0 14px rgba(255,212,94,0)}100%{box-shadow:0 0 0 0 rgba(255,212,94,0)}}
-/* opening-story dialogue speech bubble */
-.story-bubble{position:absolute;z-index:4;max-width:min(78%,520px);display:flex;gap:12px;align-items:flex-end;animation:fade .45s ease}
-.story-bubble .face{width:64px;height:64px;border-radius:50%;object-fit:cover;flex:0 0 auto;border:3px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,.45);background:#10153a}
-.story-bubble .say{position:relative;background:rgba(255,255,255,.96);color:#1a1c3a;border-radius:18px;padding:12px 16px;box-shadow:0 6px 22px rgba(0,0,0,.35)}
-.story-bubble .who{font-weight:800;font-size:13px;letter-spacing:.4px;color:#5a3bd0;margin-bottom:2px}
-.story-bubble .txt{font-size:clamp(16px,2.4vw,21px);line-height:1.32;font-weight:600}
-.story-bubble .say::after{content:"";position:absolute;bottom:14px;width:0;height:0;border:9px solid transparent}
-.story-bubble.left .say::after{left:-16px;border-right-color:rgba(255,255,255,.96)}
-.story-bubble.right{flex-direction:row-reverse}
-.story-bubble.right .say::after{right:-16px;border-left-color:rgba(255,255,255,.96)}
-/* scene 1 narrator: wide, low "cinema subtitle" bar */
-.story-bubble.center{left:50%;transform:translateX(-50%);flex-direction:column;align-items:center;text-align:center;width:min(96%,1180px);max-width:none}
-.story-bubble.center .say{
-  width:100%;padding:11px 28px;border-radius:12px;
-  background:rgba(6,8,22,.62);
-  border:1px solid rgba(255,255,255,.10);
-  box-shadow:0 6px 24px rgba(0,0,0,.45);
-  backdrop-filter:blur(5px);
-  animation:floatY 3.2s ease-in-out infinite
-}
 @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@media (prefers-reduced-motion: reduce){.story-bubble.center .say{animation:none}}
-.story-bubble.center .txt{font-size:clamp(13px,1.8vw,18px);line-height:1.34;color:#f4f6ff;letter-spacing:.2px;text-shadow:0 1px 4px rgba(0,0,0,.7)}
-.story-bubble.center .say::after{display:none}
 
 /* ---------- dialogue bubble ---------- */
 .dialogue{
@@ -166,12 +143,6 @@ img.avatar{border-radius:50%;object-fit:cover;object-position:50% 12%;
 .dialogue .who.meera{color:#9fe0ff}
 .dialogue .who.narr{color:var(--muted)}
 .dialogue .line{font-size:21px;line-height:1.5}
-/* compact dialogue (keeps full scene art visible, e.g. Morning Park) */
-.compact-dlg{gap:10px;padding-top:10px;padding-bottom:14px}
-.compact-dlg .dialogue{padding:10px 14px}
-.compact-dlg .dialogue .avatar{width:44px;height:44px}
-.compact-dlg .dialogue .line{font-size:18px;line-height:1.4}
-.compact-dlg .dialogue .next{width:42px;height:42px;font-size:20px}
 .dialogue .next{
   margin-left:auto;align-self:center;background:var(--gold);color:#241a00;border:none;
   width:48px;height:48px;border-radius:50%;font-size:22px;cursor:pointer;flex:none;font-weight:900;
@@ -1087,7 +1058,6 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 .coach .coach-face{width:234px;height:408px;object-fit:cover;object-position:42% 28%;flex:0 0 auto;
   border:0;border-radius:0;background:none;box-shadow:none;
   filter:drop-shadow(0 8px 16px rgba(0,0,0,.5)) drop-shadow(0 0 18px rgba(255,212,94,.22))}
-@keyframes coachBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 .coach.cheer .coach-face{animation:coachCheer .8s ease}
 @keyframes coachCheer{0%{transform:translateY(0) scale(1)}30%{transform:translateY(-12px) scale(1.08)}55%{transform:translateY(-4px) scale(1.04)}100%{transform:translateY(0) scale(1)}}
 .coach.think .coach-face{animation:coachThink 1s ease}
@@ -1735,7 +1705,6 @@ const CONSTELLATIONS=[
            [1,2],[2,5],[5,9],[7,8],[8,12],[8,10],[10,11]], bright:[0,1,5,6,13] },
 ];
 CONSTELLATIONS.forEach(c=>c.target=keyset(c.edges));
-const GALLERY_IDS=["orion","dipper","scorpius","cassiopeia"];
 const byId=id=>CONSTELLATIONS.find(c=>c.id===id);
 
 /* ===== Constellation hunt sequence: spot → trace → "why it's called X" reveal ===== */
@@ -1863,30 +1832,6 @@ function show(name){
   SCENES[name]();
 }
 
-/* generic dialogue runner: lines=[{who,text}], onDone() */
-function runDialogue(container, lines, onDone, primaryLabel){
-  let i=0;
-  const box=document.createElement("div");
-  box.className="dialogue";
-  container.appendChild(box);
-  function render(){
-    const ln=lines[i];
-    const whoCls=ln.who==="Kabir"?"kabir":ln.who==="Meera"?"meera":"narr";
-    box.innerHTML=
-      (ln.who!=="Narrator"?avatar(ln.who.toLowerCase()):'<div class="avatar" aria-hidden="true">📖</div>')+
-      '<div style="flex:1"><div class="who '+whoCls+'">'+ (ln.who==="Narrator"?"":ln.who) +'</div>'+
-      '<div class="line">'+ln.text+'</div></div>';
-    const btn=document.createElement("button");
-    btn.className="next";
-    const last=i===lines.length-1;
-    btn.textContent = last?"✓":"➜";
-    btn.setAttribute("aria-label", last?(primaryLabel||"Continue"):"Next line");
-    btn.onclick=()=>{ if(last){ onDone(); } else { i++; render(); } };
-    box.appendChild(btn);
-    Speech.speak(ln.text, null, ln.who);
-  }
-  render();
-}
 
 /* decorative twinkles */
 function twinkles(host,n){
@@ -3138,7 +3083,7 @@ SCENES.discover=()=>{
   // After the child names the shape, Meera asks WHY; once she finishes, a reason box appears.
   function afterGuess(ans){
     setStep("explain");
-    const q="Interesting! Why do you think this looks like "+esc(ans)+"?";
+    const q="Interesting! Why do you think it looks like that?";
     sayThen(q, guard(()=>textPrompt("I think it's because…","Type your reason here…",80,reason=>afterReason(ans,reason))));
   }
 
@@ -3177,7 +3122,7 @@ SCENES.discover=()=>{
     } else {
       // child said everyone would see the SAME shape (or answer was unclear)
       sayThen("Different people can see different things in the same stars!", guard(()=>
-        sayThen("You saw "+esc(phrase)+", but long ago people saw this as "+seenAs+"!", guard(()=>
+        sayThen("And long ago, people saw this as "+seenAs+"!", guard(()=>
           sayThen(last?"You have found them all!":"Let's move to the next constellation.", guard(showNext))))));
     }
   }
