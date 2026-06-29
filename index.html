@@ -31,9 +31,11 @@ body{
   font-family:var(--font);
   color:var(--text);
   background:
-    radial-gradient(1200px 700px at 50% -10%, #243069 0%, transparent 60%),
-    radial-gradient(900px 600px at 80% 110%, #1a1146 0%, transparent 55%),
-    var(--indigo-900);
+    radial-gradient(1200px 820px at 82% 8%, rgba(190,72,200,.20), transparent 60%),
+    radial-gradient(1000px 760px at 12% 22%, rgba(118,66,206,.15), transparent 60%),
+    radial-gradient(1100px 800px at 50% 56%, rgba(4,3,14,.45), transparent 70%),
+    linear-gradient(160deg,#160e30 0%,#0b0922 45%,#060512 78%,#000 100%);
+  background-attachment:fixed;
   font-size:18px;
   line-height:1.55;
   -webkit-font-smoothing:antialiased;
@@ -66,31 +68,33 @@ body{
 .track{width:26px;height:3px;background:var(--indigo-line);border-radius:3px}
 .track.done{background:var(--gold)}
 
+/* premium "Sky Stars" HUD pill (shown in the explorer scenes) */
 .coins{
   display:flex;align-items:center;gap:8px;
-  background:var(--indigo-card);border:1px solid var(--indigo-line);
-  padding:8px 16px;border-radius:var(--pill);font-weight:800;font-size:18px;
+  background:linear-gradient(180deg,rgba(40,48,104,.9),rgba(22,28,64,.92));
+  border:1px solid rgba(255,212,94,.4);
+  padding:7px 15px;border-radius:var(--pill);font-weight:900;font-size:18px;color:var(--gold);
+  box-shadow:0 6px 16px rgba(0,0,0,.35),inset 0 0 16px rgba(255,212,94,.12),0 0 14px rgba(255,212,94,.18);
 }
 .coins.hidden{display:none}
-.coins .ico{font-size:20px}
+.coins .ico{font-size:18px}
+.coins .coin-label{font-size:12.5px;font-weight:800;color:var(--muted);letter-spacing:.3px}
+.coins #coinval{font-size:19px;color:#fff}
+.coins .coin-rank{font-size:13px;letter-spacing:1px;color:var(--gold)}
 .coins.spend{animation:tickdown .5s ease}
 @keyframes tickdown{0%{transform:translateY(0)}40%{transform:translateY(4px);color:var(--coral)}100%{transform:translateY(0)}}
 .coins.earn{animation:tickup .5s ease}
 @keyframes tickup{0%{transform:translateY(0)}40%{transform:translateY(-4px);color:var(--gold)}100%{transform:translateY(0)}}
 
-.narr-toggle{
-  display:flex;align-items:center;gap:8px;cursor:pointer;
-  background:var(--indigo-card);border:1px solid var(--indigo-line);
-  padding:8px 14px;border-radius:var(--pill);font-weight:700;font-size:15px;color:var(--text);
-  min-height:44px;
+/* sound on/off — a single round speaker icon button */
+.snd-toggle{
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  width:48px;height:48px;border-radius:50%;
+  background:var(--indigo-card);border:1px solid var(--indigo-line);color:var(--text);
 }
-.narr-toggle:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-.narr-toggle .sw{
-  width:38px;height:22px;border-radius:var(--pill);background:var(--indigo-line);position:relative;transition:.2s;flex:none;
-}
-.narr-toggle .sw::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--muted);transition:.2s}
-.narr-toggle.on .sw{background:var(--gold)}
-.narr-toggle.on .sw::after{left:18px;background:#1a1a2e}
+.snd-toggle .snd-ico{font-size:22px;line-height:1}
+.snd-toggle:not(.on){filter:grayscale(.7) brightness(.8)}
+.snd-toggle:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 
 /* ---------- scene host ---------- */
 #screen{flex:1;display:flex;flex-direction:column;position:relative;min-height:0}
@@ -199,13 +203,15 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 .starnode.bright .starshape{fill:var(--gold);stroke:#fff6cf;
   filter:drop-shadow(0 0 3px var(--gold-deep))}
 .starnode.sel .starshape,.starnode.used .starshape,.starnode:hover .starshape{fill:var(--gold);stroke:#fff6cf;
-  filter:drop-shadow(0 0 6px var(--gold)) drop-shadow(0 0 14px var(--gold-deep)) drop-shadow(0 0 22px var(--gold-deep))}
+  filter:drop-shadow(0 0 1.6px var(--gold))}
 .starhit{cursor:pointer;fill:transparent}
 .starhit:focus-visible{outline:3px solid var(--gold);outline-offset:1px;border-radius:50%}
 .starnode.hint .starshape{animation:starpulse 1.05s ease-in-out infinite;
   transform-box:fill-box;transform-origin:center}
 @keyframes starpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.55)}}
 .edge{stroke:var(--gold);stroke-width:1.1;stroke-linecap:round;filter:drop-shadow(0 0 3px var(--gold-deep))}
+/* lines the child draws to connect stars (Activity 1 hunt + Activity 2 trace): thin & white */
+.field .edge{stroke:#fff;stroke-width:.5;filter:none}
 .edge.draw{animation:dash .13s linear}
 @keyframes dash{from{stroke-dasharray:120;stroke-dashoffset:120}to{stroke-dashoffset:0}}
 .ghost{stroke:var(--gold);stroke-width:1;stroke-dasharray:2.5 2.5;opacity:.55}
@@ -321,16 +327,56 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 /* ---------- Pattern Hunt: full-screen redesign ---------- */
 .hunt-stage{position:relative;overflow:hidden}
 .huntfield{position:absolute;inset:0;z-index:0;
-  background:radial-gradient(130% 120% at 50% 0%, #161d49 0%, #0a0e29 80%)}
+  background:
+    radial-gradient(130% 120% at 50% 0%, #0c0c12 0%, #000 80%)}
 .huntfield .starshape{fill:#fff;stroke:#fff}                 /* every star plain white */
-/* shape cards stacked vertically at the TOP-left */
-.shaperail{position:absolute;left:12px;top:14px;z-index:4;
-  display:flex;flex-direction:column;gap:8px;max-height:60%;overflow:auto;padding:4px}
-.shaperail .shapetab{flex-direction:row;justify-content:flex-start;gap:7px;width:112px;padding:5px 9px}
+/* foreground (interactive) stars twinkle */
+.huntfield .starnode .starshape{animation:twinkle 3.4s ease-in-out infinite}
+.huntfield .starnode:nth-child(2n) .starshape{animation-duration:4.2s;animation-delay:.6s}
+.huntfield .starnode:nth-child(3n) .starshape{animation-duration:2.8s;animation-delay:1.2s}
+/* decorative layers: faint background + medium middle stars, and a soft Milky Way band */
+.hf-deco{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+/* .star-dust-layer : a faint diagonal star-dust trail (lavender → magenta → lavender) */
+.hf-milkyway{position:absolute;left:-18%;right:-18%;top:10%;height:70%;transform:rotate(-17deg);
+  filter:blur(40px);opacity:.6;
+  background:linear-gradient(110deg,transparent 0%,rgba(205,175,255,.06) 26%,rgba(236,150,220,.13) 50%,rgba(205,175,255,.06) 74%,transparent 100%)}
+/* .background-stars : many tiny, dim stars in white / pale lavender / pale pink (~40–60% opacity) */
+.hf-star{position:absolute;border-radius:50%;background:#fff}
+.hf-star.tiny{width:1.5px;height:1.5px;animation:twFaint 3s ease-in-out infinite}
+.hf-star.med{width:2.6px;height:2.6px;box-shadow:0 0 4px rgba(222,200,255,.5);
+  animation:twMed 3s ease-in-out infinite,driftDust 17s ease-in-out infinite}        /* medium dust gently drifts */
+.hf-star.tiny:nth-child(3n){background:#e7dbff}      /* pale lavender */
+.hf-star.tiny:nth-child(5n){background:#ffd9ec}      /* pale pink */
+.hf-star.tiny:nth-child(4n){animation:twFaint 3s ease-in-out infinite,driftDust 23s ease-in-out infinite}  /* some tiny dust drifts too */
+.hf-star.tiny:nth-child(7n){animation:twFaint 3s ease-in-out infinite,driftDust 19s ease-in-out infinite}
+.hf-star.med:nth-child(4n){background:#efe6ff}
+@keyframes twFaint{0%,100%{opacity:.5}50%{opacity:.22}}
+@keyframes twMed{0%,100%{opacity:.55}50%{opacity:.28}}
+@keyframes driftDust{0%,100%{transform:translate(0,0)}50%{transform:translate(6px,-5px)}}
+/* Mission panel: the shape cards become a mission tracker, top-left */
+.mission-panel{position:absolute;left:12px;top:14px;z-index:4;width:182px;max-height:90%;
+  display:flex;flex-direction:column;border-radius:16px;overflow:hidden;
+  background:linear-gradient(180deg,rgba(32,40,96,.94),rgba(16,22,56,.94));
+  border:1px solid var(--indigo-line);box-shadow:0 12px 30px rgba(0,0,0,.5);backdrop-filter:blur(4px)}
+.mission-head{padding:9px 12px;border-bottom:1px solid var(--indigo-line);
+  background:linear-gradient(180deg,rgba(255,212,94,.16),rgba(255,212,94,.02))}
+.mission-title{font-weight:900;font-size:12.5px;letter-spacing:.5px;color:var(--gold)}
+.mission-prog{margin-top:4px;font-size:14px;letter-spacing:2px;line-height:1}
+.shaperail{display:flex;flex-direction:column;gap:8px;overflow:auto;padding:9px}
+.shaperail .shapetab{flex-direction:row;justify-content:flex-start;gap:8px;width:100%;padding:6px 10px;
+  background:linear-gradient(180deg,rgba(64,76,150,.55),rgba(40,50,112,.55));box-shadow:0 3px 8px rgba(0,0,0,.32)}
+.shaperail .shapetab:hover{transform:translateY(-2px);box-shadow:0 7px 16px rgba(0,0,0,.42)}
 .shaperail .shapetab .sicon{width:25px;height:25px;flex:0 0 auto}
 .shaperail .shapetab .slabel{font-size:12.5px}
-.shaperail .shapetab .scheck{top:50%;right:7px;font-size:15px;transform:translateY(-50%) scale(.5)}
+.shaperail .shapetab .scheck{position:absolute;top:50%;right:8px;font-size:15px;transform:translateY(-50%) scale(.5)}
 .shaperail .shapetab.done .scheck{transform:translateY(-50%) scale(1)}
+/* completed mission: turns green with a sparkle pop */
+.shaperail .shapetab.done{border-color:var(--green);
+  background:linear-gradient(180deg,rgba(131,232,178,.30),rgba(131,232,178,.10));animation:missionDone .6s ease}
+@keyframes missionDone{0%{transform:scale(1)}30%{transform:scale(1.08)}100%{transform:scale(1)}}
+.shapetab .sspark{position:absolute;top:-7px;right:-3px;font-size:17px;opacity:0;pointer-events:none}
+.shapetab.done .sspark{animation:sparkPop .85s ease}
+@keyframes sparkPop{0%{opacity:0;transform:scale(.3) rotate(-25deg)}45%{opacity:1;transform:scale(1.35) rotate(12deg)}100%{opacity:0;transform:scale(1) rotate(0)}}
 /* Undo / Clear / Continue — small golden tabs in a row, bottom-left corner */
 .hunt-controls{position:absolute;left:14px;bottom:14px;z-index:5;
   display:flex;flex-direction:row;gap:8px;align-items:center;flex-wrap:wrap;max-width:60%}
@@ -341,11 +387,12 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   transition:left .6s cubic-bezier(.2,.8,.2,1),bottom .6s cubic-bezier(.2,.8,.2,1),transform .6s cubic-bezier(.2,.8,.2,1)}
 .coach .coach-face{width:74px;height:74px;border-radius:50%;object-fit:cover;object-position:50% 12%;flex:0 0 auto;
   border:3px solid var(--gold);box-shadow:0 5px 16px rgba(0,0,0,.5);background:#10153a}
-.coach .coach-say{position:relative;max-width:min(34vw,280px);background:rgba(255,255,255,.97);color:#1a1c3a;
-  border-radius:14px;padding:9px 13px;font-weight:700;font-size:clamp(12.5px,1.3vw,15px);line-height:1.3;
-  box-shadow:0 5px 16px rgba(0,0,0,.4);animation:fade .3s ease}
+.coach .coach-say{position:relative;display:flex;align-items:flex-start;gap:5px;max-width:min(24vw,200px);
+  background:rgba(255,255,255,.97);color:#1a1c3a;border-radius:16px;padding:7px 11px;font-weight:700;
+  font-size:clamp(11px,1vw,13px);line-height:1.28;box-shadow:0 6px 18px rgba(0,0,0,.4);animation:fade .3s ease}
+.coach .coach-say .cs-ico{flex:0 0 auto;font-size:14px;line-height:1.25}
 .coach .coach-say:empty{display:none}
-.coach .coach-say::after{content:"";position:absolute;left:-13px;bottom:13px;border:7px solid transparent;border-right-color:rgba(255,255,255,.97)}
+.coach .coach-say::after{content:"";position:absolute;left:-12px;bottom:12px;border:7px solid transparent;border-right-color:rgba(255,255,255,.97)}
 /* finale: Kabir glides to the centre and narrates */
 .coach.center{left:50%;bottom:50%;transform:translate(-50%,50%);flex-direction:column;align-items:center;text-align:center}
 .coach.center .coach-face{width:140px;height:140px}
@@ -380,8 +427,30 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 
 /* ---------- Trace: full-screen tracing ---------- */
 .trace-stage{position:relative;overflow:hidden}
-.tracefield{position:absolute;inset:0;z-index:0;background:radial-gradient(130% 120% at 50% 0%, #161d49 0%, #0a0e29 80%)}
+.tracefield{position:absolute;inset:0;z-index:0;overflow:hidden;
+  background:
+    radial-gradient(58% 50% at 50% 54%, rgba(0,0,6,.52), transparent 70%),
+    radial-gradient(72% 60% at 86% 8%,  rgba(198,74,196,.16), transparent 62%),
+    radial-gradient(64% 58% at 94% 48%, rgba(132,60,206,.17), transparent 64%),
+    radial-gradient(56% 50% at 12% 18%, rgba(116,66,206,.18), transparent 60%),
+    radial-gradient(52% 46% at 22% 88%, rgba(176,58,170,.15), transparent 64%),
+    linear-gradient(160deg, #160e30 0%, #0c0a24 42%, #070614 74%, #020207 100%)}
+.tracefield svg.field{position:relative;z-index:2;animation:huntFieldIn .8s ease both}
 .tracefield .starshape{fill:#fff;stroke:#fff}                /* tracing stars are plain white */
+.tracefield .starnode.bright .starshape{fill:#fff;stroke:#fff;filter:none}   /* no yellow stars */
+/* Activity 2 constellation line — thin white-gold starlight + glowing nodes */
+.tracefield .field .edge{stroke:#FFE8A3;stroke-width:.7;stroke-linecap:round;opacity:.82;
+  filter:drop-shadow(0 0 1.4px #FFD76A) drop-shadow(0 0 4px rgba(255,215,106,.7))}
+.tracefield .field .starnode.used .starshape,.tracefield .field .starnode.sel .starshape{
+  fill:#fff7d6;stroke:#fff;filter:drop-shadow(0 0 2px var(--gold)) drop-shadow(0 0 5px var(--gold-deep))}
+/* when the pattern is found: re-trace the line like drawn starlight, then a gentle pulse */
+.tracefield .field.trace-win .edge{animation:traceDraw .6s ease-out both,traceGlow 2.2s ease-in-out .6s infinite}
+@keyframes traceDraw{from{stroke-dasharray:220;stroke-dashoffset:220}to{stroke-dasharray:220;stroke-dashoffset:0}}
+@keyframes traceGlow{0%,100%{filter:drop-shadow(0 0 1.4px #FFD76A) drop-shadow(0 0 4px rgba(255,215,106,.65))}
+  50%{filter:drop-shadow(0 0 3px #FFE8A3) drop-shadow(0 0 11px rgba(255,215,106,.95))}}
+.tracefield .field.trace-win .starnode.used .starshape{animation:nodePulse 2.2s ease-in-out infinite}
+@keyframes nodePulse{0%,100%{filter:drop-shadow(0 0 2px var(--gold)) drop-shadow(0 0 5px var(--gold-deep))}
+  50%{filter:drop-shadow(0 0 4px #fff7df) drop-shadow(0 0 11px var(--gold))}}
 .trace-rail{position:absolute;left:12px;top:12px;z-index:4;display:flex;flex-direction:column;gap:10px;width:262px;max-height:94%;overflow:auto;padding:2px}
 .trace-ref{background:radial-gradient(120% 120% at 50% 0%, #182052 0%, #0c1130 80%);border:1px solid var(--indigo-line);border-radius:14px;padding:8px;text-align:center}
 .trace-ref .rlabel{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.5px;margin-bottom:4px}
@@ -417,15 +486,89 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 
 /* ---------- Unified discover screen ---------- */
 .discover-stage{position:relative;overflow:hidden}
-.discover-coach{position:absolute;left:8px;bottom:0;z-index:6;display:flex;flex-direction:column;align-items:flex-start;gap:0;pointer-events:none;max-width:42vw}
-.discover-coach .dc-fig{height:min(56vh,520px);width:auto;flex:0 0 auto;filter:drop-shadow(0 8px 20px rgba(0,0,0,.55))}
-.discover-coach .dc-say{position:relative;margin-left:64px;margin-bottom:1.5vh;max-width:min(22vw,230px);
-  background:rgba(255,255,255,.97);color:#1a1c3a;border-radius:13px;padding:9px 12px;font-weight:700;
-  font-size:clamp(12px,1.25vw,14.5px);line-height:1.3;box-shadow:0 5px 16px rgba(0,0,0,.45);pointer-events:auto}
-.discover-coach .dc-say .who{color:#5a3bd0;font-weight:800;font-size:11.5px;margin-bottom:1px}
-.discover-coach .dc-say::after{content:"";position:absolute;left:24px;bottom:-11px;border:6px solid transparent;border-top-color:rgba(255,255,255,.97)}
-.discover-controls{position:absolute;left:14px;top:14px;z-index:7;display:flex;gap:8px;flex-wrap:wrap}
-.discover-controls .btn{font-size:13px;padding:7px 12px;min-height:38px;min-width:auto}
+.discover-coach{position:absolute;left:2.5vw;bottom:0;z-index:6;display:flex;flex-direction:column;align-items:flex-start;gap:0;pointer-events:none;max-width:42vw}
+.discover-coach .dc-fig{height:min(47vh,432px);width:auto;flex:0 0 auto;filter:drop-shadow(0 8px 20px rgba(0,0,0,.55))}
+/* Meera's dialogue — soft warm-glass speech bubble, nudged close to her */
+.discover-coach .dc-say{position:relative;z-index:2;margin-left:24px;margin-bottom:-1.6vh;max-width:min(20vw,206px);
+  background:linear-gradient(180deg,rgba(251,248,255,.96),rgba(235,227,252,.93));color:#241f3d;
+  border:1px solid rgba(186,146,255,.34);border-radius:22px 22px 22px 9px;padding:10px 13px;font-weight:700;
+  font-size:clamp(11.5px,1.2vw,14px);line-height:1.34;pointer-events:auto;
+  backdrop-filter:blur(8px) saturate(1.05);-webkit-backdrop-filter:blur(8px) saturate(1.05);
+  box-shadow:0 12px 28px rgba(18,8,38,.30),0 0 20px rgba(168,85,247,.20),inset 0 1px 0 rgba(255,255,255,.92);
+  animation:bubblePop .35s cubic-bezier(.2,1.4,.4,1)}
+/* Orion & Scorpius: a little more breathing room between bubble and Meera */
+.discover-coach:not(.cass-coach) .dc-say{margin-bottom:0}
+.discover-coach .dc-say .who{display:flex;align-items:center;gap:5px;color:#7B61FF;font-weight:800;font-size:11px;letter-spacing:.04em;margin-bottom:2px}
+.discover-coach .dc-say .dc-star{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;font-size:8.5px;color:#fff;
+  background:linear-gradient(180deg,#a78bfa,#7c5cf0);box-shadow:0 0 6px rgba(124,92,240,.5)}
+/* tail: a clear downward pointer toward Meera below the bubble */
+.discover-coach .dc-say::after{content:"";position:absolute;left:22px;bottom:-11px;
+  border:9px solid transparent;border-top-color:rgba(236,228,252,.94);
+  filter:drop-shadow(0 2px 1px rgba(18,16,40,.16))}
+
+/* top-left head: Mission badge + tiny step tracker */
+.discover-head{position:absolute;top:14px;left:14px;z-index:7;display:flex;flex-direction:column;gap:7px;align-items:flex-start;animation:huntFieldIn .6s ease .2s both}
+.discover-badge{display:flex;align-items:center;gap:9px;padding:7px 15px 7px 10px;border-radius:16px;
+  background:linear-gradient(180deg,rgba(30,17,56,.76),rgba(48,26,76,.56));
+  border:1px solid rgba(255,234,185,.42);backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+  box-shadow:0 14px 32px rgba(0,0,0,.28),0 0 12px rgba(255,233,180,.24),inset 0 1px 0 rgba(255,255,255,.10)}
+.discover-badge .db-ico{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:10px;flex:0 0 auto;font-size:15px;
+  background:linear-gradient(180deg,rgba(168,139,250,.30),rgba(232,121,249,.20));border:1px solid rgba(200,150,255,.42);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.20),0 0 14px rgba(168,85,247,.30)}
+.discover-badge .db-title{font-size:13px;font-weight:900;color:#f8fafc;letter-spacing:.02em;line-height:1.05}
+.discover-badge .db-sub{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:rgba(226,232,240,.7);margin-top:1px}
+.step-track{display:flex;align-items:center;gap:5px;margin-left:3px;padding:5px 11px;border-radius:999px;
+  background:linear-gradient(180deg,rgba(30,17,56,.6),rgba(44,24,70,.44));border:1px solid rgba(255,234,185,.38);
+  backdrop-filter:blur(14px) saturate(1.05);-webkit-backdrop-filter:blur(14px) saturate(1.05);
+  box-shadow:0 8px 18px rgba(0,0,0,.20),0 0 12px rgba(255,233,180,.22),inset 0 1px 0 rgba(255,255,255,.08)}
+.step-track .step{font-size:10px;font-weight:800;letter-spacing:.03em;color:rgba(226,232,240,.42);transition:color .3s,text-shadow .3s}
+.step-track .step.done{color:rgba(205,180,255,.92)}
+.step-track .step.on{color:#fde68a;text-shadow:0 0 9px rgba(250,204,21,.5)}
+.step-track .step-arrow{font-size:9px;color:rgba(226,232,240,.28)}
+
+/* bottom-centre segmented control: [Back | Reset | Hint] — soft floating control deck */
+.discover-dock{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);z-index:7;display:flex;align-items:stretch;padding:5px;border-radius:16px;
+  background:linear-gradient(180deg,rgba(30,17,56,.78),rgba(48,26,76,.58));border:1px solid rgba(255,234,185,.42);
+  backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+  box-shadow:0 16px 40px rgba(0,0,0,.36),0 0 13px rgba(255,233,180,.26),0 0 26px rgba(168,85,247,.20),inset 0 1px 0 rgba(255,255,255,.13);
+  animation:huntFieldIn .6s ease .2s both,dockFloat 6s ease-in-out 1s infinite}
+@keyframes dockFloat{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
+.discover-dock .seg{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:90px;height:46px;padding:0;border:0;cursor:pointer;
+  background:transparent;color:#e7ecf5;border-radius:13px;transition:background .18s,transform .15s,box-shadow .2s}
+.discover-dock .seg:hover{background:rgba(255,212,94,.12);transform:translateY(-1px);box-shadow:0 0 16px rgba(255,215,110,.2),inset 0 1px 0 rgba(255,255,255,.12)}
+.discover-dock .seg:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.discover-dock .seg[disabled]{opacity:.4;cursor:default;transform:none}
+.discover-dock .seg .seg-ico{font-size:19px;line-height:1;filter:drop-shadow(0 0 5px rgba(255,220,120,.3))}
+.discover-dock .seg .seg-label{font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:rgba(226,232,240,.78)}
+.discover-dock .seg-div{width:1px;align-self:center;height:26px;margin:0 1px;background:linear-gradient(180deg,transparent,rgba(125,211,252,.32),transparent)}
+/* standalone sound toggle — top-right */
+.discover-sound{position:absolute;top:14px;right:14px;z-index:7;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;cursor:pointer;color:#e7ecf5;
+  background:linear-gradient(180deg,rgba(15,23,42,.7),rgba(30,41,59,.5));border:1px solid rgba(125,211,252,.2);
+  backdrop-filter:blur(16px) saturate(1.05);-webkit-backdrop-filter:blur(16px) saturate(1.05);
+  box-shadow:0 10px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.09);transition:transform .15s,box-shadow .2s;animation:huntFieldIn .6s ease .2s both}
+.discover-sound:hover{transform:scale(1.06)}
+.discover-sound:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.discover-sound.snd-off{filter:grayscale(.6) brightness(.9)}
+/* "Next / Finish" button — bottom-right corner */
+.discover-next{position:absolute;right:20px;bottom:20px;z-index:8}
+/* Next button — violet glass on-theme, with a thin white-gold glowing border */
+.discover-next .btn{background:linear-gradient(180deg,rgba(72,42,116,.92),rgba(46,25,74,.92));color:#ffe9bd;
+  border:1px solid rgba(255,234,185,.58);
+  box-shadow:0 8px 22px rgba(0,0,0,.36),0 0 14px rgba(255,233,180,.30),inset 0 1px 0 rgba(255,255,255,.12)}
+.discover-next .btn:hover{transform:translateY(-2px);
+  box-shadow:0 10px 26px rgba(0,0,0,.42),0 0 20px rgba(255,233,180,.46),inset 0 1px 0 rgba(255,255,255,.16)}
+/* Cassiopeia: Meera stays the standard SIZE but is pushed flush into the bottom-left
+   corner. The image has transparent padding, so negative margins pull her body into
+   the corner / down to the ground; .discover-stage overflow:hidden clips the rest. */
+.discover-coach.cass-coach{left:2.5vw;bottom:0}
+.discover-coach.cass-coach .dc-fig{height:min(52vh,482px);margin-left:-9.5vw;margin-bottom:-2vh}
+/* night-sky stars gently twinkle */
+@keyframes twinkle{0%,100%{opacity:1}50%{opacity:.38}}
+.tracefield .starnode .starshape{animation:twinkle 3.2s ease-in-out infinite}
+.tracefield .starnode:nth-child(2n) .starshape{animation-duration:4.1s;animation-delay:.7s}
+.tracefield .starnode:nth-child(3n) .starshape{animation-duration:2.6s;animation-delay:1.3s}
+.tracefield .starnode:nth-child(5n) .starshape{animation-duration:3.7s;animation-delay:.35s}
+.tracefield .starnode.hint .starshape{animation:starpulse 1.05s ease-in-out infinite}
 .figoverlay-wrap{position:absolute;inset:0;z-index:3;pointer-events:none}
 .figoverlay{opacity:0;animation:figin 1.1s ease forwards}
 .figimg{opacity:0;animation:figimgin 1.1s ease forwards, figglow 2.6s ease-in-out 1.1s infinite;
@@ -434,20 +577,70 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 @keyframes figglow{
   0%,100%{filter:drop-shadow(0 0 8px rgba(175,212,255,.9)) drop-shadow(0 0 18px rgba(135,185,255,.65)) drop-shadow(0 0 30px rgba(120,170,255,.45))}
   50%{filter:drop-shadow(0 0 16px rgba(200,228,255,1)) drop-shadow(0 0 34px rgba(145,195,255,.95)) drop-shadow(0 0 52px rgba(120,170,255,.75))}}
+/* reveal WOW: slightly dim the sky behind the figure + soft floating particles */
+.reveal-dim{position:absolute;inset:0;z-index:2;pointer-events:none;background:rgba(5,8,24,.38);opacity:0;animation:revealDim 1.1s ease forwards}
+@keyframes revealDim{to{opacity:1}}
+.reveal-spark{position:absolute;width:4px;height:4px;border-radius:50%;background:#fff7d6;pointer-events:none;z-index:4;
+  transform:translate(-50%,-50%);box-shadow:0 0 6px 2px rgba(255,212,94,.8);animation:revealSpark var(--sd,2s) ease-in-out infinite}
+@keyframes revealSpark{0%,100%{opacity:0;transform:translate(-50%,-50%) scale(.35)}50%{opacity:.9;transform:translate(-50%,-50%) scale(1)}}
 /* translucent silhouette parts (a ghostly blue figure over the gold star-lines) */
 .fb{fill:rgba(150,190,255,.17);stroke:rgba(200,220,255,.5);stroke-width:.6;stroke-linejoin:round}
 .fl{fill:none;stroke:rgba(160,196,255,.30);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
 .fbody{fill:none;stroke:rgba(160,196,255,.24);stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
 .fthin{fill:none;stroke:rgba(160,196,255,.30);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-@media (prefers-reduced-motion: reduce){.discover-coach .dc-say,.discover-coach .dc-fig{animation:none}.figoverlay{opacity:1;animation:none}.figimg{opacity:.5;animation:none}}
-/* centred text box where the child names the pattern they made */
-.guess-box{position:absolute;left:50%;bottom:7%;transform:translateX(-50%);z-index:9;
-  display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;
-  background:rgba(16,21,58,.94);border:2px solid var(--gold);border-radius:16px;padding:14px 16px;
-  box-shadow:0 12px 32px rgba(0,0,0,.6);max-width:min(92vw,560px);animation:fade .3s ease}
-.guess-input{font-size:clamp(15px,2vw,20px);padding:10px 14px;border-radius:10px;border:2px solid #3b4488;
-  background:#fff;color:#15183a;font-weight:700;min-width:min(62vw,300px);outline:none}
-.guess-input:focus{border-color:var(--gold)}
+@media (prefers-reduced-motion: reduce){.discover-coach .dc-say,.discover-coach .dc-fig,.guess-box,.choice-tray{animation:none}.discover-dock{animation:huntFieldIn .6s ease .2s both}.figoverlay{opacity:1;animation:none}.figimg{opacity:.5;animation:none}}
+/* "Star Thought Card" — light, magical response bar (slides up only when needed) */
+.guess-box{position:absolute;left:54%;bottom:10%;transform:translateX(-50%);z-index:9;
+  display:flex;flex-direction:column;gap:8px;align-items:stretch;text-align:left;
+  background:linear-gradient(180deg,rgba(30,17,56,.80),rgba(42,23,68,.68));
+  border:1px solid rgba(190,140,255,.32);border-radius:18px;padding:11px 16px;
+  backdrop-filter:blur(12px) saturate(1.05);-webkit-backdrop-filter:blur(12px) saturate(1.05);
+  box-shadow:0 14px 34px rgba(0,0,0,.42),0 0 22px rgba(168,85,247,.22),inset 0 1px 0 rgba(255,255,255,.09);
+  width:min(92vw,430px);animation:guessUp .42s cubic-bezier(.2,.9,.2,1) both}
+@keyframes guessUp{from{opacity:0;transform:translate(-50%,24px) scale(.97)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+.gb-label{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:#e7dcff;letter-spacing:.01em;padding-left:2px}
+.gb-label .gb-star{color:#fde68a;font-size:13px;filter:drop-shadow(0 0 5px rgba(250,204,21,.5))}
+.gb-row{display:flex;gap:13px;align-items:center;justify-content:center;flex-wrap:nowrap}
+/* input — misty blue-lavender fill, gold edge, soft inner glow, readable white text */
+.guess-input{flex:1 1 auto;min-width:0;height:42px;font-size:clamp(14px,1.8vw,17px);padding:0 14px;border-radius:12px;font-weight:700;color:#fff;
+  border:1.5px solid rgba(255,216,120,.7);background:rgba(238,230,255,.12);
+  backdrop-filter:blur(8px) saturate(1.05);-webkit-backdrop-filter:blur(8px) saturate(1.05);outline:none;
+  box-shadow:inset 0 1px 6px rgba(255,255,255,.07),0 0 10px rgba(168,85,247,.16);transition:border-color .2s,box-shadow .2s,background .2s}
+.guess-input::placeholder{color:rgba(232,224,255,.6);font-weight:600}
+.guess-input:focus{background:rgba(244,238,255,.18);border-color:rgba(255,222,130,1);
+  box-shadow:0 0 0 3px rgba(255,210,80,.16),0 0 16px rgba(255,220,110,.30)}
+/* soft "submit star" — gold gradient, dark readable text, calm shadow (not a loud tab) */
+.guess-box .guess-go{flex:0 0 auto;white-space:nowrap;height:42px;min-height:42px;padding:0 15px;border-radius:13px;font-size:13.5px;font-weight:900;
+  background:linear-gradient(180deg,#FFD86B,#F7B93E);color:#2A1D05;border:1px solid rgba(255,235,160,.8);
+  box-shadow:0 4px 12px rgba(255,190,60,.28)}
+.guess-box .guess-go:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(255,200,70,.38)}
+/* smaller variant for the reason step */
+.guess-box.compact{padding:10px 15px;gap:7px}
+.guess-box.compact .gb-label{font-size:12px}
+.guess-box.compact .guess-input{height:38px;font-size:clamp(13px,1.7vw,15px)}
+.guess-box.compact .guess-go{height:38px;min-height:38px;font-size:13px;padding:0 15px}
+/* "thinking choices" — raised magical answer buttons (equal weight) */
+/* Same / Different tray + tabs — identical look to the bottom control dock (.discover-dock .seg) */
+.choice-tray{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);z-index:9;display:flex;align-items:stretch;gap:2px;
+  padding:5px;border-radius:16px;
+  background:linear-gradient(180deg,rgba(30,17,56,.78),rgba(48,26,76,.58));border:1px solid rgba(255,234,185,.42);
+  backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+  box-shadow:0 16px 40px rgba(0,0,0,.36),0 0 13px rgba(255,233,180,.26),0 0 26px rgba(168,85,247,.20),inset 0 1px 0 rgba(255,255,255,.13);
+  animation:guessUp .42s cubic-bezier(.2,.9,.2,1) both}
+.choice-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:120px;height:58px;padding:0 20px;border:0;cursor:pointer;
+  background:transparent;color:#e7ecf5;border-radius:14px;font:inherit;
+  transition:background .18s,transform .15s,box-shadow .2s}
+.choice-card:hover{background:rgba(255,212,94,.12);transform:translateY(-1px);box-shadow:0 0 16px rgba(255,215,110,.2),inset 0 1px 0 rgba(255,255,255,.12)}
+.choice-card:active{transform:translateY(1px) scale(.98)}
+.choice-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.choice-card .cc-ico{width:23px;height:23px;flex:0 0 auto;color:#FFD86B}
+.choice-card .cc-ico path,.choice-card .cc-ico circle{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.choice-card .cc-ico.fill path{fill:currentColor;stroke:none}
+.choice-card .cc-ico{filter:drop-shadow(0 0 5px rgba(255,220,120,.3))}
+.choice-card .cc-ico.fill{filter:drop-shadow(0 0 6px rgba(255,210,90,.5))}
+.choice-card .cc-text{font-size:11.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:rgba(232,224,255,.85);white-space:nowrap}
+.choice-card .cc-check{display:none}
+.choice-card.sel{background:rgba(255,212,94,.16)}
 
 /* ---------- desktop fit: keep every page inside one screen ----------
    On a desktop the whole app is locked to the viewport height so that
@@ -496,16 +689,563 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
   .twinkle{opacity:.7!important}
 }
+
+/* ============================================================
+   HOME / TITLE SCREEN  (Section 1 — premium night-sky opening)
+   Self-contained, offline, CSS/JS only. Built by SCENES.start.
+   Honours prefers-reduced-motion (global block above) and the
+   existing sound toggle (state.narrationOn). Touches nothing in
+   the learning flow, park, or game screens.
+   ============================================================ */
+.home-scene{position:relative;flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+
+/* ---- deep navy→indigo sky + atmosphere ---- */
+.home-sky{position:absolute;inset:0;overflow:hidden;z-index:0;
+  background:
+    radial-gradient(140% 100% at 50% -25%, #1b2360 0%, transparent 55%),
+    radial-gradient(120% 90% at 85% 115%, #251a55 0%, transparent 55%),
+    linear-gradient(180deg,#0c1234 0%,#0a0e26 55%,#0a0920 100%)}
+.home-sky,.home-content{transition:transform 1s cubic-bezier(.3,.7,.2,1)}
+
+/* soft moon glow, top-right corner */
+.home-moon{position:absolute;top:-70px;right:-46px;width:clamp(180px,26vw,300px);height:clamp(180px,26vw,300px);
+  border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at 38% 36%,#fff9ea 0%,#ffe7a6 16%,rgba(255,221,150,.34) 44%,transparent 72%);
+  filter:blur(1px)}
+
+/* nebula / cloud glow layers (slow drift) */
+.home-nebula{position:absolute;border-radius:50%;filter:blur(60px);opacity:.5;pointer-events:none}
+.home-nebula.n1{width:64vw;height:64vw;left:-12vw;top:-14vw;
+  background:radial-gradient(circle,rgba(86,108,220,.6),transparent 66%);animation:homeNeb 28s ease-in-out infinite}
+.home-nebula.n2{width:60vw;height:60vw;right:-14vw;bottom:-18vw;
+  background:radial-gradient(circle,rgba(150,90,210,.55),transparent 66%);animation:homeNeb 34s ease-in-out infinite reverse}
+@keyframes homeNeb{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(3%,-3%) scale(1.08)}}
+
+/* hundreds of tiny background stars */
+.home-starlayer,.home-biglayer,.home-flylayer,.home-shootlayer{position:absolute;inset:0;pointer-events:none}
+.home-star{position:absolute;border-radius:50%;background:#fff;opacity:var(--o,.6);
+  box-shadow:0 0 3px rgba(255,255,255,.45);animation:homeTwinkle 3s ease-in-out infinite}
+@keyframes homeTwinkle{0%,100%{opacity:calc(var(--o,.6)*.35)}50%{opacity:var(--o,.6)}}
+
+/* a few larger foreground stars with soft glow + 4-point spikes; --g brightens on mouse hover */
+.home-bigstar{position:absolute;width:0;height:0;--g:1}
+.home-bigstar .bs-core{position:absolute;left:0;top:0;width:6px;height:6px;border-radius:50%;
+  transform:translate(-50%,-50%);background:#fff;
+  box-shadow:0 0 calc(7px*var(--g)) calc(1px*var(--g)) rgba(255,247,224,.9),
+             0 0 calc(22px*var(--g)) calc(6px*var(--g)) rgba(255,212,94,.5);
+  transition:box-shadow .35s ease;animation:homeBig 4s ease-in-out infinite}
+.home-bigstar::before,.home-bigstar::after{content:"";position:absolute;left:0;top:0;
+  transform:translate(-50%,-50%);opacity:calc(.45*var(--g));transition:opacity .35s ease;
+  background:linear-gradient(90deg,transparent,rgba(255,247,224,.85),transparent)}
+.home-bigstar::before{width:calc(34px*var(--g));height:2px}
+.home-bigstar::after{width:2px;height:calc(34px*var(--g))}
+@keyframes homeBig{0%,100%{filter:none}50%{filter:brightness(1.25)}}
+
+/* firefly-like floating sparkles */
+.home-fly{position:absolute;width:4px;height:4px;border-radius:50%;background:#ffe9a8;
+  box-shadow:0 0 6px 2px rgba(255,212,94,.7);opacity:.7;
+  animation:homeFly var(--d,9s) ease-in-out infinite}
+@keyframes homeFly{0%{transform:translate(0,0);opacity:.15}50%{transform:translate(var(--dx,0),var(--dy,-40px));opacity:.85}100%{transform:translate(0,0);opacity:.15}}
+
+/* occasional shooting star */
+.home-shoot{position:absolute;width:150px;height:2px;border-radius:2px;transform-origin:left center;
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.95));
+  filter:drop-shadow(0 0 6px #fff);opacity:0;animation:homeShoot 1.15s ease-out forwards}
+.home-shoot::after{content:"";position:absolute;right:-2px;top:50%;width:5px;height:5px;border-radius:50%;
+  transform:translateY(-50%);background:#fff;box-shadow:0 0 8px 2px #fff}
+@keyframes homeShoot{0%{opacity:0;transform:translate(0,0) rotate(20deg) scaleX(.3)}
+  12%{opacity:1}100%{opacity:0;transform:translate(58vw,24vh) rotate(20deg) scaleX(1)}}
+
+/* ---- foreground content (title / characters / button) ---- */
+.home-content{position:relative;z-index:5;flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:clamp(10px,2.4vh,28px);
+  padding:clamp(18px,5vh,46px) 20px;text-align:center;min-height:0}
+
+/* premium title: stars settle first, then it fades/scales in with a gold shimmer */
+.home-title-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+.home-title{margin:0;font-family:var(--font);font-weight:900;line-height:1.04;letter-spacing:.5px;
+  font-size:clamp(32px,7.6vw,80px);
+  background:linear-gradient(100deg,#ffe9a8 0%,#ffffff 28%,#ffd45e 50%,#ffffff 72%,#ffe9a8 100%);
+  background-size:230% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 2px 16px rgba(255,212,94,.4));
+  opacity:0;transform:scale(.86) translateY(10px);
+  animation:homeTitleIn 1s cubic-bezier(.2,.8,.2,1) .6s forwards, homeShimmer 7s linear 1.7s infinite}
+@keyframes homeTitleIn{to{opacity:1;transform:none}}
+@keyframes homeShimmer{0%{background-position:0% center}100%{background-position:230% center}}
+.home-tag{margin:0;color:var(--muted);font-size:clamp(14px,2.4vw,21px);font-weight:700;
+  opacity:0;animation:homeFadeUp .9s ease 1.05s forwards}
+@keyframes homeFadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* characters — alive, not static stickers */
+.home-chars{display:flex;align-items:flex-end;justify-content:center;gap:clamp(4px,3vw,36px);
+  opacity:0;animation:homeFadeUp 1s ease 1s forwards}
+.home-char{width:auto;filter:drop-shadow(0 12px 24px rgba(0,0,0,.5));transform-origin:bottom center}
+/* Kabir's SVG has whitespace around the character, so he needs a larger box to
+   visually match Meera. Negative margin pulls his feet down to Meera's baseline. */
+.home-char.kabir{height:clamp(190px,42vh,420px);margin-bottom:-7.4vh;margin-right:-3vw;position:relative;left:-10vw;animation:homeKabirIdle 5.4s ease-in-out infinite}
+.home-char.meera{height:clamp(140px,30vh,300px);animation:homeMeeraIdle 5.4s ease-in-out infinite}
+/* both characters: a calm up-and-down float, no side-to-side tilt */
+@keyframes homeKabirIdle{0%{transform:translateY(0) scaleY(1)}
+  50%{transform:translateY(-6px) scaleY(1.012)}100%{transform:translateY(0)}}
+@keyframes homeMeeraIdle{0%{transform:translateY(0) scaleY(1)}
+  50%{transform:translateY(-6px) scaleY(1.015)}100%{transform:translateY(0)}}
+
+/* ---- the Start button: strongest focus on the screen ---- */
+.home-start{position:relative;font-family:var(--font);font-weight:900;cursor:pointer;
+  font-size:clamp(20px,2.8vw,28px);color:#3a2600;border:none;border-radius:var(--pill);
+  padding:clamp(15px,2.2vh,22px) clamp(38px,6vw,64px);min-height:60px;
+  background:linear-gradient(180deg,#ffe680 0%,#ffd45e 46%,#f4b740 100%);
+  opacity:0;transform:translateY(16px);
+  animation:homeStartIn .8s cubic-bezier(.2,.9,.2,1) 1.45s forwards,
+            homeStartBreathe 2.8s ease-in-out 2.4s infinite;
+  transition:transform .18s ease,box-shadow .25s ease,filter .2s ease}
+@keyframes homeStartIn{to{opacity:1;transform:none}}
+@keyframes homeStartBreathe{
+  0%,100%{transform:scale(1);box-shadow:0 10px 28px rgba(244,183,64,.5),0 0 22px 4px rgba(255,212,94,.3),inset 0 2px 6px rgba(255,255,255,.55)}
+  50%{transform:scale(1.035);box-shadow:0 14px 40px rgba(244,183,64,.6),0 0 44px 10px rgba(255,212,94,.5),inset 0 2px 6px rgba(255,255,255,.55)}}
+.home-start:hover,.home-start:focus-visible{animation-play-state:paused;transform:translateY(-3px) scale(1.05);filter:brightness(1.05);
+  box-shadow:0 18px 46px rgba(244,183,64,.7),0 0 60px 14px rgba(255,212,94,.6),inset 0 2px 6px rgba(255,255,255,.6)}
+.home-start:focus-visible{outline:3px solid #fff;outline-offset:4px}
+.home-start:active{transform:translateY(0) scale(.98)}
+/* tiny hover sparkles */
+.home-start::before,.home-start::after{content:"✨";position:absolute;font-size:16px;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .4s ease}
+.home-start::before{top:-10px;left:14px}
+.home-start::after{bottom:-8px;right:16px}
+.home-start:hover::before{opacity:.95;transform:translateY(-4px) rotate(-12deg)}
+.home-start:hover::after{opacity:.95;transform:translateY(4px) rotate(12deg)}
+/* click: compress then bounce */
+.home-start.clicked{animation:homeStartClick .5s ease}
+@keyframes homeStartClick{0%{transform:scale(1)}25%{transform:scale(.92)}55%{transform:scale(1.08)}100%{transform:scale(1)}}
+
+/* click sparkle burst */
+.home-burst{position:absolute;z-index:25;pointer-events:none}
+.burst-spark{position:absolute;left:0;top:0;width:8px;height:8px;border-radius:50%;
+  background:radial-gradient(circle,#fff,#ffd45e);box-shadow:0 0 8px #ffd45e;pointer-events:none;
+  animation:homeBurst .8s ease-out forwards}
+@keyframes homeBurst{0%{transform:translate(-50%,-50%) scale(1);opacity:1}
+  100%{transform:translate(calc(-50% + var(--bx,0)),calc(-50% + var(--by,0))) scale(.2);opacity:0}}
+
+/* small, low-priority circular audio toggle (chrome is hidden on the home screen) */
+.home-audio{position:absolute;top:16px;right:16px;z-index:20;
+  width:48px;height:48px;border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  color:var(--text);background:rgba(20,26,60,.55);border:1px solid var(--indigo-line);
+  box-shadow:0 0 14px rgba(120,140,255,.25);backdrop-filter:blur(4px);transition:transform .15s ease,box-shadow .2s ease}
+.home-audio:hover{transform:scale(1.06);box-shadow:0 0 20px rgba(150,170,255,.45)}
+.home-audio:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.home-audio.off{filter:grayscale(.7) brightness(.85)}
+
+/* cinematic transition: stars brighten, gentle zoom up, star-glow flash */
+.home-flash{position:absolute;inset:0;z-index:30;pointer-events:none;opacity:0;
+  background:radial-gradient(circle at 50% 58%,rgba(255,247,224,.95),rgba(255,221,150,.55) 36%,rgba(20,26,60,0) 76%);
+  transition:opacity .8s ease}
+.home-scene.igniting .home-sky,.home-scene.igniting .home-content{transform:scale(1.12) translateY(-3%)}
+.home-scene.igniting .home-flash{opacity:1}
+.home-scene.igniting .home-star{opacity:1}
+.home-scene.igniting .home-bigstar{--g:2.6}
+
+@media (prefers-reduced-motion: reduce){
+  .home-title,.home-tag,.home-chars,.home-start{opacity:1!important;transform:none!important}
+}
+
+/* ============================================================
+   MISSION HUNT — premium "sky explorer" redesign (Activity 1)
+   Scoped to .hunt-stage / .huntfield / journal / cards / coach.
+   Pure CSS/JS, offline. Honours prefers-reduced-motion. The star
+   field engine, shape recognition and scoring are UNTOUCHED — these
+   are atmosphere/feedback layers built on top by SCENES.hunt.
+   ============================================================ */
+.hunt-stage{position:relative;overflow:hidden}
+
+/* ---- immersive night sky ---- */
+/* ===== .space-background : dreamy purple cosmic night sky (base + nebula, CSS only) =====
+   Layer 1 base: black + dark navy + deep purple.  Layer 2 nebula: soft magenta/purple
+   radial glows, richer toward the upper-right.  Centre kept slightly darker so the
+   interactive constellation stars stay readable. */
+.huntfield{position:absolute;inset:0;z-index:0;overflow:hidden;
+  background:
+    radial-gradient(58% 50% at 50% 54%, rgba(0,0,6,.52), transparent 70%),       /* darker centre */
+    radial-gradient(72% 60% at 86% 8%,  rgba(198,74,196,.16), transparent 62%),   /* magenta — upper right */
+    radial-gradient(64% 58% at 94% 48%, rgba(132,60,206,.17), transparent 64%),   /* purple — right */
+    radial-gradient(56% 50% at 12% 18%, rgba(116,66,206,.18), transparent 60%),   /* purple — upper left */
+    radial-gradient(52% 46% at 22% 88%, rgba(176,58,170,.15), transparent 64%),   /* magenta — lower left */
+    linear-gradient(160deg, #160e30 0%, #0c0a24 42%, #070614 74%, #020207 100%)}  /* deep space base */
+.huntfield svg.field{position:relative;z-index:2;animation:huntFieldIn .8s ease both}
+@keyframes huntFieldIn{from{opacity:0}to{opacity:1}}
+/* drifting, fading nebula clouds (added by JS, sit behind the field) */
+.hunt-neb{position:absolute;border-radius:50%;filter:blur(64px);pointer-events:none;z-index:0;mix-blend-mode:screen}
+.hunt-neb.a{width:58vw;height:58vw;right:-14vw;top:-16vw;left:auto;
+  background:radial-gradient(circle,rgba(196,76,202,.28),transparent 66%);animation:huntNebA 34s ease-in-out infinite}
+.hunt-neb.b{width:52vw;height:52vw;right:-12vw;bottom:-16vw;
+  background:radial-gradient(circle,rgba(132,64,212,.40),transparent 66%);animation:huntNebB 42s ease-in-out infinite}
+.hunt-neb.c{width:44vw;height:44vw;left:6vw;top:38vh;
+  background:radial-gradient(circle,rgba(176,66,176,.28),transparent 64%);animation:huntNebC 48s ease-in-out infinite}
+@keyframes huntNebA{0%,100%{transform:translate(0,0) scale(1);opacity:.22}50%{transform:translate(4%,-3%) scale(1.12);opacity:.42}}
+@keyframes huntNebB{0%,100%{transform:translate(0,0) scale(1.05);opacity:.52}50%{transform:translate(-4%,3%) scale(.95);opacity:.24}}
+@keyframes huntNebC{0%,100%{transform:translate(-3%,2%) scale(.9);opacity:.16}50%{transform:translate(4%,-3%) scale(1.16);opacity:.42}}
+/* faint, slowly-rotating galaxy band — removed (its conic arcs read as a white centre glow/spokes) */
+.hunt-galaxy{display:none;position:absolute;left:50%;top:50%;width:135vmax;height:135vmax;transform:translate(-50%,-50%);
+  pointer-events:none;z-index:0;opacity:.55;mix-blend-mode:screen;filter:blur(2px);
+  background:
+    radial-gradient(closest-side at 50% 50%,rgba(120,150,255,.10),transparent 70%),
+    conic-gradient(from 0deg at 50% 50%,
+      transparent 0deg,rgba(150,130,230,.10) 42deg,transparent 92deg,
+      transparent 184deg,rgba(110,160,235,.12) 226deg,transparent 286deg,transparent 360deg);
+  animation:huntGalaxy 150s linear infinite}
+@keyframes huntGalaxy{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+/* .nebula-layer (wisps) — TWO crossing layers of soft lavender/magenta cloud filaments.
+   Each layer's puffs are placed along a gentle ARC (not a straight line) and the two
+   layers sit at different angles, so they read as flowing, overlapping mist — not stripes. */
+.huntfield::before,.tracefield::before{content:"";position:absolute;inset:-16%;pointer-events:none;z-index:0;
+  opacity:.62;transform:rotate(-7deg);filter:blur(11px);
+  background:
+    radial-gradient(22% 6%   at 6% 30%,  rgba(220,196,255,.17), transparent 73%),   /* upper-left wisp (curve start) */
+    radial-gradient(20% 5.5% at 18% 16%, rgba(255,196,238,.14), transparent 74%),    /* upper-left wisp (curve up) */
+    radial-gradient(34% 7%   at 12% 47%, rgba(228,205,255,.20), transparent 72%),
+    radial-gradient(28% 6%   at 33% 54%, rgba(255,190,236,.15), transparent 73%),
+    radial-gradient(34% 6.5% at 55% 48%, rgba(212,182,255,.19), transparent 72%),
+    radial-gradient(26% 6%   at 76% 40%, rgba(245,202,246,.14), transparent 73%),
+    radial-gradient(22% 5.5% at 93% 32%, rgba(226,198,255,.12), transparent 74%);
+  animation:nebWispA 70s ease-in-out infinite}
+.huntfield::after,.tracefield::after{content:"";position:absolute;inset:-18%;pointer-events:none;z-index:0;
+  opacity:.5;transform:rotate(-26deg);filter:blur(13px);
+  background:
+    radial-gradient(22% 6%   at 13% 10%, rgba(226,200,255,.14), transparent 74%),   /* upper-left corner wisp */
+    radial-gradient(24% 6%   at 10% 18%, rgba(244,206,250,.14), transparent 74%),
+    radial-gradient(30% 6%   at 26% 30%, rgba(231,205,255,.16), transparent 73%),
+    radial-gradient(38% 5.5% at 50% 41%, rgba(255,186,234,.13), transparent 74%),
+    radial-gradient(30% 7%   at 71% 51%, rgba(208,178,255,.16), transparent 73%),
+    radial-gradient(24% 6%   at 89% 61%, rgba(238,198,255,.12), transparent 74%);
+  animation:nebWispB 58s ease-in-out infinite}
+@keyframes nebWispA{0%,100%{transform:rotate(-7deg) translate(0,0)}50%{transform:rotate(-5.5deg) translate(2%,-1.5%)}}
+@keyframes nebWispB{0%,100%{transform:rotate(-26deg) translate(0,0)}50%{transform:rotate(-28deg) translate(-2%,1.5%)}}
+/* floating particles + shooting star reuse the home keyframes */
+.hunt-fly{position:absolute;width:2px;height:2px;border-radius:50%;background:rgba(216,228,255,.92);
+  box-shadow:0 0 5px 1px rgba(170,195,255,.45);opacity:.45;pointer-events:none;animation:homeFly var(--d,9s) ease-in-out infinite}
+.hunt-shoot{position:absolute;width:130px;height:2px;border-radius:2px;transform-origin:left center;pointer-events:none;z-index:1;
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.9));filter:drop-shadow(0 0 6px #fff);opacity:0;animation:homeShoot 1.15s ease-out forwards}
+
+/* ---- decorative star dust in the empty right strip below the mission tablet:
+   purely ambient — dim, small, slow, never interactive, never competes with play ---- */
+.hunt-dustfield{position:absolute;pointer-events:none;z-index:1;overflow:hidden}
+.hunt-dust{position:absolute;border-radius:50%;background:rgba(198,212,255,.6);pointer-events:none;
+  box-shadow:0 0 3px rgba(170,195,255,.35);animation:dustTw var(--dt,5s) ease-in-out infinite}
+@keyframes dustTw{0%,100%{opacity:.06}50%{opacity:.3}}
+/* soft nebula + whitish glow (same family as the centre glow) behind the right-side dust */
+.hunt-dustglow{position:absolute;border-radius:50%;pointer-events:none;z-index:0;filter:blur(40px);
+  background:radial-gradient(circle,rgba(206,220,255,.16),rgba(150,130,230,.10) 46%,rgba(96,170,220,.06) 64%,transparent 74%);
+  animation:dustGlow 18s ease-in-out infinite}
+@keyframes dustGlow{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:.8;transform:scale(1.06)}}
+
+/* ---- magical interactive stars (tiered glow) ---- */
+.huntfield .field .starshape{fill:#fdfdff;stroke:#fff;stroke-width:.2;transform-box:fill-box;transform-origin:center;
+  filter:drop-shadow(0 0 1px rgba(255,255,255,.85)) drop-shadow(0 0 2px rgba(150,190,255,.45));
+  transition:fill .15s,filter .2s,transform .15s;animation:huntTw 3.4s ease-in-out infinite}
+.huntfield .field .starnode:nth-child(2n) .starshape{animation-duration:4.2s;animation-delay:.6s}
+.huntfield .field .starnode:nth-child(3n) .starshape{animation-duration:2.8s;animation-delay:1.2s}
+@keyframes huntTw{0%,100%{opacity:.66}50%{opacity:1}}
+.huntfield .field .starnode.bright .starshape{fill:#fff7d6;
+  filter:drop-shadow(0 0 1.4px rgba(255,236,170,.9)) drop-shadow(0 0 4px rgba(255,210,90,.6))}
+.huntfield .field .starnode:hover .starshape,
+.huntfield .field .starnode.near .starshape{fill:var(--gold);stroke:#fff6cf;transform:scale(1.25);
+  filter:drop-shadow(0 0 3px var(--gold)) drop-shadow(0 0 8px var(--gold-deep))}
+.huntfield .field .starnode.sel .starshape{fill:var(--gold);stroke:#fff;
+  filter:drop-shadow(0 0 4px var(--gold)) drop-shadow(0 0 10px var(--gold-deep))}
+/* used stars keep a soft golden glow = visible progress */
+.huntfield .field .starnode.used .starshape{fill:var(--gold);stroke:#fff6cf;
+  filter:drop-shadow(0 0 2px var(--gold)) drop-shadow(0 0 5px rgba(255,210,90,.55))}
+/* decorative background stars — soft, small, no glow, no hover, not tappable */
+.huntfield .field .starnode.deco{pointer-events:none}
+.huntfield .field .starnode.deco .starshape{fill:#cfd9f5;stroke:none;opacity:.3;
+  filter:none;transform:scale(.75);animation:huntTwSoft 6s ease-in-out infinite}
+.huntfield .field .starnode.deco:hover .starshape{fill:#cfd9f5;transform:scale(.75);filter:none}
+@keyframes huntTwSoft{0%,100%{opacity:.18}50%{opacity:.34}}
+/* intro: stars pulse once to invite a tap (decorative stars sit still) */
+.huntfield .field.intro .starnode:not(.deco) .starshape{animation:huntIntroPulse 1.1s ease 1}
+@keyframes huntIntroPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.55)}}
+/* click ripple + sparkle bursts (SVG, added by JS) */
+.hunt-ripple{fill:none;stroke:var(--gold);stroke-width:.6;opacity:.9;transform-box:fill-box;transform-origin:center;animation:huntRipple .6s ease-out forwards}
+@keyframes huntRipple{from{transform:scale(.3);opacity:.9}to{transform:scale(2.8);opacity:0}}
+.hunt-spark{fill:#fff3c4;transform-box:fill-box;transform-origin:center;animation:huntSparkAnim .7s ease-out forwards}
+@keyframes huntSparkAnim{0%{transform:scale(.2);opacity:1}100%{transform:translate(var(--sx,0),var(--sy,0)) scale(1);opacity:0}}
+.hunt-trav{fill:#FFE8A3;opacity:.85;filter:drop-shadow(0 0 2px #FFD76A) drop-shadow(0 0 5px rgba(255,215,106,.8))}
+
+/* ---- magical golden lines ---- */
+.huntfield .field .edge{stroke:#FFE8A3;stroke-width:.9;stroke-linecap:round;opacity:.82;
+  filter:drop-shadow(0 0 2px #FFD76A) drop-shadow(0 0 5px rgba(255,215,106,.7))}
+.huntfield .field .edge.draw{animation:huntDraw .35s ease-out both}
+@keyframes huntDraw{from{stroke-dasharray:160;stroke-dashoffset:160}to{stroke-dashoffset:0}}
+.huntfield .field.shape-celebrate .edge{filter:drop-shadow(0 0 4px #FFE8A3) drop-shadow(0 0 12px #FFD76A) drop-shadow(0 0 18px rgba(255,215,106,.85))}
+
+/* ============================================================
+   EXPLORER MISSION TABLET — premium glass astronomy dashboard
+   ============================================================ */
+.mission-panel{position:absolute;right:16px;top:30vh;left:auto;z-index:6;
+  width:235px;max-height:calc(100% - 30vh - 110px);
+  display:flex;flex-direction:column;gap:9px;padding:13px 15px;border-radius:18px;overflow:hidden;
+  background:linear-gradient(180deg,rgba(30,17,56,.80),rgba(48,26,76,.60));
+  border:1px solid rgba(190,140,255,.26);backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+  box-shadow:0 16px 38px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.08),0 0 18px rgba(168,85,247,.14);
+  animation:journalIn .7s cubic-bezier(.2,.8,.2,1) both}
+/* spaceship-console flourishes: a glowing gradient ring around the WHOLE boundary + a soft scanline glow up top */
+.mission-panel::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:2px;pointer-events:none;z-index:1;
+  background:linear-gradient(135deg,#a78bfa,#e879f9,#facc15,#a78bfa);background-size:300% 300%;
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;
+  opacity:.78;filter:drop-shadow(0 0 6px rgba(168,85,247,.45));animation:panelEdge 9s linear infinite}
+@keyframes panelEdge{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+.mission-panel::after{content:"";position:absolute;left:0;right:0;top:0;height:46px;pointer-events:none;
+  background:radial-gradient(120% 100% at 50% 0,rgba(190,110,255,.18),transparent 70%)}
+@keyframes journalIn{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+
+/* header: [icon] Explorer Mission / Shape Hunt ............ 0/7 */
+.mp-head{display:flex;align-items:center;gap:10px}
+.mp-ico{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:12px;flex:0 0 auto;font-size:18px;
+  background:linear-gradient(180deg,rgba(168,139,250,.32),rgba(232,121,249,.22));border:1px solid rgba(200,150,255,.42);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.20),0 0 16px rgba(168,85,247,.34)}
+.mp-headtext{flex:1;min-width:0}
+.mp-title{font-size:18px;font-weight:800;color:#f8fafc;letter-spacing:-.02em;line-height:1.05}
+.mp-sub{font-size:11px;color:rgba(226,232,240,.7);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:1px}
+.mp-count{flex:0 0 auto;font-size:15px;font-weight:900;color:rgba(226,232,240,.85);
+  background:rgba(168,85,247,.16);border:1px solid rgba(200,150,255,.30);border-radius:999px;padding:3px 11px}
+.mp-count b{color:#fde68a}
+
+/* progress: just the glowing bar, count lives in the header */
+.progress-track{height:9px;border-radius:999px;background:rgba(148,163,184,.18);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.3)}
+.progress-fill{height:100%;width:0;border-radius:999px;
+  background:linear-gradient(90deg,#facc15,#e879f9,#a78bfa);background-size:200% 100%;
+  box-shadow:0 0 11px rgba(168,85,247,.34);transition:width 450ms cubic-bezier(.2,.8,.2,1);animation:progShift 7s linear infinite}
+@keyframes progShift{0%{background-position:0 0}100%{background-position:200% 0}}
+.progress-fill.bump{animation:progShift 7s linear infinite,progBump .55s ease}
+@keyframes progBump{0%{filter:brightness(1)}40%{filter:brightness(1.55)}100%{filter:brightness(1)}}
+
+/* current mission — "Current Mission" label + the glowing shape icon */
+.current-strip{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 11px;border-radius:12px;
+  background:radial-gradient(circle at top right,rgba(250,204,21,.16),transparent 62%),linear-gradient(135deg,rgba(30,41,59,.82),rgba(15,23,42,.66));
+  border:1px solid rgba(250,204,21,.30);box-shadow:0 0 13px rgba(250,204,21,.08),inset 0 1px 0 rgba(255,255,255,.09);
+  animation:cardIn .5s ease both}
+.cur-tag{flex:1;min-width:0;font-size:12px;font-weight:800;color:#fde68a;text-transform:uppercase;letter-spacing:.06em;line-height:1.1}
+.cur-icon{flex:0 0 auto;width:34px;height:34px;font-size:24px;color:#fde68a;display:flex;align-items:center;justify-content:center;
+  animation:curIconPulse 2.4s ease-in-out infinite}
+.cur-icon svg{width:34px;height:34px;overflow:visible;display:block}
+@keyframes curIconPulse{0%,100%{filter:drop-shadow(0 0 3px currentColor);transform:scale(1)}50%{filter:drop-shadow(0 0 9px currentColor);transform:scale(1.06)}}
+
+/* mission path — compact visual grid (replaces the long list) */
+.mission-path{display:flex;flex-direction:column;gap:9px}
+.mission-path-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(226,232,240,.72);padding-left:2px}
+.mission-path-grid{display:flex;flex-direction:column;gap:6px}
+.mission-path-tile{position:relative;min-height:0;border-radius:11px;border:0;cursor:pointer;padding:7px 11px;
+  background:rgba(34,18,60,.42);border:1px solid rgba(180,140,240,.16);
+  display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:11px;
+  transition:transform .16s ease,border-color .16s ease,background .16s ease,opacity .16s ease;animation:cardIn .45s ease both}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.mission-path-tile .shape-icon{color:#94a3b8;display:flex;flex:0 0 auto}
+.shape-icon svg{overflow:visible;display:block}
+.mission-path-tile .shape-icon svg{width:22px;height:22px}
+.shape-icon svg polygon,.shape-icon svg polyline,.shape-icon svg line,.shape-icon svg path,
+.cur-icon svg polygon,.cur-icon svg polyline{
+  fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 5px currentColor)}
+.mission-path-label{flex:1;text-align:left;font-size:13px;font-weight:800;color:rgba(226,232,240,.78);letter-spacing:.01em;line-height:1.1}
+.mission-path-tile:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.mission-path-tile:hover{transform:translateY(-2px)}
+/* completed */
+/* completed: dark violet glass + golden glowing border + soft lavender inner glow */
+.mission-path-tile.completed{border-color:rgba(255,216,120,.62);
+  background:linear-gradient(180deg,rgba(42,20,70,.74),rgba(28,14,50,.64));
+  box-shadow:0 0 16px rgba(255,215,106,.42),inset 0 0 14px rgba(196,156,255,.36),inset 0 1px 0 rgba(255,255,255,.10);
+  animation:completedGlow 2.6s ease-in-out infinite}
+@keyframes completedGlow{
+  0%,100%{box-shadow:0 0 12px rgba(255,215,106,.34),inset 0 0 12px rgba(196,156,255,.30),inset 0 1px 0 rgba(255,255,255,.10)}
+  50%{box-shadow:0 0 22px rgba(255,221,130,.58),inset 0 0 18px rgba(206,170,255,.46),inset 0 1px 0 rgba(255,255,255,.12)}}
+.mission-path-tile.completed .shape-icon{color:#ffe6ad}
+.mission-path-tile.completed .mission-path-label{color:#ece0ff}
+.mp-tile-check{position:absolute;top:50%;right:9px;transform:translateY(-50%);width:19px;height:19px;border-radius:50%;display:none;
+  align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#3a2a00;
+  background:linear-gradient(180deg,#ffe9b0,#ffd76a);box-shadow:0 0 10px rgba(255,215,106,.6);border:1.5px solid #6e5320}
+.mission-path-tile.completed .mp-tile-check{display:flex}
+/* current */
+.mission-path-tile.current{border-color:rgba(250,204,21,.5);background:rgba(250,204,21,.10);
+  box-shadow:0 0 14px rgba(250,204,21,.14);animation:cardIn .45s ease both,currentMissionPulse 2.6s ease-in-out infinite}
+.mission-path-tile.current .shape-icon{color:#fde68a}
+.mission-path-tile.current .mission-path-label{color:#fde68a}
+@keyframes currentMissionPulse{0%,100%{box-shadow:0 0 11px rgba(250,204,21,.11)}50%{box-shadow:0 0 18px rgba(250,204,21,.22)}}
+.mp-tile-now{position:absolute;top:50%;right:9px;left:auto;transform:translateY(-50%);display:none;
+  font-size:8.5px;font-weight:900;letter-spacing:.06em;color:#3a2c00;background:linear-gradient(180deg,#ffe27a,#facc15);
+  padding:2px 7px;border-radius:999px;box-shadow:0 0 10px rgba(250,204,21,.5)}
+.mission-path-tile.current .mp-tile-now{display:block}
+/* locked / upcoming */
+.mission-path-tile.locked{opacity:.32}
+.mission-path-tile.locked .shape-icon{color:#94a3b8}
+@keyframes doneBump{0%{transform:scale(1)}30%{transform:scale(1.05)}100%{transform:scale(1)}}
+
+/* ---- Kabir companion + premium speech bubble ---- */
+.coach{position:absolute;left:10px;bottom:-8vh;z-index:7;display:flex;flex-direction:column-reverse;align-items:flex-start;gap:0;
+  pointer-events:none;                                  /* never blocks taps on the stars behind it */
+  transition:left .6s cubic-bezier(.2,.8,.2,1),bottom .6s,transform .6s;animation:coachIn .6s ease .3s both}
+@keyframes coachIn{from{opacity:0;transform:translateY(14px) scale(.92)}to{opacity:1;transform:none}}
+/* full-body Kabir, standing on the left as a companion. The PNG is a wide canvas with
+   the figure centred, so we crop to the figure with object-fit:cover (never a box/circle). */
+.coach .coach-face{width:234px;height:408px;object-fit:cover;object-position:42% 28%;flex:0 0 auto;
+  border:0;border-radius:0;background:none;box-shadow:none;
+  filter:drop-shadow(0 8px 16px rgba(0,0,0,.5)) drop-shadow(0 0 18px rgba(255,212,94,.22))}
+@keyframes coachBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.coach.cheer .coach-face{animation:coachCheer .8s ease}
+@keyframes coachCheer{0%{transform:translateY(0) scale(1)}30%{transform:translateY(-12px) scale(1.08)}55%{transform:translateY(-4px) scale(1.04)}100%{transform:translateY(0) scale(1)}}
+.coach.think .coach-face{animation:coachThink 1s ease}
+@keyframes coachThink{0%{transform:rotate(0)}25%{transform:rotate(-6deg)}55%{transform:rotate(5deg)}100%{transform:rotate(0)}}
+.coach.excited .coach-face{filter:drop-shadow(0 8px 16px rgba(0,0,0,.5)) drop-shadow(0 0 26px rgba(255,212,94,.55))}
+.coach .coach-say{position:relative;display:flex;align-items:flex-start;gap:6px;max-width:min(23vw,208px);
+  margin-bottom:-18px;margin-left:14px;                  /* sit just above Kabir's head (small gap, not touching) */
+  background:linear-gradient(180deg,#ffffff,#f3f1fb);color:#23204a;border-radius:14px;padding:7px 11px;font-weight:700;
+  font-size:clamp(10.5px,.95vw,12.5px);line-height:1.28;border:1px solid rgba(120,110,200,.16);
+  box-shadow:0 8px 18px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.85);animation:bubblePop .35s cubic-bezier(.2,1.4,.4,1)}
+@keyframes bubblePop{0%{opacity:0;transform:scale(.7) translateY(6px)}100%{opacity:1;transform:none}}
+.coach .coach-say .cs-ico{flex:0 0 auto;font-size:13px}
+.coach .coach-say:empty{display:none}
+.coach .coach-say::after{content:"";position:absolute;left:42px;top:100%;border:8px solid transparent;border-top-color:#f3f1fb}
+/* finale: Kabir glides centre and narrates */
+.coach.center{left:50%;bottom:50%;transform:translate(-50%,50%);flex-direction:column;align-items:center;text-align:center;animation:none}
+.coach.center .coach-face{width:140px;height:140px}
+.coach.center .coach-say{max-width:min(78vw,560px);font-size:clamp(16px,2.2vw,24px);order:-1;padding:12px 20px;border-radius:18px}
+.coach.center .coach-say::after{display:none}
+
+/* ---- bottom controls hierarchy ---- */
+/* bottom controls = one floating glass dock (same language as the panel/badge) */
+.hunt-controls{position:absolute;left:50%;transform:translateX(-50%);bottom:18px;z-index:8;
+  display:flex;flex-direction:row;gap:7px;align-items:center;justify-content:center;flex-wrap:nowrap;max-width:94%;
+  padding:8px;border-radius:999px;
+  background:linear-gradient(180deg,rgba(30,17,56,.76),rgba(48,26,76,.54));
+  border:1px solid rgba(190,140,255,.24);backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+  box-shadow:0 16px 38px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.08),0 0 18px rgba(168,85,247,.30);
+  animation:huntFieldIn .6s ease .2s both}
+.hunt-controls .btn{min-height:40px;border-radius:999px;box-shadow:none;
+  transition:transform .14s ease,box-shadow .2s ease,border-color .2s,background .25s,opacity .2s}
+/* Continue — the single primary golden action */
+.hunt-controls .hc-continue{font-size:14px;font-weight:900;padding:9px 22px;min-height:42px;
+  box-shadow:0 5px 14px rgba(244,183,64,.36),inset 0 1px 0 rgba(255,255,255,.5)}
+.hunt-controls .hc-continue:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(244,183,64,.5),inset 0 1px 0 rgba(255,255,255,.6)}
+.hunt-controls .hc-continue[disabled]{filter:grayscale(.5) brightness(.78);box-shadow:none;transform:none}
+/* secondary controls — soft, flat, part of the dock (10% larger; glow lives on the dock) */
+.hunt-controls .hc-undo,.hunt-controls .hc-clear{font-size:13.5px;font-weight:800;padding:9px 17px;min-height:44px;
+  background:rgba(170,130,240,.16);color:#efe7fb;border:1px solid rgba(195,150,255,.22)}
+.hunt-controls .hc-undo:hover,.hunt-controls .hc-clear:hover{transform:translateY(-1px);
+  background:rgba(255,212,94,.12);border-color:rgba(255,212,94,.4)}
+.hunt-controls .hc-skip{background:transparent;color:rgba(255,212,94,.85);border:1px solid rgba(255,212,94,.24);
+  font-weight:700;font-size:12px;padding:8px 13px;opacity:.85}
+.hunt-controls .hc-skip:hover{opacity:1;transform:translateY(-1px);background:rgba(255,212,94,.08)}
+.hunt-controls .btn:active{transform:translateY(1px) scale(.97)}
+
+/* ---- Continue + Skip: a separate, fixed bottom-right dock (not animated) ---- */
+/* the dock itself carries the soft glow; the tabs inside stay flat */
+.hunt-nav{position:absolute;right:16px;bottom:18px;z-index:8;
+  display:flex;flex-direction:row;gap:7px;align-items:center;justify-content:flex-end;padding:8px;border-radius:999px;
+  background:linear-gradient(180deg,rgba(30,17,56,.76),rgba(48,26,76,.54));
+  border:1px solid rgba(190,140,255,.24);backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+  box-shadow:0 16px 38px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.08),0 0 18px rgba(168,85,247,.30)}
+.hunt-nav .btn{min-height:44px;border-radius:999px;box-shadow:none;
+  transition:transform .14s ease,border-color .2s,background .25s,opacity .2s}
+/* Continue — styled exactly like the Undo tab */
+.hunt-nav .hc-continue{font-size:13.5px;font-weight:800;padding:9px 17px;
+  background:rgba(170,130,240,.16);color:#efe7fb;border:1px solid rgba(195,150,255,.22)}
+.hunt-nav .hc-continue:hover{transform:translateY(-1px);background:rgba(255,212,94,.12);border-color:rgba(255,212,94,.4)}
+.hunt-nav .hc-continue[disabled]{filter:grayscale(.5) brightness(.78);transform:none;opacity:.7}
+/* Skip — soft ghost pill */
+.hunt-nav .hc-skip{background:transparent;color:rgba(255,212,94,.85);border:1px solid rgba(255,212,94,.24);
+  font-weight:700;font-size:12.5px;padding:9px 16px}
+.hunt-nav .hc-skip:hover{opacity:1;transform:translateY(-1px);background:rgba(255,212,94,.08)}
+.hunt-nav .btn:active{transform:translateY(1px) scale(.97)}
+
+/* ---- "Shape Found!" celebration + surprise badges ---- */
+.hunt-celebrate{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);z-index:12;pointer-events:none;
+  display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;
+  background:linear-gradient(180deg,rgba(40,48,104,.94),rgba(20,26,62,.96));border:2px solid var(--gold);border-radius:20px;padding:16px 30px;
+  box-shadow:0 18px 44px rgba(0,0,0,.5),0 0 40px rgba(255,212,94,.35);animation:celebrateIn 1.4s ease forwards}
+.hunt-celebrate .cel-title{font-size:clamp(20px,3vw,30px);font-weight:900;color:var(--gold);text-shadow:0 2px 12px rgba(255,212,94,.4)}
+.hunt-celebrate .cel-sub{font-size:16px;font-weight:800;color:var(--green)}
+@keyframes celebrateIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}30%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-60%) scale(1)}}
+.hunt-surprise{position:absolute;left:50%;top:19%;transform:translateX(-50%);z-index:11;pointer-events:none;
+  display:flex;align-items:center;gap:8px;background:linear-gradient(180deg,#fff,#ffeec2);color:#5a3b00;font-weight:900;font-size:15px;
+  border-radius:999px;padding:8px 18px;border:2px solid var(--gold-deep);box-shadow:0 10px 26px rgba(0,0,0,.4);animation:surpriseIn 1.6s ease forwards}
+@keyframes surpriseIn{0%{opacity:0;transform:translateX(-50%) translateY(-14px) scale(.7)}16%{opacity:1;transform:translateX(-50%) translateY(0) scale(1.05)}28%{transform:translateX(-50%) translateY(0) scale(1)}80%{opacity:1}100%{opacity:0;transform:translateX(-50%) translateY(-10px)}}
+
+/* gentle mistake shake (no harsh red) + mission-complete sky glow */
+.huntfield.shake{animation:huntShake .42s ease}
+@keyframes huntShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+.hunt-stage.complete .huntfield::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(62% 52% at 50% 45%,rgba(255,236,170,.18),transparent 70%);animation:huntSkyGlow 1.2s ease both}
+@keyframes huntSkyGlow{from{opacity:0}to{opacity:1}}
+
+/* ---- full-screen HUD overlay (Sky Stars + audio) — top-left of the field ---- */
+.hunt-hud{position:absolute;top:18px;left:18px;right:auto;z-index:9;display:flex;align-items:center;gap:10px;animation:huntFieldIn .6s ease .2s both}
+.hunt-stars{display:flex;align-items:center;gap:7px;
+  background:linear-gradient(180deg,rgba(15,23,42,.74),rgba(30,41,59,.52));border:1px solid rgba(125,211,252,.20);
+  padding:6px 13px;border-radius:999px;font-weight:900;color:var(--gold);
+  backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+  box-shadow:0 14px 32px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.09),0 0 12px rgba(255,212,94,.08)}
+.hunt-stars .ico{font-size:15px}
+.hunt-stars .hl{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.3px}
+.hunt-stars .hv{font-size:16px;color:#fff}
+.hunt-stars.bump{animation:doneBump .5s ease}
+.hunt-audio{width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;
+  color:var(--text);background:linear-gradient(180deg,rgba(15,23,42,.7),rgba(30,41,59,.5));border:1px solid rgba(125,211,252,.20);
+  backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+  box-shadow:0 10px 24px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.09);
+  transition:transform .15s,box-shadow .2s}
+.hunt-audio:hover{transform:scale(1.06);box-shadow:0 0 20px rgba(150,170,255,.4)}
+.hunt-audio:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.hunt-audio.off{filter:grayscale(.7) brightness(.85)}
+
+/* ---- Mission Hunt responsive: laptops, Chromebooks, short/narrow windows ---- */
+@media (max-width:900px){
+  .mission-panel{right:10px;top:10px;width:202px;padding:11px 13px;gap:8px;border-radius:16px}
+  .coach{left:8px;bottom:-6vh}
+  .coach .coach-face{width:180px;height:314px}
+  .coach .coach-say{max-width:min(42vw,200px)}
+  .hunt-celebrate{padding:14px 22px}
+}
+/* tablet / phone: dock the mission tablet to the bottom as a drawer — the header,
+   progress and the current mission stay visible; the full list scrolls below it */
+@media (max-width:620px){
+  .mission-panel{right:10px;left:10px;top:auto;bottom:10px;width:auto;max-height:46%;
+    flex-direction:column;animation:journalUp .6s cubic-bezier(.2,.8,.2,1) both}
+  .coach .coach-say{display:none}                 /* keep Kabir; drop the bubble on very small screens */
+  .hunt-controls{gap:7px;bottom:calc(46% + 18px)} /* sit above the bottom drawer */
+  .hunt-controls .btn{font-size:12.5px;padding:8px 12px;min-height:42px}
+  .hunt-controls .hc-continue{font-size:13.5px;padding:9px 17px;min-height:42px}
+  /* the right dock becomes a row stacked just above the Undo/Clear row */
+  .hunt-nav{top:auto!important;right:10px;left:10px;width:auto;flex-direction:row;
+    bottom:calc(46% + 74px);padding:8px;gap:7px;justify-content:center}
+  .hunt-nav .btn{min-height:42px}
+  .hunt-hud{top:10px;left:10px;right:auto;gap:7px}
+  .hunt-stars{padding:6px 12px;font-size:16px}
+  .hunt-stars .hl{display:none}
+  .hunt-audio{width:42px;height:42px}
+}
+@keyframes journalUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@media (max-height:600px){
+  .mission-panel{max-height:calc(100% - 150px);top:10px}
+  .coach{bottom:-4vh}
+  .coach .coach-face{width:133px;height:232px}
+  .hunt-controls{bottom:10px}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .mission-panel,.mission-path-tile,.current-strip,.coach,.huntfield svg.field{opacity:1!important;transform:none!important}
+  .cur-icon,.mission-panel,.hunt-nav{animation:none!important}
+  .progress-fill,.mission-path-tile.current,.mission-path-tile.completed,.hunt-dust,.hunt-dustglow{animation:none!important}
+  .huntfield::before,.huntfield::after,.tracefield::before,.tracefield::after,.hf-star{animation:none!important}
+  .hunt-dustglow{opacity:.6!important;transform:none!important}
+}
 </style>
 
 <div id="app">
   <div id="chrome" class="hidden">
     <div class="progress" id="progress" aria-label="Your journey progress"></div>
-    <div class="coins hidden" id="coins" aria-live="polite" aria-label="Star coins">
-      <span class="ico" aria-hidden="true">⭐</span><span id="coinval">0</span>
+    <div class="coins hidden" id="coins" aria-live="polite" aria-label="Sky Stars score">
+      <span class="ico" aria-hidden="true">⭐</span><span class="coin-label">Sky Stars</span><span id="coinval">0</span><span class="coin-rank" id="coinrank" aria-hidden="true">☆☆☆☆☆</span>
     </div>
-    <button class="narr-toggle on" id="narrToggle" aria-pressed="true" title="Turn narration on or off">
-      <span class="sw" aria-hidden="true"></span><span>🔊 Read aloud</span>
+    <button class="snd-toggle on" id="narrToggle" aria-pressed="true" title="Turn sound on or off" aria-label="Turn sound on or off">
+      <span class="snd-ico" aria-hidden="true">🔊</span>
     </button>
   </div>
   <div id="screen" aria-live="polite"></div>
@@ -740,6 +1480,8 @@ const Rewards = {
 function renderCoins(anim){
   const c=document.getElementById("coins");
   document.getElementById("coinval").textContent=state.starCoins;
+  const rk=document.getElementById("coinrank");
+  if(rk){ const n=Math.min(5,Math.floor(state.starCoins/3)); let o=""; for(let i=0;i<5;i++) o+=(i<n?"⭐":"☆"); rk.textContent=o; }
   if(anim){ c.classList.remove("earn","spend"); void c.offsetWidth; c.classList.add(anim); }
 }
 
@@ -752,25 +1494,9 @@ const MILESTONES=[
   {key:"Star Explorer",  scenes:["reward"]},
 ];
 function renderProgress(){
+  // progress milestone bar removed; keep the (empty) element as a flex spacer
   const p=document.getElementById("progress");
-  const order=["start","story","hunt","spot","discover","trace","reveal","reward","finale"];
-  const cur=order.indexOf(state.currentScene);
-  p.innerHTML="";
-  MILESTONES.forEach((m,i)=>{
-    const firstScene=order.indexOf(m.scenes[0]);
-    const lastScene=order.indexOf(m.scenes[m.scenes.length-1]);
-    const done = cur>lastScene;
-    const current = cur>=firstScene && cur<=lastScene;
-    const wrap=document.createElement("div");
-    wrap.className="milestone"+(done?" done":current?" current":"");
-    let label=m.key;
-    wrap.innerHTML='<span class="dot" aria-hidden="true"></span><span class="mlabel">'+label+'</span>';
-    p.appendChild(wrap);
-    if(i<MILESTONES.length-1){
-      const t=document.createElement("span");
-      t.className="track"+(done?" done":""); p.appendChild(t);
-    }
-  });
+  if(p) p.innerHTML="";
 }
 
 /* ============================================================
@@ -814,25 +1540,31 @@ function createStarField(host, stars, opts){
   const scale=opts.starScale||1;
   stars.forEach((s,i)=>{
     const cx=s.x*100, cy=s.y*100, baseT="translate("+cx+" "+cy+")";
+    // a star flagged interactive:false is purely decorative background — softer,
+    // smaller, no glow, no hover, not tappable. (Undefined = interactive, so every
+    // other scene that builds a field is unchanged.)
+    const deco=(s.interactive===false);
     const g=document.createElementNS(NS,"g");
-    g.setAttribute("class","starnode"+(s.bright?" bright":""));
+    g.setAttribute("class","starnode"+(s.bright?" bright":"")+(deco?" deco":""));
     g.setAttribute("transform",baseT);
-    const R=(s.bright?4.4:3.3)*scale;
+    const R=(deco?2.0:(s.bright?4.4:2.3))*scale;
     const poly=document.createElementNS(NS,"polygon");
     poly.setAttribute("points",starPoints(R));
     poly.setAttribute("class","starshape");
     g.appendChild(poly);
-    // generous transparent hit area (easy tap + keyboard focus)
-    const hit=document.createElementNS(NS,"circle");
-    hit.setAttribute("cx",0); hit.setAttribute("cy",0); hit.setAttribute("r",Math.max(4,R+2.2));
-    hit.setAttribute("class","starhit");
-    hit.setAttribute("tabindex","0");
-    hit.setAttribute("role","button");
-    hit.setAttribute("aria-label",(s.bright?"Bright star ":"Star ")+(i+1));
-    const act=(e)=>{ e.preventDefault(); select(i); };
-    hit.addEventListener("click",act);
-    hit.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" ") act(e); });
-    g.appendChild(hit);
+    if(!deco){
+      // generous transparent hit area (easy tap + keyboard focus)
+      const hit=document.createElementNS(NS,"circle");
+      hit.setAttribute("cx",0); hit.setAttribute("cy",0); hit.setAttribute("r",Math.max(4,R+2.2));
+      hit.setAttribute("class","starhit");
+      hit.setAttribute("tabindex","0");
+      hit.setAttribute("role","button");
+      hit.setAttribute("aria-label",(s.bright?"Bright star ":"Star ")+(i+1));
+      const act=(e)=>{ e.preventDefault(); select(i); };
+      hit.addEventListener("click",act);
+      hit.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" ") act(e); });
+      g.appendChild(hit);
+    }
     gStar.appendChild(g);
     nodes.push({g,poly,baseT,s});
   });
@@ -843,7 +1575,7 @@ function createStarField(host, stars, opts){
   function setPending(i){
     resetSel();
     pending=i;
-    if(i!==null){ const n=nodes[i]; n.g.setAttribute("transform",n.baseT+" scale(1.4)"); n.g.classList.add("sel"); }
+    if(i!==null){ const n=nodes[i]; n.g.setAttribute("transform",n.baseT+" scale(1.18)"); n.g.classList.add("sel"); }
   }
   function clearPending(){ resetSel(); pending=null; }
   function markUsed(){
@@ -896,7 +1628,13 @@ function createStarField(host, stars, opts){
     ghost(a,b){
       const g=drawEdge(a,b,"ghost"); gHint.appendChild(g);
       setTimeout(()=>{ if(g.parentNode) g.parentNode.removeChild(g); },5000);
-    }
+    },
+    // persistent dotted guide for a whole set of edges — stays until cleared
+    guide(edgePairs){
+      gHint.innerHTML="";
+      (edgePairs||[]).forEach(([a,b])=>{ gHint.appendChild(drawEdge(a,b,"ghost")); });
+    },
+    clearGuide(){ gHint.innerHTML=""; }
   };
 }
 
@@ -951,6 +1689,7 @@ const CONSTELLATIONS=[
     // where each W-star sits on her body (shoulder, chin, waist, knee, shin; image fractions, star order)
     figurePts:[{x:0.36,y:0.25},{x:0.49,y:0.18},{x:0.48,y:0.42},{x:0.63,y:0.53},{x:0.60,y:0.73}],
     findNarr:"This constellation is called Cassiopeia. Find it in the night sky!",
+    tol:0.18,                                                  // same match strictness as Orion / Scorpius
     stars:[{x:.14,y:.40,bright:1},{x:.32,y:.62},{x:.50,y:.42},{x:.68,y:.63},{x:.86,y:.39,bright:1}],
     edges:[[0,1],[1,2],[2,3],[3,4]], bright:[0,4] },
   { id:"cygnus", name:"Cygnus", desc:"a flying swan (a cross)",
@@ -968,9 +1707,9 @@ const CONSTELLATIONS=[
     coachImg:"Visuals/Meera holding scorpion cutout.webp",
     figureImg:"Visuals/scorpion cutout.webp",                  // scorpion figure (bg removed) overlaid when traced
     figureAspect:1.5,                                         // image is 1536x1024
-    // where each star sits INSIDE the scorpion image (x=frac of width, y=frac of height; star order)
-    figurePts:[{x:0.60,y:0.10},{x:0.82,y:0.33},{x:0.70,y:0.42},{x:0.55,y:0.45},{x:0.66,y:0.55},{x:0.14,y:0.62},{x:0.38,y:0.53},{x:0.22,y:0.58},{x:0.60,y:0.66},{x:0.15,y:0.74},{x:0.27,y:0.70}],
-    figureScale:1.3, figureRotate:6,
+    // measured with calibrate.html — each star's exact spot on the scorpion (star order 0..10)
+    figurePts:[{x:0.549,y:0.198},{x:0.619,y:0.245},{x:0.655,y:0.352},{x:0.563,y:0.432},{x:0.682,y:0.465},{x:0.155,y:0.671},{x:0.408,y:0.537},{x:0.254,y:0.610},{x:0.705,y:0.549},{x:0.222,y:0.773},{x:0.327,y:0.763}],
+    figureScale:1.0,
     findNarr:"This constellation is called Scorpius. Find it in the night sky!",
     tol:0.18,                                                  // visual shape match strictness
     stars:[{x:.775,y:.198,bright:1},{x:.895,y:.287},{x:.900,y:.431,bright:1},{x:.667,y:.488},
@@ -983,8 +1722,10 @@ const CONSTELLATIONS=[
     unified:true,                                              // single-screen "discover" experience
     coachImg:"Visuals/Meera holding orion cutout.webp",
     figureImg:"Visuals/orion hunter cutout.webp",            // hunter figure (bg removed), draped over the stars
-    figureAspect:1.223, figureScale:1.05,                   // content-cover (adapts to any traced size/position)
+    figureAspect:1.223, figureScale:1.0,                    // point-fit: pin each star onto the hunter's body (calibrated)
     figureContent:{x0:0.182,y0:0.031,x1:0.808,y1:0.873},    // non-transparent box of the hunter inside the image
+    // measured with calibrate.html — each star's exact spot on the hunter (star order 0..13)
+    figurePts:[{x:0.271,y:0.154},{x:0.694,y:0.152},{x:0.718,y:0.238},{x:0.321,y:0.297},{x:0.476,y:0.156},{x:0.724,y:0.338},{x:0.404,y:0.337},{x:0.579,y:0.391},{x:0.577,y:0.530},{x:0.761,y:0.488},{x:0.532,y:0.563},{x:0.457,y:0.584},{x:0.665,y:0.662},{x:0.427,y:0.708}],
     findNarr:"This constellation is called Orion. Find it in the night sky!",
     tol:0.18,                                                  // visual shape match strictness
     stars:[{x:.100,y:.158,bright:1},{x:.764,y:.210,bright:1},{x:.857,y:.302},{x:.166,y:.360},
@@ -1112,7 +1853,8 @@ function show(name){
   if(typeof stopStoryAudio==="function") stopStoryAudio();   // never let story narration bleed into gameplay
   state.currentScene=name;
   const chrome=document.getElementById("chrome");
-  chrome.classList.toggle("hidden", name==="start"||name==="story");
+  // discover has its own in-scene controls (full-screen star field), so hide the top chrome there
+  chrome.classList.toggle("hidden", name==="start"||name==="story"||name==="discover"||name==="hunt");
   // coins appear from Pattern Hunt onward (§5)
   const coinsOn=["hunt","spot","discover","trace","reveal","reward"].includes(name);
   document.getElementById("coins").classList.toggle("hidden", !coinsOn);
@@ -1159,6 +1901,50 @@ function twinkles(host,n){
     host.appendChild(d);
   }
 }
+/* Pattern-Hunt background: a soft Milky Way + two twinkling star layers
+   (hundreds of tiny faint stars, plus fewer medium ones) BEHIND the interactive field */
+function addHuntDeco(wrap){
+  const deco=document.createElement("div"); deco.className="hf-deco";
+  const mw=document.createElement("div"); mw.className="hf-milkyway"; deco.appendChild(mw);
+  const layer=(cls,n)=>{ for(let i=0;i<n;i++){ const d=document.createElement("div");
+    d.className="hf-star "+cls;
+    d.style.left=(Math.random()*100)+"%"; d.style.top=(Math.random()*100)+"%";
+    d.style.animationDelay=(Math.random()*4).toFixed(2)+"s";
+    d.style.animationDuration=(2.4+Math.random()*3).toFixed(2)+"s";
+    deco.appendChild(d); } };
+  layer("tiny",280);    // faint background
+  layer("med",70);      // medium middle
+  wrap.insertBefore(deco, wrap.firstChild);   // sits BEHIND the interactive star svg
+}
+
+/* Reusable premium night-sky atmosphere — the same layers used on the Mission
+   Hunt screen: faint background stars + Milky Way, drifting/fading nebula clouds,
+   a slow galaxy band, floating star dust and the occasional shooting star.
+   Safe on any full-bleed .huntfield/.tracefield wrap; honours reduced-motion. */
+function scheduleSkyShoot(host){
+  setTimeout(()=>{
+    if(!host.isConnected) return;
+    const sh=document.createElement("div"); sh.className="hunt-shoot";
+    sh.style.left=(Math.random()*40).toFixed(0)+"%"; sh.style.top=(Math.random()*30).toFixed(0)+"%";
+    sh.addEventListener("animationend",()=>sh.remove()); host.appendChild(sh);
+    scheduleSkyShoot(host);
+  },18000+Math.random()*12000);
+}
+function addSkyAtmosphere(wrap){
+  addHuntDeco(wrap);                                     // faint bg stars + Milky Way (behind the field)
+  const rm=!!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if(rm) return;
+  const gal=document.createElement("div"); gal.className="hunt-galaxy"; wrap.appendChild(gal);
+  ["a","b","c"].forEach(k=>{ const n=document.createElement("div"); n.className="hunt-neb "+k; wrap.appendChild(n); });
+  const fly=document.createElement("div"); fly.style.cssText="position:absolute;inset:0;pointer-events:none;z-index:0"; wrap.appendChild(fly);
+  for(let i=0;i<16;i++){ const f=document.createElement("div"); f.className="hunt-fly";
+    f.style.left=(Math.random()*100).toFixed(1)+"%"; f.style.top=(Math.random()*100).toFixed(1)+"%";
+    f.style.setProperty("--dx",(Math.random()*50-25).toFixed(0)+"px");
+    f.style.setProperty("--dy",(-20-Math.random()*50).toFixed(0)+"px");
+    f.style.setProperty("--d",(7+Math.random()*7).toFixed(1)+"s");
+    f.style.animationDelay=(Math.random()*6).toFixed(1)+"s"; fly.appendChild(f); }
+  scheduleSkyShoot(wrap);
+}
 
 /* ---------- OPENING STORY ----------
    The opening (old scene 1–8 picture story) has been replaced by a single video,
@@ -1190,22 +1976,175 @@ const HUNT_CUES={
   1:{t:"Hurray! Just 1 left.",               a:"1 left.wav"},
 };
 
-/* ---------- OPENING / TITLE PAGE (shown before the story) ---------- */
+/* ---------- OPENING / TITLE PAGE — premium night-sky home screen ----------
+   See the "HOME / TITLE SCREEN" CSS block for all styling. Everything here is
+   pure DOM + CSS, single-file and offline. Timers self-cancel when the child
+   leaves the screen (they check state.currentScene), so nothing leaks. */
+const HOME_KABIR_SRC = "Visuals/kabir chracter.svg";   // no-bag Kabir vector SVG; falls back to the inline IMG.kabir if it can't load
+let homeShootTimer=null, homeAttnTimer=null;
+
+/* hundreds of tiny background stars, varied size + opacity + twinkle timing */
+function buildHomeStars(layer,n,opts){
+  opts=opts||{};
+  for(let i=0;i<n;i++){
+    const d=document.createElement("div"); d.className="home-star";
+    const sz=((opts.min||1)+Math.random()*((opts.max||2.4)-(opts.min||1)));
+    d.style.width=d.style.height=sz.toFixed(2)+"px";
+    d.style.left=(Math.random()*100).toFixed(2)+"%";
+    d.style.top=(Math.random()*100).toFixed(2)+"%";
+    d.style.setProperty("--o",(0.25+Math.random()*0.6).toFixed(2));
+    d.style.animationDuration=(2.4+Math.random()*4).toFixed(2)+"s";
+    d.style.animationDelay=(Math.random()*5).toFixed(2)+"s";
+    layer.appendChild(d);
+  }
+}
+/* a handful of larger foreground stars with soft glow (mouse-reactive) */
+function buildBigStars(layer){
+  const pts=[[16,26],[78,20],[30,60],[68,56],[50,14],[88,44],[12,50]];
+  const arr=[];
+  pts.forEach((p,idx)=>{
+    const b=document.createElement("div"); b.className="home-bigstar";
+    b.style.left=p[0]+"%"; b.style.top=p[1]+"%";
+    b.style.animationDelay=(idx*0.7).toFixed(2)+"s";
+    const core=document.createElement("div"); core.className="bs-core"; b.appendChild(core);
+    layer.appendChild(b); arr.push(b);
+  });
+  return arr;
+}
+/* firefly-like floating sparkles (skipped under reduced-motion) */
+function buildFireflies(layer,n){
+  for(let i=0;i<n;i++){
+    const f=document.createElement("div"); f.className="home-fly";
+    f.style.left=(Math.random()*100).toFixed(1)+"%";
+    f.style.top=(40+Math.random()*55).toFixed(1)+"%";
+    f.style.setProperty("--dx",(Math.random()*60-30).toFixed(0)+"px");
+    f.style.setProperty("--dy",(-20-Math.random()*60).toFixed(0)+"px");
+    f.style.setProperty("--d",(6+Math.random()*8).toFixed(1)+"s");
+    f.style.animationDelay=(Math.random()*6).toFixed(1)+"s";
+    layer.appendChild(f);
+  }
+}
+/* occasional shooting star every 20–30s (re-schedules itself while on the home screen) */
+function scheduleShoot(host){
+  if(state.currentScene!=="start") return;
+  homeShootTimer=setTimeout(()=>{
+    if(state.currentScene!=="start"||!host.isConnected) return;
+    const s=document.createElement("div"); s.className="home-shoot";
+    s.style.left=(Math.random()*40).toFixed(0)+"%";
+    s.style.top=(Math.random()*30).toFixed(0)+"%";
+    s.addEventListener("animationend",()=>s.remove());
+    host.appendChild(s);
+    scheduleShoot(host);
+  },20000+Math.random()*10000);
+}
+/* Kabir occasionally looks up (subtle attention) */
+function scheduleKabirAttn(el){
+  if(state.currentScene!=="start") return;
+  homeAttnTimer=setTimeout(()=>{
+    if(state.currentScene!=="start"||!el.isConnected){ return; }
+    el.classList.add("attn");
+    setTimeout(()=>el.classList.remove("attn"),1500);
+    scheduleKabirAttn(el);
+  },9000+Math.random()*6000);
+}
+
 SCENES.start=()=>{
   state.currentScene="start";
   Speech.stop(); stopStoryAudio();
+  if(homeShootTimer){clearTimeout(homeShootTimer);homeShootTimer=null;}
+  if(homeAttnTimer){clearTimeout(homeAttnTimer);homeAttnTimer=null;}
   screen.innerHTML="";
-  const s=document.createElement("div"); s.className="scene";
-  const bg=document.createElement("div"); bg.className="sky-bg"; twinkles(bg,90); s.appendChild(bg);
-  const c=document.createElement("div"); c.className="center";
-  c.innerHTML='<h1 class="title">Constellation Explorers</h1>'+
-    '<p class="subtitle">Discover the pictures hidden in the night sky</p>'+
-    duo("Kabir and Meera are ready to explore with you");
-  const btn=document.createElement("button");
-  btn.className="btn pulse"; btn.style.fontSize="22px"; btn.textContent="▶ Start the game";
-  btn.onclick=()=>show("story");                              // pressing Start opens scene 1
-  c.appendChild(btn);
-  s.appendChild(c); screen.appendChild(s);
+  const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  const scene=document.createElement("div"); scene.className="scene home-scene";
+
+  /* --- night sky background --- */
+  const sky=document.createElement("div"); sky.className="home-sky";
+  sky.innerHTML='<div class="home-moon"></div><div class="home-nebula n1"></div><div class="home-nebula n2"></div>';
+  const starLayer=document.createElement("div"); starLayer.className="home-starlayer"; sky.appendChild(starLayer);
+  buildHomeStars(starLayer,220,{min:1,max:2.6});
+  const bigLayer=document.createElement("div"); bigLayer.className="home-biglayer"; sky.appendChild(bigLayer);
+  const bigStars=buildBigStars(bigLayer);
+  const flyLayer=document.createElement("div"); flyLayer.className="home-flylayer"; sky.appendChild(flyLayer);
+  if(!reduceMotion) buildFireflies(flyLayer,14);
+  const shootLayer=document.createElement("div"); shootLayer.className="home-shootlayer"; sky.appendChild(shootLayer);
+  scene.appendChild(sky);
+
+  /* --- foreground content --- */
+  const content=document.createElement("div"); content.className="home-content";
+  const tWrap=document.createElement("div"); tWrap.className="home-title-wrap";
+  tWrap.innerHTML='<h1 class="home-title">Constellation Explorers</h1>'+
+                  '<p class="home-tag">Discover the pictures hidden in the night sky</p>';
+  content.appendChild(tWrap);
+
+  const chars=document.createElement("div"); chars.className="home-chars";
+  const kabir=document.createElement("img"); kabir.className="home-char kabir"; kabir.alt="Kabir";
+  kabir.src=encodeURI(HOME_KABIR_SRC);                       // no-bag Kabir if provided…
+  kabir.onerror=()=>{ if(typeof IMG!=="undefined"&&IMG.kabir){ kabir.onerror=null; kabir.src=IMG.kabir; } }; // …else the existing Kabir
+  const meera=document.createElement("img"); meera.className="home-char meera"; meera.alt="Meera";
+  if(typeof IMG!=="undefined"&&IMG.meera) meera.src=IMG.meera;
+  chars.appendChild(kabir); chars.appendChild(meera);
+  content.appendChild(chars);
+
+  const btn=document.createElement("button"); btn.className="home-start"; btn.textContent="Let's Explore!";
+  content.appendChild(btn);
+  scene.appendChild(content);
+
+  /* small circular audio toggle (top chrome is hidden on this screen) */
+  const audioBtn=document.createElement("button");
+  audioBtn.className="home-audio"+(state.narrationOn?"":" off");
+  audioBtn.setAttribute("aria-label","Turn sound on or off");
+  audioBtn.setAttribute("aria-pressed",String(state.narrationOn));
+  audioBtn.innerHTML='<span aria-hidden="true">'+(state.narrationOn?"🔊":"🔇")+'</span>';
+  audioBtn.onclick=()=>{ toggleNarration(); const on=state.narrationOn;
+    audioBtn.classList.toggle("off",!on); audioBtn.setAttribute("aria-pressed",String(on));
+    audioBtn.firstChild.textContent=on?"🔊":"🔇"; };
+  scene.appendChild(audioBtn);
+
+  const flash=document.createElement("div"); flash.className="home-flash"; scene.appendChild(flash);
+  screen.appendChild(scene);
+
+  /* --- Start → cinematic transition into the park (story video) --- */
+  let igniting=false;
+  function spawnBurst(){
+    const host=document.createElement("div"); host.className="home-burst";
+    const r=btn.getBoundingClientRect(), sr=scene.getBoundingClientRect();
+    host.style.left=(r.left-sr.left+r.width/2)+"px";
+    host.style.top=(r.top-sr.top+r.height/2)+"px";
+    for(let i=0;i<16;i++){
+      const sp=document.createElement("span"); sp.className="burst-spark";
+      const a=(Math.PI*2*i/16)+Math.random()*0.3, d=40+Math.random()*70;
+      sp.style.setProperty("--bx",(Math.cos(a)*d).toFixed(0)+"px");
+      sp.style.setProperty("--by",(Math.sin(a)*d).toFixed(0)+"px");
+      host.appendChild(sp);
+    }
+    scene.appendChild(host);
+    setTimeout(()=>host.remove(),900);
+  }
+  btn.onclick=()=>{
+    if(igniting) return; igniting=true;
+    btn.classList.add("clicked"); spawnBurst();
+    if(reduceMotion){ setTimeout(()=>show("story"),180); return; }   // no zoom/flash under reduced motion
+    setTimeout(()=>scene.classList.add("igniting"),120);              // stars brighten + gentle zoom + glow flash
+    setTimeout(()=>show("story"),1000);                              // ~900–1000ms cinematic, then the park
+  };
+
+  /* --- light magical interactions (disabled under reduced motion) --- */
+  if(!reduceMotion){
+    let raf=0,mx=-1,my=-1;
+    sky.addEventListener("mousemove",(e)=>{
+      const r=sky.getBoundingClientRect(); mx=e.clientX-r.left; my=e.clientY-r.top;
+      if(!raf) raf=requestAnimationFrame(()=>{ raf=0;
+        bigStars.forEach((b)=>{
+          const bx=b.offsetLeft, by=b.offsetTop;            // width:0 element → left/top is the star centre
+          const g=Math.max(1, 2.6-Math.hypot(mx-bx,my-by)/170);
+          b.style.setProperty("--g",g.toFixed(2));
+        });
+      });
+    });
+    sky.addEventListener("mouseleave",()=>bigStars.forEach((b)=>b.style.setProperty("--g","1")));
+    scheduleShoot(shootLayer);
+  }
 };
 
 /* ---------- THE 7-SCENE PICTURE STORY ---------- */
@@ -1213,6 +2152,7 @@ SCENES.start=()=>{
    its blurry frozen last frame is never shown. A Skip button lets the child jump ahead. */
 function videoScene(src, doneLabel, onAdvance){
   Speech.stop(); stopStoryAudio(); stopHuntAudio();
+  document.getElementById("chrome").classList.add("hidden");        // full-screen video, like the intro
   screen.innerHTML="";
   const s=document.createElement("div"); s.className="scene";
   s.style.cssText="position:relative;background:#000;overflow:hidden";
@@ -1221,7 +2161,9 @@ function videoScene(src, doneLabel, onAdvance){
   video.src=encodeURI(src);
   video.poster=encodeURI(src.replace(/\.mp4$/i,".poster.webp"));   // first frame shows instantly — no black gap while buffering
   video.setAttribute("playsinline",""); video.controls=false; video.preload="auto";
-  video.style.cssText="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;z-index:0";
+  // fill the screen with no black bars; centre the frame so the small overflow is split
+  // evenly (only ~half is cropped from the bottom, instead of all of it)
+  video.style.cssText="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;background:#000;z-index:0";
   s.appendChild(video);
 
   const bar=document.createElement("div");
@@ -1259,17 +2201,40 @@ SCENES.story=()=>{
    y in pixels — star shapes and shape-recognition geometry stay undistorted.
    The stars keep the SAME on-screen size; we just place MORE of them.        */
 function genHuntStars(aspect){
-  const rows=5, cols=Math.max(6, Math.round(5.5*aspect));  // fewer stars, wider gaps (no clusters)
-  const mL=0.17*aspect, mR=0.05*aspect, my=0.12, stars=[]; // big left margin clears cards/coach/controls
-  for(let r=0;r<rows;r++){
-    for(let c=0;c<cols;c++){
-      const i=r*cols+c;
-      const x=mL+(aspect-mL-mR)*(c/(cols-1));
-      const y=my+(1-2*my)*(r/(rows-1));
-      const jx=(((i*37)%5)-2)*0.008*aspect;                // tiny scatter so they never bunch up
-      const jy=(((i*53)%5)-2)*0.009;
-      stars.push({x:x+jx, y:y+jy});                        // all stars identical (plain white)
-    }
+  // Evenly SCATTERED across the whole play area so the child can reach stars anywhere
+  // and build any shape. A "jittered grid" (one star per cell, randomly placed inside
+  // the cell) gives full coverage that still looks organic — not stiff rows.
+  // Deterministic (seeded) so the layout is stable per load.
+  // Margins clear the Explorer Mission tablet (right) and thin top/bottom strips,
+  // so no tappable star ever hides under the panel. Wider jitter lets the outer
+  // stars sit near the remaining edges.
+  // Field now spans almost the FULL width — only the Explorer Mission tablet's own
+  // top-right rectangle is kept clear of tappable stars (so none hides under it).
+  // Everything else — left, centre, far right and the whole strip BELOW the panel —
+  // gets stars, so the sky feels filled edge to edge.
+  const x0=0.025*aspect, x1=aspect-0.025*aspect, y0=0.06, y1=0.93;
+  let seed=1234567>>>0; const rnd=()=>{ seed=(seed*1664525+1013904223)>>>0; return seed/4294967296; };
+  const W=x1-x0, H=y1-y0, stars=[];
+  const cols=Math.max(8, Math.round(5.5*aspect)), rows=5;  // fewer interactive stars — sparser, less crowded
+  const cw=W/cols, ch=H/rows;
+  // panel exclusion BAND: the tablet now sits lower (~top:22vh→~0.64), so we clear
+  // only that vertical band on the right — stars still fill the corner ABOVE the panel.
+  const panelX=aspect-0.18*aspect;
+  const inPanel=(x,y)=>(x>panelX && y>0.27 && y<0.77);
+  // ~60–86% of the field stars stay bright & tappable; the rest become soft
+  // decorative background stars. The chance rises left→right, so the bright-star
+  // density leans toward the right (it used to look left-heavy). The left still
+  // keeps ~60% bright, so every target shape stays traceable anywhere on screen.
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    const x=x0+(c+0.08+0.84*rnd())*cw;       // use almost the whole cell → reaches the edges/corners
+    const y=y0+(r+0.08+0.84*rnd())*ch;
+    if(inPanel(x,y)) continue;               // keep the tablet area clear of tappable stars
+    const pBright=0.60+0.26*((x-x0)/W);      // left ≈0.60 → right ≈0.86
+    stars.push({x, y, interactive: rnd()<pBright});
+  }
+  // a few soft background stars directly BELOW the panel + Continue/Skip dock (lower-right)
+  for(let i=0;i<4;i++){
+    stars.push({ x:(aspect-0.20*aspect)+rnd()*0.17*aspect, y:0.70+rnd()*0.20, interactive:false });
   }
   return stars;
 }
@@ -1360,15 +2325,14 @@ function identifyShape(stars, edges){
   return "shape";
 }
 
-/* 6–7 reference shapes the child hunts for in the star scene */
+/* 6 reference shapes the child hunts for in the star scene */
 const HUNT_TARGETS=[
-  {type:"line",      label:"Line"},
-  {type:"triangle",  label:"Triangle"},
-  {type:"square",    label:"Square"},
-  {type:"rectangle", label:"Rectangle"},
-  {type:"letter L",  label:"L-shape"},
-  {type:"zigzag",    label:"Zig-zag"},
-  {type:"pentagon",  label:"Pentagon"},
+  {type:"triangle",  label:"Triangle",  title:"Find a Triangle",  tip:"Find 3 corners in the stars."},
+  {type:"square",    label:"Square",    title:"Find a Square",    tip:"Find 4 equal sides."},
+  {type:"rectangle", label:"Rectangle", title:"Find a Rectangle", tip:"Find a long box shape."},
+  {type:"letter L",  label:"L-shape",   title:"Find an L-shape",  tip:"Find a corner path."},
+  {type:"zigzag",    label:"Zig-zag",   title:"Find a Zigzag",    tip:"Find a bending star path."},
+  {type:"pentagon",  label:"Pentagon",  title:"Find a Pentagon",  tip:"Find 5 corners."},
 ];
 /* small gold star-and-line icon for each reference shape */
 function shapeIcon(type){
@@ -1389,6 +2353,23 @@ function shapeIcon(type){
   const dots=pts.map(p=>'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3.2" fill="var(--star)"/>').join("");
   return '<svg viewBox="0 0 48 48" class="sicon" aria-hidden="true">'+shape+dots+'</svg>';
 }
+/* glowing geometric glyph for the mission tablet (stroke = currentColor, so the
+   panel state colours — cyan/amber/slate — flow straight through). */
+function shapeGlyph(type){
+  const pts=({
+    line:      [[8,38],[40,10]],
+    triangle:  [[24,8],[8,40],[40,40]],
+    square:    [[12,12],[36,12],[36,36],[12,36]],
+    rectangle: [[6,15],[42,15],[42,33],[6,33]],
+    "letter L":[[14,8],[14,40],[40,40]],
+    zigzag:    [[7,14],[18,34],[29,14],[40,34]],
+    pentagon:  [[24,6],[43,20],[35,43],[13,43],[5,20]],
+  })[type]||[];
+  const open=(type==="line"||type==="zigzag"||type==="letter L");
+  const list=pts.map(p=>p.join(",")).join(" ");
+  const shape=open ? '<polyline points="'+list+'"/>' : '<polygon points="'+list+'"/>';
+  return '<svg viewBox="0 0 48 48" aria-hidden="true">'+shape+'</svg>';
+}
 
 /* ---------- SCENE 5: PATTERN HUNT (find the reference shapes) ---------- */
 SCENES.hunt=()=>{
@@ -1397,18 +2378,44 @@ SCENES.hunt=()=>{
   state.patternsFound=[];
   const NEED=HUNT_TARGETS.length;
   const found=new Set();
+  let celebrating=false;
+  const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   const s=document.createElement("div"); s.className="scene hunt-stage";
 
-  // full-screen star field (the play area)
+  // full-screen immersive star field (the play area)
   const wrap=document.createElement("div"); wrap.className="huntfield"; s.appendChild(wrap);
-  // shape cards stacked down the LEFT
-  const rail=document.createElement("div"); rail.className="shaperail"; s.appendChild(rail);
-  // Kabir coach in the corner with a speech bubble (cues during the hunt)
+
+  // ---- Explorer Mission Tablet (right): glass dashboard — header, progress,
+  //      a dominant "current mission" card, and the full mission list ----
+  const panel=document.createElement("div"); panel.className="mission-panel";
+  panel.innerHTML=
+    '<div class="mp-head">'+
+      '<span class="mp-ico" aria-hidden="true">🛰️</span>'+
+      '<div class="mp-headtext"><div class="mp-title">Explorer Mission</div>'+
+        '<div class="mp-sub">Shape Hunt</div></div>'+
+      '<span class="mp-count" aria-live="polite"><b>0</b>/'+NEED+'</span>'+
+    '</div>'+
+    '<div class="progress-track"><div class="progress-fill"></div></div>'+
+    '<div class="current-strip" aria-label="Current mission">'+
+      '<span class="cur-tag">Current Mission</span>'+
+      '<span class="cur-icon" aria-hidden="true"></span>'+
+    '</div>'+
+    '<div class="mission-path"><div class="mission-path-title">Mission Path</div>'+
+      '<div class="mission-path-grid"></div></div>';
+  s.appendChild(panel);
+  const progFill=panel.querySelector(".progress-fill");
+  const headCount=panel.querySelector(".mp-count b");
+  const curIcon=panel.querySelector(".cur-icon");
+  const grid=panel.querySelector(".mission-path-grid");
+
+  // ---- Kabir companion + premium speech bubble (cues during the hunt) ----
   const coach=document.createElement("div"); coach.className="coach";
   const say=document.createElement("div"); say.className="coach-say";
+  say.innerHTML='<span class="cs-ico" aria-hidden="true">⭐</span><span class="cs-text"></span>';
   const face=document.createElement("img"); face.className="coach-face"; face.alt="Kabir";
-  if(typeof IMG!=="undefined"&&IMG.kabir) face.src=IMG.kabir;
+  face.src=encodeURI("Visuals/kabir standing.png");                    // full-body Kabir, transparent bg…
+  face.onerror=()=>{ if(typeof IMG!=="undefined"&&IMG.kabir){ face.onerror=null; face.src=IMG.kabir; } }; // …else the inline portrait
   coach.appendChild(face); coach.appendChild(say); s.appendChild(coach);
   // Kabir's full character + dialogue box, shown centre-stage once all shapes are found (no float)
   const heroStage=document.createElement("div"); heroStage.className="hero-stage";
@@ -1416,32 +2423,160 @@ SCENES.hunt=()=>{
   const heroFig=document.createElement("img"); heroFig.className="hero-fig"; heroFig.alt="Kabir";
   if(typeof IMG!=="undefined"&&IMG.kabir) heroFig.src=IMG.kabir;
   heroStage.appendChild(heroSay); heroStage.appendChild(heroFig); s.appendChild(heroStage);
-  // bottom controls
+  // bottom controls (Undo / Clear) + a right-side mission dock (Continue / Skip), below the panel
   const controls=document.createElement("div"); controls.className="hunt-controls"; s.appendChild(controls);
+  const navDock=document.createElement("div"); navDock.className="hunt-nav"; s.appendChild(navDock);
+
+  // ---- full-screen HUD overlay: Sky Stars score + small audio toggle (top-right) ----
+  const hud=document.createElement("div"); hud.className="hunt-hud";
+  const stars=document.createElement("div"); stars.className="hunt-stars"; stars.setAttribute("aria-live","polite"); stars.setAttribute("aria-label","Sky Stars score");
+  stars.innerHTML='<span class="ico" aria-hidden="true">⭐</span><span class="hl">Sky Stars</span><span class="hv">0</span>';
+  hud.appendChild(stars);
+  const audioBtn=document.createElement("button"); audioBtn.className="hunt-audio"+(state.narrationOn?"":" off");
+  audioBtn.setAttribute("aria-label","Turn sound on or off"); audioBtn.setAttribute("aria-pressed",String(state.narrationOn));
+  audioBtn.innerHTML='<span aria-hidden="true">'+(state.narrationOn?"🔊":"🔇")+'</span>';
+  audioBtn.onclick=()=>{ toggleNarration(); const on=state.narrationOn;
+    audioBtn.classList.toggle("off",!on); audioBtn.setAttribute("aria-pressed",String(on)); audioBtn.firstChild.textContent=on?"🔊":"🔇"; };
+  hud.appendChild(audioBtn); s.appendChild(hud);
+  function updateHud(bump){
+    const hv=stars.querySelector(".hv"); if(hv) hv.textContent=state.starCoins;
+    if(bump){ stars.classList.remove("bump"); void stars.offsetWidth; stars.classList.add("bump"); }
+  }
 
   screen.appendChild(s);
+  updateHud();
 
-  // build the field after layout so it fills the screen; stars keep their size,
-  // there are just more of them, spread across the full width.
+  // build the field after layout so it fills the screen (logic unchanged; star
+  // positions / scale / shape recognition are exactly as before).
   const aspect=Math.max(1.15,(wrap.clientWidth||window.innerWidth)/(wrap.clientHeight||window.innerHeight));
   const STARS=genHuntStars(aspect);
-  const field=createStarField(wrap,STARS,{starScale:0.45, vbW:Math.round(100*aspect)});
+  let prevCount=0;                                       // detects a freshly-drawn edge for the travelling particle
+  const field=createStarField(wrap,STARS,{starScale:0.33, vbW:Math.round(100*aspect),
+    onChange:(keys,edges)=>{
+      if(edges.length===prevCount+1){ const e=edges[edges.length-1]; travelParticle(e[0],e[1]); }
+      prevCount=edges.length;
+    }});
+  addHuntDeco(wrap);                                     // faint background stars + Milky Way, behind the field
 
-  function coachSay(text){ say.textContent=text; }
-  function cue(left){ const q=HUNT_CUES[left]; if(!q) return; coachSay(q.t); playHunt(q.a); }
+  // ---- gentle decorative dust in the empty right strip below the mission tablet ----
+  // (no interactive stars live here — genHuntStars reserves this margin — so it only fills space)
+  (function addPanelDust(){
+    const glow=document.createElement("div"); glow.className="hunt-dustglow";
+    glow.style.cssText+=";width:34vw;height:34vw;right:-5vw;top:54%";
+    wrap.appendChild(glow);
+    const box=document.createElement("div"); box.className="hunt-dustfield";
+    box.style.cssText+=";top:52%;right:0;width:30%;height:46%";
+    for(let i=0;i<13;i++){ const d=document.createElement("div"); d.className="hunt-dust";
+      const sz=(1.4+Math.random()*1.8).toFixed(1);
+      d.style.width=sz+"px"; d.style.height=sz+"px";
+      d.style.left=(6+Math.random()*88).toFixed(1)+"%";
+      d.style.top=(4+Math.random()*90).toFixed(1)+"%";
+      d.style.setProperty("--dt",(4+Math.random()*3.5).toFixed(1)+"s");
+      d.style.animationDelay=(Math.random()*5).toFixed(1)+"s";
+      box.appendChild(d); }
+    wrap.appendChild(box);
+  })();
+
+  // ---- ambient depth: nebula + floating particles + occasional shooting star ----
+  if(!reduceMotion){
+    const gal=document.createElement("div"); gal.className="hunt-galaxy"; wrap.appendChild(gal);
+    const na=document.createElement("div"); na.className="hunt-neb a"; wrap.appendChild(na);
+    const nb=document.createElement("div"); nb.className="hunt-neb b"; wrap.appendChild(nb);
+    const nc=document.createElement("div"); nc.className="hunt-neb c"; wrap.appendChild(nc);
+    const fly=document.createElement("div"); fly.style.cssText="position:absolute;inset:0;pointer-events:none;z-index:0"; wrap.appendChild(fly);
+    for(let i=0;i<16;i++){ const f=document.createElement("div"); f.className="hunt-fly";
+      f.style.left=(Math.random()*100).toFixed(1)+"%"; f.style.top=(Math.random()*100).toFixed(1)+"%";
+      f.style.setProperty("--dx",(Math.random()*50-25).toFixed(0)+"px");
+      f.style.setProperty("--dy",(-20-Math.random()*50).toFixed(0)+"px");
+      f.style.setProperty("--d",(7+Math.random()*7).toFixed(1)+"s");
+      f.style.animationDelay=(Math.random()*6).toFixed(1)+"s"; fly.appendChild(f); }
+    scheduleHuntShoot(wrap);
+  }
+
+  // ---- magic helpers (SVG sparkle / ripple / travelling line particle) ----
+  const NS="http://www.w3.org/2000/svg";
+  function sparkleStar(x,y){
+    for(let k=0;k<5;k++){
+      const c=document.createElementNS(NS,"circle");
+      c.setAttribute("cx",x); c.setAttribute("cy",y); c.setAttribute("r",(0.5+Math.random()*0.6).toFixed(2));
+      c.setAttribute("class","hunt-spark");
+      const ang=Math.random()*Math.PI*2, dist=2+Math.random()*3;
+      c.style.setProperty("--sx",(Math.cos(ang)*dist).toFixed(2)+"px");
+      c.style.setProperty("--sy",(Math.sin(ang)*dist).toFixed(2)+"px");
+      field.svg.appendChild(c); setTimeout(()=>c.remove(),720);
+    }
+  }
+  function rippleStar(x,y){
+    const c=document.createElementNS(NS,"circle");
+    c.setAttribute("cx",x); c.setAttribute("cy",y); c.setAttribute("r",2); c.setAttribute("class","hunt-ripple");
+    field.svg.appendChild(c); setTimeout(()=>c.remove(),640);
+  }
+  function travelParticle(a,b){
+    const c=document.createElementNS(NS,"circle");
+    c.setAttribute("r",0.9); c.setAttribute("class","hunt-trav");
+    c.setAttribute("cx",STARS[a].x*100); c.setAttribute("cy",STARS[a].y*100);
+    const m=document.createElementNS(NS,"animateMotion");
+    m.setAttribute("dur","0.5s"); m.setAttribute("fill","freeze");
+    m.setAttribute("path","M0 0 L "+((STARS[b].x-STARS[a].x)*100).toFixed(2)+" "+((STARS[b].y-STARS[a].y)*100).toFixed(2));
+    c.appendChild(m); field.svg.appendChild(c);
+    if(m.beginElement){ try{ m.beginElement(); }catch(e){} }
+    setTimeout(()=>c.remove(),540);
+  }
+  function scheduleHuntShoot(host){
+    if(state.currentScene!=="hunt") return;
+    setTimeout(()=>{
+      if(state.currentScene!=="hunt"||!host.isConnected) return;
+      const sh=document.createElement("div"); sh.className="hunt-shoot";
+      sh.style.left=(Math.random()*40).toFixed(0)+"%"; sh.style.top=(Math.random()*30).toFixed(0)+"%";
+      sh.addEventListener("animationend",()=>sh.remove()); host.appendChild(sh);
+      scheduleHuntShoot(host);
+    },18000+Math.random()*12000);
+  }
+
+  // ---- intro: stars pulse once to invite a tap ----
+  if(!reduceMotion){ field.svg.classList.add("intro"); setTimeout(()=>field.svg.classList.remove("intro"),1300); }
+
+  // ---- speech bubble + audio cues ----
+  function coachSay(text){
+    const t=say.querySelector(".cs-text"); if(t){ t.textContent=text; } else { say.textContent=text; }
+    say.style.animation="none"; void say.offsetWidth; say.style.animation="";       // replay the pop on each new line
+  }
+  function cue(left){ const q=HUNT_CUES[left]; if(!q) return; coachSay(q.t); }
+  function pulseCoach(cls,ms){ coach.classList.add(cls); setTimeout(()=>coach.classList.remove(cls),ms||900); }
   stopHuntAudio();
-  coachSay("We are a team! Connect the stars to make each shape on the left, then tap its card. Let's find them all!");
-  playHunt("activity 1 instruction audio.wav");   // Kabir's spoken instruction (matches the bubble)
+  coachSay("Let's find hidden shapes in the stars! Connect the dots, then tap its card.");
 
-  // reference shape cards (tap to claim a shape you have made)
+  // ---- mission path: compact visual grid of tappable shape tiles ----
   const tabEls={};
-  HUNT_TARGETS.forEach(t=>{
-    const tab=document.createElement("button"); tab.type="button"; tab.className="shapetab";
-    tab.innerHTML=shapeIcon(t.type)+'<span class="slabel">'+t.label+'</span><span class="scheck" aria-hidden="true">✓</span>';
-    tab.setAttribute("aria-label","Mark "+t.label+" as found");
-    tab.onclick=()=>tryFind(t);
-    rail.appendChild(tab); tabEls[t.type]=tab;
+  HUNT_TARGETS.forEach((t,idx)=>{
+    const tile=document.createElement("button"); tile.type="button"; tile.className="mission-path-tile locked";
+    tile.style.animationDelay=(0.4+idx*0.06).toFixed(2)+"s";               // tiles appear one by one
+    tile.setAttribute("aria-label","Mark "+t.label+" as found");
+    tile.innerHTML='<span class="mp-tile-now" aria-hidden="true">NOW</span>'+
+                   '<span class="mp-tile-check" aria-hidden="true">✓</span>'+
+                   '<span class="shape-icon">'+shapeGlyph(t.type)+'</span>'+
+                   '<span class="mission-path-label">'+t.label+'</span>';
+    tile.onclick=()=>tryFind(t);
+    tile.addEventListener("mouseenter",()=>{ if(!found.has(t.type)&&!celebrating) coachSay("Can you spot a "+t.label+"?"); });
+    grid.appendChild(tile); tabEls[t.type]=tile;
   });
+
+  // ---- refresh the tablet: progress bar, header count, current card, tile states ----
+  function refreshPanel(bump){
+    progFill.style.width=Math.round((found.size/NEED)*100)+"%";
+    headCount.textContent=found.size;
+    if(bump){ progFill.classList.remove("bump"); void progFill.offsetWidth; progFill.classList.add("bump"); }
+    const cur=HUNT_TARGETS.find(t=>!found.has(t.type));     // first unfound = current mission
+    HUNT_TARGETS.forEach(t=>{ const tile=tabEls[t.type];
+      tile.classList.remove("completed","current","locked"); tile.disabled=false;
+      if(found.has(t.type)){ tile.classList.add("completed"); tile.disabled=true; }
+      else if(cur&&t.type===cur.type){ tile.classList.add("current"); }
+      else { tile.classList.add("locked"); }
+    });
+    if(cur){ curIcon.innerHTML=shapeGlyph(cur.type); panel.querySelector(".current-strip").setAttribute("aria-label","Current mission: "+cur.title); }
+    else { curIcon.textContent="🎉"; panel.querySelector(".current-strip").setAttribute("aria-label","All shapes found!"); }
+  }
+  refreshPanel();
 
   function accepts(type, made){
     if(type===made) return true;
@@ -1450,26 +2585,60 @@ SCENES.hunt=()=>{
     return false;
   }
 
-  const done=mkBtn("Continue ➜","small",()=>{ stopHuntAudio(); revealConstellation(); }); done.disabled=true;
-  controls.appendChild(mkBtn("↶ Undo","small",()=>field.undo()));
-  controls.appendChild(mkBtn("⟲ Clear","small",()=>field.clear()));
-  controls.appendChild(done);
-  // Skip lets the child move on without finding all 7 shapes
-  controls.appendChild(mkBtn("Skip ➜","small",()=>{ stopHuntAudio(); revealConstellation(); }));
+  // ---- controls: Undo / Clear stay in the bottom dock; Continue (primary) + Skip
+  //      live in the right-side mission dock, tucked just under the panel ----
+  const done=mkBtn("Continue ➜","hc-continue",()=>{ stopHuntAudio(); revealConstellation(); }); done.disabled=true;
+  controls.appendChild(mkBtn("↶ Undo","hc-undo",()=>field.undo()));
+  controls.appendChild(mkBtn("⟲ Clear","hc-clear",()=>field.clear()));
+  navDock.appendChild(done);
+  // Skip lets the child move on without finding all shapes
+  navDock.appendChild(mkBtn("Skip ➜","hc-skip",()=>{ stopHuntAudio(); revealConstellation(); }));
+
+  // ---- celebration + intermittent surprises ----
+  const SURPRISES=["✨ Sharp Eyes!","🔭 Pattern Finder!","🌟 Sky Explorer!","⭐ Star Detective!"];
+  function showBadge(label){
+    const cel=document.createElement("div"); cel.className="hunt-celebrate";
+    cel.innerHTML='<div class="cel-title">'+label+' Found!</div><div class="cel-sub">+2 ⭐</div>';
+    s.appendChild(cel); setTimeout(()=>cel.remove(),1400);
+  }
+  function surprise(){
+    const idx=Math.floor(found.size/3)-1;
+    const el=document.createElement("div"); el.className="hunt-surprise";
+    el.textContent=SURPRISES[((idx%SURPRISES.length)+SURPRISES.length)%SURPRISES.length];
+    s.appendChild(el); setTimeout(()=>el.remove(),1600);
+  }
 
   function tryFind(t){
+    if(celebrating) return;                                  // brief lock during the celebration
     if(found.has(t.type)) return;
-    if(field.starCount()<2){ Sfx.retry(); return; }
+    if(field.starCount()<2){ Sfx.retry(); pulseCoach("think",1000); coachSay("Pick a few stars first, then tap a card."); return; }
     const made=identifyShape(STARS, field.edges());
     if(accepts(t.type, made)){
       found.add(t.type);
-      tabEls[t.type].classList.add("done"); tabEls[t.type].disabled=true;
-      Rewards.earn(2); Sfx.found(); field.clear(); renderProgress();
+      refreshPanel(true);
+      Rewards.earn(2); Sfx.found(); updateHud(true);
+      // celebrate: glow the made lines + sparkle each used star
+      const usedIdx=[...new Set(field.edges().flatMap(e=>[e[0],e[1]]))];
+      field.svg.classList.add("shape-celebrate");
+      usedIdx.forEach(i=>sparkleStar(STARS[i].x*100, STARS[i].y*100));
       const left=NEED-found.size;
-      if(left>0) cue(left);                       // bubble text + matching "n more" narration
-      else finish();
+      pulseCoach("cheer",900);
+      if(left>0){
+        if(left<=2) coach.classList.add("excited");         // near the end: stay excited
+        showBadge(t.label);
+        if(found.size%3===0) surprise();                    // intermittent delight every 3 shapes
+        celebrating=true;
+        setTimeout(()=>{ field.svg.classList.remove("shape-celebrate"); field.clear(); renderProgress(); celebrating=false; cue(left); },900);
+      } else {
+        setTimeout(()=>field.svg.classList.remove("shape-celebrate"),1000);
+        finish();
+      }
     } else {
       Sfx.retry();
+      wrap.classList.remove("shake"); void wrap.offsetWidth; wrap.classList.add("shake");
+      setTimeout(()=>wrap.classList.remove("shake"),440);
+      pulseCoach("think",1000);
+      coachSay("Good try! Look carefully again.");
     }
   }
 
@@ -1479,10 +2648,33 @@ SCENES.hunt=()=>{
     Rewards.setTitle("Pattern Finder");
     field.clear();
     coach.style.display="none";                  // hide the corner coach
-    heroSay.textContent="You are a champion! We found 7 shapes and patterns. Let's move ahead and help us find some more.";
+    s.classList.add("complete");                 // soft sky glow
+    heroSay.textContent="You are a champion! We found all the shapes and patterns. Let's move ahead and find some more.";
     heroStage.classList.add("show");             // full Kabir centre-stage + dialogue box (no float)
-    playHunt("when all 7 shapes found.wav");
+    if(!reduceMotion){ for(let k=0;k<14;k++) sparkleStar(8+Math.random()*((100*aspect)-16), 8+Math.random()*84); }
     done.disabled=false; done.classList.add("pulse");
+  }
+
+  // ---- click ripple on interactive stars (added at svg level; does not touch the field engine) ----
+  field.svg.addEventListener("click",e=>{
+    const hit=e.target.closest?e.target.closest(".starhit"):null; if(!hit) return;
+    const node=hit.closest(".starnode"); if(!node) return;
+    const idx=Array.prototype.indexOf.call(node.parentNode.children,node);
+    if(idx<0||!STARS[idx]) return;
+    rippleStar(STARS[idx].x*100, STARS[idx].y*100);
+  });
+
+  // ---- light cursor magic: nearby interactive stars glow ----
+  if(!reduceMotion){
+    const starNodes=Array.prototype.slice.call(field.svg.querySelectorAll(".starnode:not(.deco)"));
+    let rects=[];
+    const cache=()=>{ const wr=wrap.getBoundingClientRect();
+      rects=starNodes.map(n=>{ const r=n.getBoundingClientRect(); return {n,cx:r.left+r.width/2-wr.left,cy:r.top+r.height/2-wr.top}; }); };
+    setTimeout(cache,60);
+    let raf=0,mx=-1,my=-1;
+    wrap.addEventListener("mousemove",e=>{ const wr=wrap.getBoundingClientRect(); mx=e.clientX-wr.left; my=e.clientY-wr.top;
+      if(!raf) raf=requestAnimationFrame(()=>{ raf=0; rects.forEach(o=>{ o.n.classList.toggle("near", Math.hypot(mx-o.cx,my-o.cy)<72); }); }); });
+    wrap.addEventListener("mouseleave",()=>{ starNodes.forEach(n=>n.classList.remove("near")); });
   }
 };
 
@@ -1671,63 +2863,106 @@ SCENES.discover=()=>{
   const fieldBox=document.createElement("div"); fieldBox.className="tracefield"; s.appendChild(fieldBox);
 
   // Meera's full character (with the book) in the bottom corner + a floating dialogue box
-  const coach=document.createElement("div"); coach.className="discover-coach";
+  const coach=document.createElement("div"); coach.className="discover-coach"+(c.id==="cassiopeia"?" cass-coach":"");
   const fig=document.createElement("img"); fig.className="dc-fig"; fig.alt="Meera with the "+c.name+" book";
   fig.src=encodeURI(c.coachImg||"");
   fig.onerror=()=>{ if(typeof IMG!=="undefined"&&IMG.meera && fig.src.indexOf("data:")<0) fig.src=IMG.meera; };
   const say=document.createElement("div"); say.className="dc-say";
   coach.appendChild(say); coach.appendChild(fig); s.appendChild(coach);   // bubble ABOVE Meera
 
-  // controls (top-left) + clue (top-right), golden
-  const controls=document.createElement("div"); controls.className="discover-controls"; s.appendChild(controls);
-  const clueWrap=document.createElement("div"); clueWrap.className="trace-clue"; s.appendChild(clueWrap);
+  // top-left head: mission badge + tiny step tracker (Spot → Imagine → Explain → Reveal)
+  const head=document.createElement("div"); head.className="discover-head";
+  head.innerHTML='<div class="discover-badge"><span class="db-ico" aria-hidden="true">🌌</span>'+
+                 '<div class="db-text"><div class="db-title">Mission 2</div>'+
+                 '<div class="db-sub">Star Story Space</div></div></div>'+
+                 '<div class="step-track" aria-label="Activity steps">'+
+                   '<span class="step" data-step="spot">Spot</span><span class="step-arrow">→</span>'+
+                   '<span class="step" data-step="imagine">Imagine</span><span class="step-arrow">→</span>'+
+                   '<span class="step" data-step="explain">Explain</span><span class="step-arrow">→</span>'+
+                   '<span class="step" data-step="reveal">Reveal</span></div>';
+  s.appendChild(head);
+  const STEP_ORDER=["spot","imagine","explain","reveal"];
+  function setStep(name){ const i=STEP_ORDER.indexOf(name);
+    head.querySelectorAll(".step").forEach(el=>{ const j=STEP_ORDER.indexOf(el.dataset.step);
+      el.classList.toggle("on", j===i); el.classList.toggle("done", j<i); }); }
+
+  // bottom-centre segmented control (Undo | Clear | Clue) + a standalone top-right sound toggle
+  const dock=document.createElement("div"); dock.className="discover-dock"; s.appendChild(dock);
+  function segBtn(ico,label,onClick){
+    const b=document.createElement("button"); b.type="button"; b.className="seg";
+    b.innerHTML='<span class="seg-ico" aria-hidden="true">'+ico+'</span><span class="seg-label">'+label+'</span>';
+    b.setAttribute("aria-label",label); b.title=label; b.onclick=onClick; return b;
+  }
+  function segDiv(){ const d=document.createElement("span"); d.className="seg-div"; d.setAttribute("aria-hidden","true"); return d; }
+  const sndBtn=document.createElement("button"); sndBtn.type="button"; sndBtn.className="discover-sound"+(state.narrationOn?"":" snd-off");
+  sndBtn.innerHTML='<span aria-hidden="true">'+(state.narrationOn?"🔊":"🔇")+'</span>';
+  sndBtn.setAttribute("aria-label","Turn sound on or off"); sndBtn.title="Turn sound on or off";
+  sndBtn.onclick=()=>{ toggleNarration(); sndBtn.firstChild.textContent=state.narrationOn?"🔊":"🔇"; sndBtn.classList.toggle("snd-off",!state.narrationOn); };
+  s.appendChild(sndBtn);
 
   screen.appendChild(s);
 
-  // strip emoji / symbols before speaking so the voice never reads "party popper" etc.
-  function setSay(t,speak,onDone){ say.innerHTML='<div class="who">Meera</div>'+t;
-    if(speak!==false) Speech.speak(t.replace(/[^\w\s.,!?'"’-]/g," ").replace(/\s+/g," ").trim(), null, "Meera", onDone); }
-  const FIND="Spot this pattern in the stars.";
+  // voiceover removed — Meera's lines show as text only (audio files to be wired in later)
+  function setSay(t,speak,onDone){ say.innerHTML='<div class="who"><span class="dc-star" aria-hidden="true">✦</span>Meera</div>'+t; }
+  const FIND="Can you spot this star pattern?";
   setSay(FIND);
+  setStep("spot");
 
   const aspect=Math.max(1.15,(fieldBox.clientWidth||window.innerWidth)/(fieldBox.clientHeight||window.innerHeight));
   const VBW=Math.round(100*aspect);
-  const lf=buildLevelFieldFS(c, aspect);
-  let solved=false, cuesUsed=0, failCount=0, attemptScored=false; const MAXCLUES=5;
+  // ONE shared star field for all three hunt constellations — same layout every
+  // level; we only pick out the constellation this level asks the child to trace.
+  const lf=(()=>{ const sf=buildSharedField(aspect); const m=sf.map[c.id];
+    return {stars:sf.stars, edges:m.edges, constIdx:m.constIdx, brightIdx:m.brightIdx}; })();
+  let solved=false, cuesUsed=0, failCount=0, attemptScored=false;
   const targetCount=c.edges.length;
   const SHAPE_TOL=(c.tol!=null)?c.tol:0.22;
   function isMatch(){ return shapesMatch(c.stars,c.edges, lf.stars,field.edges(), SHAPE_TOL); }
 
-  const field=createStarField(fieldBox,lf.stars,{starScale:0.45, vbW:VBW, onChange:()=>{
+  // golden dot that travels along each freshly-drawn line (same as Activity 1)
+  const NS="http://www.w3.org/2000/svg";
+  let dPrev=0;
+  function travelParticle(a,b){
+    const cc=document.createElementNS(NS,"circle");
+    cc.setAttribute("r",0.9); cc.setAttribute("class","hunt-trav");
+    cc.setAttribute("cx",lf.stars[a].x*100); cc.setAttribute("cy",lf.stars[a].y*100);
+    const m=document.createElementNS(NS,"animateMotion");
+    m.setAttribute("dur","0.5s"); m.setAttribute("fill","freeze");
+    m.setAttribute("path","M0 0 L "+((lf.stars[b].x-lf.stars[a].x)*100).toFixed(2)+" "+((lf.stars[b].y-lf.stars[a].y)*100).toFixed(2));
+    cc.appendChild(m); if(field&&field.svg) field.svg.appendChild(cc);
+    if(m.beginElement){ try{ m.beginElement(); }catch(e){} }
+    setTimeout(()=>cc.remove(),540);
+  }
+
+  const field=createStarField(fieldBox,lf.stars,{starScale:0.32, vbW:VBW, onChange:()=>{
     if(solved) return;
     const n=field.edges().length;
+    if(n===dPrev+1){ const e=field.edges()[n-1]; travelParticle(e[0],e[1]); }   // golden dot on the new line
+    dPrev=n;
     if(isMatch()){ win(); return; }
-    // never interrupt with speech while the child is still drawing — quiet hints only
     if(n===0){ attemptScored=false; setSay(FIND,false); return; }
     if(n>=targetCount){
-      if(!attemptScored){ attemptScored=true; failCount++; Sfx.retry(); }
-      setSay(failCount>=2 ? "Not matching yet — tap the 💡 Clue button for help." : "Hmm, that's not it yet. Tap Clear and try again.", false);
-    } else { attemptScored=false; setSay("Keep connecting the stars to match the picture in the book…",false); }
+      // a complete figure that doesn't match — Meera says try again (spoken, once per attempt)
+      if(!attemptScored){ attemptScored=true; failCount++; Sfx.retry();
+        setSay(failCount>=2 ? "That's not quite it. Tap the 💡 bulb for a clue, then try again!"
+                            : "Hmm, that doesn't match. Tap Clear and try again!", true);
+      }
+    } else { attemptScored=false; setSay("Keep connecting to match the picture!",false); }
   }});
+  addSkyAtmosphere(fieldBox);   // same premium night-sky as the Mission Hunt screen
 
-  controls.appendChild(mkBtn("↶ Undo","small",()=>{ if(!solved) field.undo(); }));
-  controls.appendChild(mkBtn("⟲ Clear","small",()=>{ if(!solved){ field.clear(); setSay(FIND,false); } }));
-
-  const cueBtn=mkBtn("💡 Clue ("+MAXCLUES+")","small",()=>{
-    if(solved||cuesUsed>=MAXCLUES) return;
-    cuesUsed++;
-    if(cuesUsed===1){ field.highlight(lf.brightIdx); setSay("Start with the brightest stars — find them first."); }
-    else if(cuesUsed===2){ field.highlight(lf.constIdx); setSay("These glowing stars make "+c.name+". Connect them like the book."); }
-    else {
-      const have=new Set(field.keys());
-      const ne=lf.edges.find(([a,b])=>!have.has(Math.min(a,b)+"-"+Math.max(a,b)));
-      if(ne){ field.highlight([ne[0],ne[1]]); field.ghost(ne[0],ne[1]); setSay("Follow the dotted line next."); }
-      else { field.highlight(lf.constIdx); setSay("Connect the glowing stars just like the book."); }
-    }
-    cueBtn.textContent=cuesUsed>=MAXCLUES?"💡 No clues left":"💡 Clue ("+(MAXCLUES-cuesUsed)+")";
-    if(cuesUsed>=MAXCLUES) cueBtn.disabled=true;
+  // segmented control: Back | Reset | Hint
+  dock.appendChild(segBtn("↶","Back",()=>{ if(!solved) field.undo(); }));
+  dock.appendChild(segDiv());
+  dock.appendChild(segBtn("⟲","Reset",()=>{ if(!solved){ field.clear(); setSay(FIND,false); } }));
+  dock.appendChild(segDiv());
+  // Hint = dotted outline of the WHOLE constellation; stays until the child finishes tracing
+  const cueBtn=segBtn("💡","Hint",()=>{
+    if(solved) return;
+    field.guide(lf.edges);
+    setSay("Follow the dotted lines to connect.");
   });
-  clueWrap.appendChild(cueBtn);
+  dock.appendChild(cueBtn);
 
   // when the constellation is formed: draw the figure right over it, same screen
   function overlayFigure(){
@@ -1743,8 +2978,17 @@ SCENES.discover=()=>{
       const ar=c.figureAspect||1;                     // image natural width/height (1 = square)
       const D=_normSet(usedD.map(i=>lf.stars[i]));
       const R=_normSet(c.stars.map(st=>st));
-      const cost=D.map(d=>R.map(r=>{ const dx=d.x-r.x, dy=d.y-r.y; return dx*dx+dy*dy; }));
-      const asg=_hungarian(cost);                     // drawn star k ↔ reference star asg[k]
+      // rotation-aware correspondence: try every rotation of the drawn set and keep the
+      // assignment that lines up best, so the figure follows a TILTED / repositioned tracing
+      let asg=null, bestTot=Infinity;
+      for(let deg=0;deg<360;deg+=15){
+        const th=deg*Math.PI/180, ct=Math.cos(th), st=Math.sin(th);
+        const Dr=D.map(p=>({x:p.x*ct-p.y*st,y:p.x*st+p.y*ct}));
+        const cmat=Dr.map(d=>R.map(r=>{ const dx=d.x-r.x, dy=d.y-r.y; return dx*dx+dy*dy; }));
+        const a=_hungarian(cmat);
+        let tot=0; for(let k=0;k<a.length;k++) tot+=cmat[k][a[k]];
+        if(tot<bestTot){ bestTot=tot; asg=a; }
+      }
       const src=[], dst=[];
       for(let k=0;k<usedD.length;k++){
         const p=c.figurePts[asg[k]];                  // body-part position inside the image (fractions of w/h)
@@ -1776,8 +3020,11 @@ SCENES.discover=()=>{
       const ccx=(cb.x0+cb.x1)/2, ccy=(cb.y0+cb.y1)/2;        // content centre (image fractions)
       const off=c.figureOffset||{x:0,y:0};                   // fine nudge, in fractions of the star box
       const Ix=Cx-ccx*boxW+(off.x||0)*bw, Iy=Cy-ccy*boxH+(off.y||0)*bh;
+      // tilt the figure to follow a rotated tracing (0° when traced upright → no change)
+      const Dn=_normSet(used.map(i=>lf.stars[i])), Rn=_normSet(c.stars.map(s=>s));
+      const rotDeg=(_bestRotAngle(Rn,Dn)*180/Math.PI)+(c.figureRotate||0);
       ov.innerHTML='<svg viewBox="0 0 '+VBW+' 100" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%">'+
-        '<image class="figimg" href="'+encodeURI(c.figureImg)+'" x="'+Ix.toFixed(2)+'" y="'+Iy.toFixed(2)+'" width="'+boxW.toFixed(2)+'" height="'+boxH.toFixed(2)+'" preserveAspectRatio="none"/></svg>';
+        '<image class="figimg" href="'+encodeURI(c.figureImg)+'" x="'+Ix.toFixed(2)+'" y="'+Iy.toFixed(2)+'" width="'+boxW.toFixed(2)+'" height="'+boxH.toFixed(2)+'" preserveAspectRatio="none" transform="rotate('+rotDeg.toFixed(2)+' '+Cx.toFixed(2)+' '+Cy.toFixed(2)+')"/></svg>';
     } else {
       // hand-drawn SVG silhouette mapped onto the traced stars' box
       let rmnx=Infinity,rmxx=-Infinity,rmny=Infinity,rmxy=-Infinity;
@@ -1789,7 +3036,22 @@ SCENES.discover=()=>{
         '<g class="figoverlay" transform="translate('+tx.toFixed(2)+','+ty.toFixed(2)+') scale('+sx.toFixed(4)+','+sy.toFixed(4)+')">'+
         (CONSTELLATION_ART[c.id]||"")+'</g></svg>';
     }
+    // dim the sky behind the figure so it pops (sits below the figure overlay)
+    const dim=document.createElement("div"); dim.className="reveal-dim";
+    fieldBox.insertBefore(dim, fieldBox.firstChild.nextSibling||null);
     fieldBox.appendChild(ov);
+    // soft particles drifting around the revealed figure
+    const rmv=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    if(!rmv){
+      const pcx=((dmnx+dmxx)/2/VBW)*100, pcy=(dmny+dmxy)/2;
+      const pw=Math.max(10,((dmxx-dmnx)/VBW)*100), ph=Math.max(10,(dmxy-dmny));
+      for(let i=0;i<16;i++){ const sp=document.createElement("div"); sp.className="reveal-spark";
+        sp.style.left=Math.max(2,Math.min(98,pcx+(Math.random()-.5)*pw*1.4)).toFixed(1)+"%";
+        sp.style.top=Math.max(2,Math.min(98,pcy+(Math.random()-.5)*ph*1.4)).toFixed(1)+"%";
+        sp.style.setProperty("--sd",(1.6+Math.random()*1.8).toFixed(1)+"s");
+        sp.style.animationDelay=(Math.random()*1.4).toFixed(2)+"s";
+        fieldBox.appendChild(sp); }
+    }
   }
 
   function esc(t){ return (t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
@@ -1799,21 +3061,27 @@ SCENES.discover=()=>{
     if(!state.huntLevelsComplete.includes(c.id)) state.huntLevelsComplete.push(c.id);
     Rewards.earn(4); renderProgress();
     cueBtn.disabled=true;
-    controls.innerHTML="";                                     // hide Undo/Clear during the reveal flow
+    field.clearGuide();                                        // remove the dotted clue outline
+    if(field.svg) field.svg.classList.add("trace-win");        // re-trace the line + gentle pulse
+    dock.style.display="none";                                 // controls done — make room for the thought card
+    setStep("imagine");
     setSay("You found it! What do you think this looks like?");
     askGuess();
   }
 
-  // a centred text box for the child to name the pattern they made
+  // a centred "thought card" for the child to name the pattern they made
   function askGuess(){
     const box=document.createElement("div"); box.className="guess-box";
-    box.innerHTML='<input type="text" class="guess-input" placeholder="Type what you see…" maxlength="40" autocomplete="off" spellcheck="false">'+
-      '<button type="button" class="btn small pulse guess-go">Tell Meera ➜</button>';
+    box.innerHTML='<div class="gb-label"><span class="gb-star" aria-hidden="true">✨</span>I imagine it looks like…</div>'+
+      '<div class="gb-row"><input type="text" class="guess-input" placeholder="Type what you see…" maxlength="40" autocomplete="off" spellcheck="false">'+
+      '<button type="button" class="btn small guess-go">Share idea ✨</button></div>';
     s.appendChild(box);
     const input=box.querySelector(".guess-input"), go=box.querySelector(".guess-go");
+    go.disabled=true;                                          // only active once the child types
+    input.addEventListener("input",()=>{ go.disabled=!input.value.trim(); });
     setTimeout(()=>{ try{ input.focus(); }catch(e){} }, 60);
     function submit(){
-      const ans=((input.value||"").trim())||"a picture";
+      const ans=(input.value||"").trim(); if(!ans) return;
       box.remove();
       afterGuess(ans);
     }
@@ -1821,42 +3089,52 @@ SCENES.discover=()=>{
     input.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); submit(); } });
   }
 
-  // speak a Meera line and call onDone once she finishes (safety net for muted / missed end events)
+  // show a Meera line, then advance after a comfortable reading pace (no voiceover yet)
   function sayThen(text, onDone){
     let did=false;
     const go=()=>{ if(did) return; did=true; onDone(); };
     setSay(text, true, go);
-    const wait = state.narrationOn ? Math.max(7000, text.length*130) : Math.max(2600, text.length*60);
+    const wait = Math.max(2800, text.length*68);
     setTimeout(go, wait);
   }
 
   // run a callback only while we're still on the discover screen
   function guard(fn){ return ()=>{ if(state.currentScene==="discover") fn(); }; }
 
-  // a centred text box; calls onSubmit(trimmedValue) when the child answers
-  function textPrompt(placeholder, maxlen, onSubmit){
-    const box=document.createElement("div"); box.className="guess-box";
-    box.innerHTML='<input type="text" class="guess-input" placeholder="'+placeholder+'" maxlength="'+maxlen+'" autocomplete="off" spellcheck="false">'+
-      '<button type="button" class="btn small pulse guess-go">Tell Meera ➜</button>';
+  // a centred "thought card" (smaller); calls onSubmit(trimmedValue) when the child answers
+  function textPrompt(label, placeholder, maxlen, onSubmit){
+    const box=document.createElement("div"); box.className="guess-box compact";
+    box.innerHTML='<div class="gb-label"><span class="gb-star" aria-hidden="true">✨</span>'+label+'</div>'+
+      '<div class="gb-row"><input type="text" class="guess-input" placeholder="'+placeholder+'" maxlength="'+maxlen+'" autocomplete="off" spellcheck="false">'+
+      '<button type="button" class="btn small guess-go">Share idea ✨</button></div>';
     s.appendChild(box);
     const input=box.querySelector(".guess-input"), go=box.querySelector(".guess-go");
+    go.disabled=true;                                          // only active once the child types
+    input.addEventListener("input",()=>{ go.disabled=!input.value.trim(); });
     setTimeout(()=>{ try{ input.focus(); }catch(e){} }, 60);
-    function submit(){ const v=((input.value||"").trim()); box.remove(); onSubmit(v); }
+    function submit(){ const v=(input.value||"").trim(); if(!v) return; box.remove(); onSubmit(v); }
     go.onclick=submit;
     input.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); submit(); } });
   }
 
-  // a centred row of tappable choice buttons at the bottom of the screen
+  // a centred row of tappable choice buttons inside the glass card
   function choicePrompt(options){
-    const box=document.createElement("div"); box.className="guess-box";
-    options.forEach(o=>{ box.appendChild(mkBtn(o.label,"small pulse",()=>{ box.remove(); o.pick(); })); });
-    s.appendChild(box);
+    const tray=document.createElement("div"); tray.className="choice-tray"; let picked=false;
+    options.forEach(o=>{
+      const card=document.createElement("button"); card.type="button"; card.className="choice-card";
+      card.innerHTML=(o.icon||"")+'<span class="cc-text">'+o.label+'</span><span class="cc-check" aria-hidden="true">✓</span>';
+      card.onclick=()=>{ if(picked) return; picked=true; card.classList.add("sel");
+        setTimeout(()=>{ tray.remove(); o.pick(); },260); };
+      tray.appendChild(card);
+    });
+    s.appendChild(tray);
   }
 
   // After the child names the shape, Meera asks WHY; once she finishes, a reason box appears.
   function afterGuess(ans){
-    const q="Interesting! Can you also tell me the reason? Why do you think this shape or pattern looks like "+esc(ans)+"?";
-    sayThen(q, guard(()=>textPrompt("Type your reason…",80,reason=>afterReason(ans,reason))));
+    setStep("explain");
+    const q="Interesting! Why do you think this looks like "+esc(ans)+"?";
+    sayThen(q, guard(()=>textPrompt("I think it's because…","Type your reason here…",80,reason=>afterReason(ans,reason))));
   }
 
   // Meera acknowledges the reason, then asks whether everyone would imagine the same shape
@@ -1865,22 +3143,27 @@ SCENES.discover=()=>{
     const ack = reason ? "What a thoughtful reason! I love how you look at the stars."
                        : "What a thoughtful answer! I love how you look at the stars.";
     sayThen(ack, guard(()=>
-      sayThen("Do you think everyone looking at these same stars would imagine the same shape, or could they imagine something different?",
+      sayThen("Would everyone imagine the same picture, or something different?",
         guard(()=>choicePrompt([
-          {label:"The same shape",      pick:()=>revealFigure(ans,"same")},
-          {label:"Something different", pick:()=>revealFigure(ans,"different")}
+          {label:"Same picture", icon:'<svg viewBox="0 0 24 24" class="cc-ico" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+            pick:()=>revealFigure(ans,"same")},
+          {label:"Different idea", icon:'<svg viewBox="0 0 24 24" class="cc-ico fill" aria-hidden="true"><path d="M12 2l1.7 6.1L20 10l-6.3 1.9L12 18l-1.7-6.1L4 10l6.3-1.9z"/></svg>',
+            pick:()=>revealFigure(ans,"different")}
         ])))));
   }
 
   // Reveal the figure, then Meera's closing teaching — branching on the child's answer
   function revealFigure(ans,resp){
     if(state.currentScene!=="discover") return;
-    const ancient="Many years ago, people looked at these same stars too. They thought it looked like "+c.name+".";
+    const SEEN_DESC={cassiopeia:"a queen holding a mirror", orion:"a mighty hunter", scorpius:"a giant scorpion"};
+    const seenAs = SEEN_DESC[c.id] ? c.name+", "+SEEN_DESC[c.id] : c.name;
+    const ancient="Long ago, people saw this as "+seenAs+"!";
     const ansClean=(ans||"").trim();
     const phrase = !ansClean ? "something"
                  : (/^(a|an|the)\s/i.test(ansClean) ? ansClean
                     : (/^[aeiou]/i.test(ansClean)?"an ":"a ")+ansClean);
     const last=step>=HUNT_SEQ.length-1;
+    setStep("reveal");
     overlayFigure();                                  // the figure drapes onto the stars as Meera explains
     if(/differ/i.test(resp)){
       // child said people could imagine something DIFFERENT
@@ -1888,19 +3171,75 @@ SCENES.discover=()=>{
         sayThen(last?"You have found them all!":"Let's move to the next constellation.", guard(showNext))));
     } else {
       // child said everyone would see the SAME shape (or answer was unclear)
-      sayThen(ancient, guard(()=>
-        sayThen("You imagined "+esc(phrase)+".", guard(()=>
-          sayThen("Different people can see different shapes and patterns in the same group of stars.", guard(showNext))))));
+      sayThen("Different people can see different things in the same stars!", guard(()=>
+        sayThen("You saw "+esc(phrase)+", but long ago people saw this as "+seenAs+"!", guard(()=>
+          sayThen(last?"You have found them all!":"Let's move to the next constellation.", guard(showNext))))));
     }
   }
 
-  // prompt to move on to the next constellation
+  // prompt to move on — button sits in the bottom-right corner
   function showNext(){
     const last=step>=HUNT_SEQ.length-1;
-    const cont=mkBtn(last?"Finish ✓":"Next ➜","small pulse",()=>{ if(last) show("reward"); else gotoStep(step+1); });
-    controls.innerHTML=""; controls.appendChild(cont);
+    const cont=mkBtn(last?"Finish ✓":"Next ➜","pulse",()=>{ if(last) show("reward"); else gotoStep(step+1); });
+    const wrap=document.createElement("div"); wrap.className="discover-next"; wrap.appendChild(cont);
+    s.appendChild(wrap);
   }
 };
+
+/* ----- ONE shared full-screen star field that holds ALL THREE hunt constellations -----
+   The SAME star layout is reused on every discover level; only the constellation
+   the child is asked to trace changes. Each constellation is embedded with its
+   TRUE proportions (uniform scale) inside its own region of the sky, so all three
+   are simultaneously present and findable in the one common star field. Regions are
+   placed clear of Meera (bottom-left) and the top controls/clue button. */
+const SHARED_LAYOUT={
+  // {cx,w} are fractions of the field width (0..aspect); {cy,h} are fractions of height (0..1)
+  cassiopeia:{cx:0.50, cy:0.15, w:0.58, h:0.16},   // top band, centre
+  scorpius:  {cx:0.40, cy:0.56, w:0.24, h:0.50},   // mid-left (clear of Meera, right of her)
+  orion:     {cx:0.84, cy:0.55, w:0.26, h:0.56}    // mid-right — each constellation in its own zone
+};
+let _sharedFieldCache=null;
+function buildSharedField(aspect){
+  const key=aspect.toFixed(3);
+  if(_sharedFieldCache && _sharedFieldCache.key===key) return _sharedFieldCache;  // identical layout across levels
+  const stars=[], map={};
+  // 1) place each constellation into its region, preserving its real proportions
+  HUNT_SEQ.forEach(id=>{
+    const con=byId(id), box=SHARED_LAYOUT[id]; if(!con||!box) return;
+    const xs=con.stars.map(s=>s.x), ys=con.stars.map(s=>s.y);
+    const minx=Math.min.apply(null,xs), maxx=Math.max.apply(null,xs);
+    const miny=Math.min.apply(null,ys), maxy=Math.max.apply(null,ys);
+    const bw=Math.max(0.001,maxx-minx), bh=Math.max(0.001,maxy-miny);
+    const scale=Math.min((box.w*aspect)/bw, box.h/bh);              // uniform → no distortion
+    const cxF=box.cx*aspect, cyF=box.cy, bcx=(minx+maxx)/2, bcy=(miny+maxy)/2;
+    const base=stars.length;
+    con.stars.forEach(st=>stars.push({x:cxF+(st.x-bcx)*scale, y:cyF+(st.y-bcy)*scale, bright:st.bright?1:0}));
+    map[id]={
+      constIdx: con.stars.map((_,i)=>base+i),               // this constellation's stars, in the shared field
+      brightIdx: con.bright.map(i=>base+i),
+      edges: con.edges.map(([a,b])=>[base+a, base+b])        // edges remapped to shared-field indices (order kept)
+    };
+  });
+  // 2) fill the WHOLE screen with an even, deterministic grid of decoy stars (no clusters).
+  // Meera (opaque, in front) sits bottom-left — stars behind her are hidden, stars around
+  // her fill what would otherwise be empty space, so we DON'T carve out a gap for her.
+  const rows=4, cols=Math.max(7, Math.round(5*aspect));   // far fewer decoy stars — constellations stay clear
+  const mL=0.035*aspect, mR=0.025*aspect, my=0.045, minD=0.06*aspect;
+  for(let r=0;r<rows;r++){
+    for(let cc=0;cc<cols;cc++){
+      const i=r*cols+cc;
+      const x=mL+(aspect-mL-mR)*(cols<2?0.5:cc/(cols-1));
+      const y=my+(1-2*my)*(rows<2?0.5:r/(rows-1));
+      const px=x+(((i*37)%5)-2)*0.009*aspect, py=y+(((i*53)%5)-2)*0.010;
+      if(py<0.085 && (px<0.18*aspect || px>0.82*aspect)) continue;        // keep top corners clear (Undo/Clear & tools)
+      let ok=true;
+      for(let k=0;k<stars.length;k++){ if(Math.hypot(stars[k].x-px,stars[k].y-py)<minD){ ok=false; break; } }
+      if(ok) stars.push({x:px,y:py});
+    }
+  }
+  _sharedFieldCache={key, stars, map};
+  return _sharedFieldCache;
+}
 
 /* build the full-screen tracing field: the constellation (placed in a central
    region) among an EVENLY-SPREAD grid of decoy stars — no random clusters. */
@@ -2010,6 +3349,42 @@ function _aspectOf(pts){
   pts.forEach(p=>{ if(p.x<mnx)mnx=p.x; if(p.x>mxx)mxx=p.x; if(p.y<mny)mny=p.y; if(p.y>mxy)mxy=p.y; });
   return Math.max(1e-4,mxx-mnx)/Math.max(1e-4,mxy-mny);
 }
+/* smallest symmetric chamfer over all rotations of B onto A (both already centred+scaled).
+   Lets a correct-but-TILTED tracing still match — orientation no longer matters. */
+function _bestRotChamfer(A,B){
+  let best=Infinity, bestDeg=0;
+  for(let deg=0;deg<360;deg+=15){
+    const th=deg*Math.PI/180, ct=Math.cos(th), st=Math.sin(th);
+    const Br=B.map(p=>({x:p.x*ct-p.y*st,y:p.x*st+p.y*ct}));
+    const d=Math.max(_chamfer(A,Br),_chamfer(Br,A));
+    if(d<best){ best=d; bestDeg=deg; }
+  }
+  for(let deg=bestDeg-12;deg<=bestDeg+12;deg+=3){            // refine around the best coarse angle
+    const th=deg*Math.PI/180, ct=Math.cos(th), st=Math.sin(th);
+    const Br=B.map(p=>({x:p.x*ct-p.y*st,y:p.x*st+p.y*ct}));
+    const d=Math.max(_chamfer(A,Br),_chamfer(Br,A));
+    if(d<best) best=d;
+  }
+  return best;
+}
+/* angle (radians) to rotate point-set R so it best lands on D (both centred+scaled).
+   Used to tilt a figure overlay to follow a rotated tracing. */
+function _bestRotAngle(R,D){
+  let best=Infinity, bestDeg=0;
+  for(let deg=0;deg<360;deg+=10){
+    const th=deg*Math.PI/180, ct=Math.cos(th), st=Math.sin(th);
+    const Rr=R.map(p=>({x:p.x*ct-p.y*st,y:p.x*st+p.y*ct}));
+    const d=Math.max(_chamfer(Rr,D),_chamfer(D,Rr));
+    if(d<best){ best=d; bestDeg=deg; }
+  }
+  for(let deg=bestDeg-8;deg<=bestDeg+8;deg+=2){
+    const th=deg*Math.PI/180, ct=Math.cos(th), st=Math.sin(th);
+    const Rr=R.map(p=>({x:p.x*ct-p.y*st,y:p.x*st+p.y*ct}));
+    const d=Math.max(_chamfer(Rr,D),_chamfer(D,Rr));
+    if(d<best){ best=d; bestDeg=deg; }
+  }
+  return bestDeg*Math.PI/180;
+}
 function _exactGraphMatch(refStars,refEdges, drawnStars,drawnEdges, tol){
   if(drawnEdges.length!==refEdges.length) return false;
   const refUsed=[...new Set(refEdges.flat())].sort((a,b)=>a-b);
@@ -2044,10 +3419,9 @@ function _visualShapeMatch(refStars,refEdges, drawnStars,drawnEdges, tol){
   if(drawnUsed.size>Math.ceil(refUsed.size*1.45)) return false;
 
   const refPts=_samplePts(refStars,refEdges,8), drawnPts=_samplePts(drawnStars,drawnEdges,8);
-  const ra=_aspectOf(refPts), da=_aspectOf(drawnPts);
-  if(ra>0&&da>0){ const r=ra/da; if(r<.55||r>1.85) return false; }
   const A=_normSet(refPts), B=_normSet(drawnPts);
-  return Math.max(_chamfer(A,B), _chamfer(B,A)) <= (tol||.18);
+  // rotation-tolerant: a tilted version of the same shape still counts
+  return _bestRotChamfer(A,B) <= (tol||.18);
 }
 function shapesMatch(refStars,refEdges, drawnStars,drawnEdges, tol){
   if(!drawnEdges.length) return false;
@@ -2151,8 +3525,11 @@ function mkBtn(label,cls,onClick){
 function toggleNarration(){
   state.narrationOn=!state.narrationOn;
   const t=document.getElementById("narrToggle");
-  t.classList.toggle("on",state.narrationOn);
-  t.setAttribute("aria-pressed",String(state.narrationOn));
+  if(t){
+    t.classList.toggle("on",state.narrationOn);
+    t.setAttribute("aria-pressed",String(state.narrationOn));
+    const ico=t.querySelector(".snd-ico"); if(ico) ico.textContent=state.narrationOn?"🔊":"🔇";
+  }
   if(!state.narrationOn) Speech.stop();
   else Speech.speak("Narration on.");
 }
