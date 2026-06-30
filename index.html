@@ -1819,6 +1819,8 @@ const SCENES={};
 function show(name){
   Speech.stop();
   if(typeof stopStoryAudio==="function") stopStoryAudio();   // never let story narration bleed into gameplay
+  if(typeof stopHuntAudio==="function") stopHuntAudio();
+  if(typeof stopLineAudio==="function") stopLineAudio();
   state.currentScene=name;
   const chrome=document.getElementById("chrome");
   // discover has its own in-scene controls (full-screen star field), so hide the top chrome there
@@ -1907,8 +1909,33 @@ function stopHuntAudio(){
 }
 function playHunt(file){
   stopHuntAudio(); Speech.stop();
+  if(!state.narrationOn || !file) return;                  // respect the sound toggle
   const a=new Audio(); a.preload="auto"; a.src=encodeURI("Audio/"+file);
   huntAudio=a; const p=a.play(); if(p&&p.catch) p.catch(()=>{});
+}
+/* narration clips for the discover activity (Activity 2 — Meera's spoken lines) */
+let lineAudio=null;
+function stopLineAudio(){
+  if(lineAudio){ try{ lineAudio.pause(); lineAudio.currentTime=0; }catch(e){}
+    if(lineAudio._tmr){ clearTimeout(lineAudio._tmr); lineAudio._tmr=null; }
+    lineAudio.onended=null; lineAudio.onerror=null; lineAudio.onplaying=null; lineAudio.ontimeupdate=null; lineAudio=null; }
+}
+function playLine(file,onEnd){
+  stopLineAudio(); Speech.stop();
+  if(!state.narrationOn || !file){ if(onEnd) onEnd(); return; }  // muted / no clip → hand back to caller
+  const a=new Audio(); a.preload="auto"; a.src=encodeURI("Audio/"+file);
+  lineAudio=a;
+  let done=false;
+  const fin=()=>{ if(done) return; done=true; if(a._tmr){ clearTimeout(a._tmr); a._tmr=null; } if(lineAudio===a) lineAudio=null; if(onEnd) onEnd(); };
+  // Advance when the clip ENDS. 'ended' is the ideal signal but can be unreliable on file://, so a
+  // watchdog re-arms on every timeupdate to "time left from where we ACTUALLY are + headroom" — it
+  // tracks real playback, so it can never fire early (no clipped tails) yet still backstops a missing
+  // 'ended' within ~0.5s. Anchoring to currentTime (not loadedmetadata) is what fixes the early cut.
+  const arm=()=>{ if(!isFinite(a.duration)||a.duration<=0) return;
+    const remain=Math.max(0,(a.duration-(a.currentTime||0))*1000)+500;
+    if(a._tmr) clearTimeout(a._tmr); a._tmr=setTimeout(fin, remain); };
+  a.onended=fin; a.onerror=fin; a.onplaying=arm; a.ontimeupdate=arm;
+  const p=a.play(); if(p&&p.catch) p.catch(()=>fin());     // autoplay blocked → don't strand the sequence
 }
 /* shapes-left → dialogue-bubble text + the matching narration clip, played after each shape is claimed */
 const HUNT_CUES={
@@ -2491,10 +2518,11 @@ SCENES.hunt=()=>{
     const t=say.querySelector(".cs-text"); if(t){ t.textContent=text; } else { say.textContent=text; }
     say.style.animation="none"; void say.offsetWidth; say.style.animation="";       // replay the pop on each new line
   }
-  function cue(left){ const q=HUNT_CUES[left]; if(!q) return; coachSay(q.t); }
+  function cue(left){ const q=HUNT_CUES[left]; if(!q) return; coachSay(q.t); playHunt(q.a); }
   function pulseCoach(cls,ms){ coach.classList.add(cls); setTimeout(()=>coach.classList.remove(cls),ms||900); }
   stopHuntAudio();
   coachSay("Let's find hidden shapes in the stars! Connect the dots, then tap its card.");
+  playHunt("let's find hidden shapes.wav");
 
   // ---- mission path: compact visual grid of tappable shape tiles ----
   const tabEls={};
@@ -2507,7 +2535,6 @@ SCENES.hunt=()=>{
                    '<span class="shape-icon">'+shapeGlyph(t.type)+'</span>'+
                    '<span class="mission-path-label">'+t.label+'</span>';
     tile.onclick=()=>tryFind(t);
-    tile.addEventListener("mouseenter",()=>{ if(!found.has(t.type)&&!celebrating) coachSay("Can you spot a "+t.label+"?"); });
     grid.appendChild(tile); tabEls[t.type]=tile;
   });
 
@@ -2589,6 +2616,7 @@ SCENES.hunt=()=>{
       setTimeout(()=>wrap.classList.remove("shake"),440);
       pulseCoach("think",1000);
       coachSay("Good try! Look carefully again.");
+      playHunt("good try look again carefully.wav");
     }
   }
 
@@ -2600,6 +2628,7 @@ SCENES.hunt=()=>{
     coach.style.display="none";                  // hide the corner coach
     s.classList.add("complete");                 // soft sky glow
     heroSay.textContent="You are a champion! We found all the shapes and patterns. Let's move ahead and find some more.";
+    playHunt("all 6 found.wav");
     heroStage.classList.add("show");             // full Kabir centre-stage + dialogue box (no float)
     if(!reduceMotion){ for(let k=0;k<14;k++) sparkleStar(8+Math.random()*((100*aspect)-16), 8+Math.random()*84); }
     done.disabled=false; done.classList.add("pulse");
@@ -2852,10 +2881,28 @@ SCENES.discover=()=>{
 
   screen.appendChild(s);
 
-  // voiceover removed — Meera's lines show as text only (audio files to be wired in later)
-  function setSay(t,speak,onDone){ say.innerHTML='<div class="who"><span class="dc-star" aria-hidden="true">✦</span>Meera</div>'+t; }
+  // Meera's lines: show text + play the matching pre-recorded clip (pass a filename to speak it).
+  // onEnd (optional) fires when the clip finishes — used to chain narration without cutting clips off.
+  function setSay(t,audio,onEnd){ say.innerHTML='<div class="who"><span class="dc-star" aria-hidden="true">✦</span>Meera</div>'+t;
+    if(audio) playLine(audio,onEnd); else if(onEnd) onEnd(); }
+  // per-line narration clips (Audio/) — text-only lines below pass no file
+  const A_FIND="can you spot this star pattern.wav";
+  const A_HINT="follow dotted lines to connect.wav";
+  const A_INTEREST="intresting!.wav";
+  const A_DIFFERENT="diff people can see diff things in same stars.wav";
+  const A_NEXT="lets move to next constellation.wav";
+  const A_ALL="you have found all.wav";
+  const A_BULB="tap the bulb.wav";
+  const A_CLEAR="tap clear and try again.wav";
+  const A_FOUND="you found it.wav";
+  const A_THOUGHTFUL="what a thoughtful reason.wav";
+  const A_EVERYONE="would everyone imagine same or different.wav";
+  const SEEN_AUDIO={ cassiopeia:"long ago people saw this as cassiopeia.wav",
+                     orion:"people saw this as orion.wav",
+                     scorpius:"people saw this as scorpious.wav" };
+  const seenAudio=SEEN_AUDIO[c.id]||"";
   const FIND="Can you spot this star pattern?";
-  setSay(FIND);
+  setSay(FIND, A_FIND);
   setStep("spot");
 
   const aspect=Math.max(1.15,(fieldBox.clientWidth||window.innerWidth)/(fieldBox.clientHeight||window.innerHeight));
@@ -2890,27 +2937,28 @@ SCENES.discover=()=>{
     if(n===dPrev+1){ const e=field.edges()[n-1]; travelParticle(e[0],e[1]); }   // golden dot on the new line
     dPrev=n;
     if(isMatch()){ win(); return; }
-    if(n===0){ attemptScored=false; setSay(FIND,false); return; }
+    if(n===0){ attemptScored=false; setSay(FIND); return; }
     if(n>=targetCount){
-      // a complete figure that doesn't match — Meera says try again (spoken, once per attempt)
+      // a complete figure that doesn't match — Meera says try again (once per attempt)
       if(!attemptScored){ attemptScored=true; failCount++; Sfx.retry();
         setSay(failCount>=2 ? "That's not quite it. Tap the 💡 bulb for a clue, then try again!"
-                            : "Hmm, that doesn't match. Tap Clear and try again!", true);
+                            : "Hmm, that doesn't match. Tap Clear and try again!",
+               failCount>=2 ? A_BULB : A_CLEAR);
       }
-    } else { attemptScored=false; setSay("Keep connecting to match the picture!",false); }
+    } else { attemptScored=false; setSay("Keep connecting to match the picture!"); }
   }});
   setTimeout(()=>{ if(state.currentScene==="discover" && fieldBox.isConnected){ fieldBox.classList.add("amb"); addSkyAtmosphere(fieldBox); } },0);   // build atmosphere + wisps after first paint (avoids entry lag)
 
   // segmented control: Back | Reset | Hint
   dock.appendChild(segBtn("↶","Back",()=>{ if(!solved) field.undo(); }));
   dock.appendChild(segDiv());
-  dock.appendChild(segBtn("⟲","Reset",()=>{ if(!solved){ field.clear(); setSay(FIND,false); } }));
+  dock.appendChild(segBtn("⟲","Reset",()=>{ if(!solved){ field.clear(); setSay(FIND); } }));
   dock.appendChild(segDiv());
   // Hint = dotted outline of the WHOLE constellation; stays until the child finishes tracing
   const cueBtn=segBtn("💡","Hint",()=>{
     if(solved) return;
     field.guide(lf.edges);
-    setSay("Follow the dotted lines to connect.");
+    setSay("Follow the dotted lines to connect.", A_HINT);
   });
   dock.appendChild(cueBtn);
 
@@ -3015,7 +3063,7 @@ SCENES.discover=()=>{
     if(field.svg) field.svg.classList.add("trace-win");        // re-trace the line + gentle pulse
     dock.style.display="none";                                 // controls done — make room for the thought card
     setStep("imagine");
-    setSay("You found it! What do you think this looks like?");
+    setSay("You found it! What do you think this looks like?", A_FOUND);
     askGuess();
   }
 
@@ -3039,13 +3087,22 @@ SCENES.discover=()=>{
     input.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); submit(); } });
   }
 
-  // show a Meera line, then advance after a comfortable reading pace (no voiceover yet)
-  function sayThen(text, onDone){
+  // show a Meera line, then advance to the next. With a clip playing we advance the instant it
+  // ENDS (so it's never cut off, and the next thing appears immediately). The timer is only a
+  // fallback for when 'ended' never fires (clip missing, or narration muted mid-line); clips run
+  // ~1–4s, so 6s comfortably covers the longest before the fallback ever matters.
+  function sayThen(text, onDone, audio){
     let did=false;
     const go=()=>{ if(did) return; did=true; onDone(); };
-    setSay(text, true, go);
-    const wait = Math.max(2800, text.length*68);
-    setTimeout(go, wait);
+    if(audio && state.narrationOn){
+      setSay(text, audio, ()=>{ if(state.currentScene==="discover") go(); });   // clip's real end → next, right away
+      // Backstop ONLY for a stuck/muted clip — must stay well above the longest clip (~7.5s) so it can
+      // never cut a clip short. playLine's watchdog tracks real playback and normally fires first.
+      setTimeout(go, 20000);
+    } else {
+      setSay(text, audio);
+      setTimeout(go, Math.max(2800, text.length*68));                           // text-only: pace by reading time
+    }
   }
 
   // run a callback only while we're still on the discover screen
@@ -3084,7 +3141,7 @@ SCENES.discover=()=>{
   function afterGuess(ans){
     setStep("explain");
     const q="Interesting! Why do you think it looks like that?";
-    sayThen(q, guard(()=>textPrompt("I think it's because…","Type your reason here…",80,reason=>afterReason(ans,reason))));
+    sayThen(q, guard(()=>textPrompt("I think it's because…","Type your reason here…",80,reason=>afterReason(ans,reason))), A_INTEREST);
   }
 
   // Meera acknowledges the reason, then asks whether everyone would imagine the same shape
@@ -3099,7 +3156,7 @@ SCENES.discover=()=>{
             pick:()=>revealFigure(ans,"same")},
           {label:"Different idea", icon:'<svg viewBox="0 0 24 24" class="cc-ico fill" aria-hidden="true"><path d="M12 2l1.7 6.1L20 10l-6.3 1.9L12 18l-1.7-6.1L4 10l6.3-1.9z"/></svg>',
             pick:()=>revealFigure(ans,"different")}
-        ])))));
+        ])), A_EVERYONE)), A_THOUGHTFUL);
   }
 
   // Reveal the figure, then Meera's closing teaching — branching on the child's answer
@@ -3118,12 +3175,12 @@ SCENES.discover=()=>{
     if(/differ/i.test(resp)){
       // child said people could imagine something DIFFERENT
       sayThen("Yes! "+ancient, guard(()=>
-        sayThen(last?"You have found them all!":"Let's move to the next constellation.", guard(showNext))));
+        sayThen(last?"You have found them all!":"Let's move to the next constellation.", guard(showNext), last?A_ALL:A_NEXT)), seenAudio);
     } else {
       // child said everyone would see the SAME shape (or answer was unclear)
       sayThen("Different people can see different things in the same stars!", guard(()=>
         sayThen("And long ago, people saw this as "+seenAs+"!", guard(()=>
-          sayThen(last?"You have found them all!":"Let's move to the next constellation.", guard(showNext))))));
+          sayThen(last?"You have found them all!":"Let's move to the next constellation.", guard(showNext), last?A_ALL:A_NEXT)), seenAudio)), A_DIFFERENT);
     }
   }
 
@@ -3480,7 +3537,7 @@ function toggleNarration(){
     t.setAttribute("aria-pressed",String(state.narrationOn));
     const ico=t.querySelector(".snd-ico"); if(ico) ico.textContent=state.narrationOn?"🔊":"🔇";
   }
-  if(!state.narrationOn) Speech.stop();
+  if(!state.narrationOn){ Speech.stop(); stopHuntAudio(); stopLineAudio(); }
   else Speech.speak("Narration on.");
 }
 document.getElementById("narrToggle").onclick=toggleNarration;
