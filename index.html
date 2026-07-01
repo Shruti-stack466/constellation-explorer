@@ -1713,7 +1713,12 @@ const HUNT_SEQ=["cassiopeia","orion","scorpius"];
    the others use the separate spot → trace → reveal flow. Past the end → reward. */
 function gotoStep(step){
   state.huntStep=step;
-  if(step>=HUNT_SEQ.length){ show("reward"); return; }
+  if(step>=HUNT_SEQ.length){
+    // activity finished → Meera explains the constellations (cut to 7s of the 9s
+    // clip), then a 0.12s dissolve into the closing scene
+    videoScene("videos/video-13.mp4","Continue ➜",()=>show("reward"), 7, 120);
+    return;
+  }
   const c=byId(HUNT_SEQ[step]);
   show(c && c.unified ? "discover" : "spot");
 }
@@ -2121,7 +2126,7 @@ SCENES.start=()=>{
 /* ---------- THE 7-SCENE PICTURE STORY ---------- */
 /* Full-screen video scene. Auto-advances to the next page ~0.7s before the clip ends, so
    its blurry frozen last frame is never shown. A Skip button lets the child jump ahead. */
-function videoScene(src, doneLabel, onAdvance){
+function videoScene(src, doneLabel, onAdvance, maxSecs, dissolveMs){
   Speech.stop(); stopStoryAudio(); stopHuntAudio();
   document.getElementById("chrome").classList.add("hidden");        // full-screen video, like the intro
   screen.innerHTML="";
@@ -2147,12 +2152,29 @@ function videoScene(src, doneLabel, onAdvance){
   // next scene in the SAME tick — the video frame stays visible until the new scene is ready,
   // so there's no blank flash; releasing the MP4 stops it buffering/decoding in the background.
   const advance=()=>{ if(done) return; done=true;
-    try{ video.pause(); video.removeAttribute("src"); video.load(); }catch(e){}
-    onAdvance();
+    try{ video.pause(); }catch(e){}
+    if(dissolveMs>0){
+      // smooth cross-dissolve: lift the finished clip above everything on its last
+      // frame, build the next scene underneath, then fade the old frame out so one
+      // video melts into the next instead of hard-cutting.
+      const fade=s;
+      fade.style.position="fixed"; fade.style.inset="0"; fade.style.zIndex="9999";
+      fade.style.pointerEvents="none"; fade.style.transition="opacity "+dissolveMs+"ms ease";
+      document.body.appendChild(fade);                 // survives #screen being cleared by the next scene
+      onAdvance();                                     // next scene builds + starts underneath
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{ fade.style.opacity="0"; }));
+      setTimeout(()=>{ try{ video.removeAttribute("src"); video.load(); }catch(e){}
+        if(fade.parentNode) fade.parentNode.removeChild(fade); }, dissolveMs+60);
+    } else {
+      try{ video.removeAttribute("src"); video.load(); }catch(e){}
+      onAdvance();
+    }
   };
   bar.appendChild(mkBtn("Skip ➜","small",advance));
-  // leave just before the end so the clip never freezes on its (blurry) final frame
+  // optional hard cut-off (e.g. trim a 9s clip to 7s); otherwise leave just before
+  // the end so the clip never freezes on its (blurry) final frame
   video.addEventListener("timeupdate",()=>{
+    if(maxSecs && video.currentTime >= maxSecs){ advance(); return; }
     if(video.duration && isFinite(video.duration) && video.currentTime >= video.duration-0.7) advance();
   });
   video.addEventListener("ended",advance);   // fallback if timeupdate misses it
@@ -2169,7 +2191,10 @@ function videoScene(src, doneLabel, onAdvance){
 
 SCENES.story=()=>{
   state.currentScene="story";
-  videoScene("videos/video-11.mp4","Let's explore ➜",()=>show("hunt"));
+  // Mission 1 (the Shape Hunt) has been removed — go straight into the
+  // constellation activity after the intro story. Meera's explanation video now
+  // plays AFTER the activity (see gotoStep's end-of-activity branch).
+  videoScene("videos/video-11.mp4","Let's explore ➜",()=>gotoStep(0));
 };
 
 /* ---------- SCENE 5: PATTERN HUNT (free discovery) ---------- */
@@ -2821,9 +2846,7 @@ SCENES.reveal=()=>{
 
   // golden Next / Finish in the bottom-right corner
   const last=step>=HUNT_SEQ.length-1;
-  const next=mkBtn(last?"Finish ✓":"Next ➜","pulse reveal-next",()=>{
-    if(last){ show("reward"); } else { gotoStep(step+1); }
-  });
+  const next=mkBtn(last?"Finish ✓":"Next ➜","pulse reveal-next",()=>gotoStep(step+1));
   s.appendChild(next);
 
   screen.appendChild(s);
@@ -2852,7 +2875,7 @@ SCENES.discover=()=>{
   // top-left head: mission badge + tiny step tracker (Spot → Imagine → Explain → Reveal)
   const head=document.createElement("div"); head.className="discover-head";
   head.innerHTML='<div class="discover-badge"><span class="db-ico" aria-hidden="true">🌌</span>'+
-                 '<div class="db-text"><div class="db-title">Mission 2</div>'+
+                 '<div class="db-text"><div class="db-title">Mission 1</div>'+
                  '<div class="db-sub">Star Story Space</div></div></div>'+
                  '<div class="step-track" aria-label="Activity steps">'+
                    '<span class="step" data-step="spot">Spot</span><span class="step-arrow">→</span>'+
@@ -3187,7 +3210,7 @@ SCENES.discover=()=>{
   // prompt to move on — button sits in the bottom-right corner
   function showNext(){
     const last=step>=HUNT_SEQ.length-1;
-    const cont=mkBtn(last?"Finish ✓":"Next ➜","pulse",()=>{ if(last) show("reward"); else gotoStep(step+1); });
+    const cont=mkBtn(last?"Finish ✓":"Next ➜","pulse",()=>gotoStep(step+1));   // last step → gotoStep plays Meera's video, then reward
     const wrap=document.createElement("div"); wrap.className="discover-next"; wrap.appendChild(cont);
     s.appendChild(wrap);
   }
