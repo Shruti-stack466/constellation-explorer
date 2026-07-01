@@ -3416,19 +3416,81 @@ function _exactGraphMatch(refStars,refEdges, drawnStars,drawnEdges, tol){
   const got=keyset(mapped);
   return got.length===target.length && got.every((v,i)=>v===target[i]);
 }
-function _visualShapeMatch(refStars,refEdges, drawnStars,drawnEdges, tol){
-  if(!drawnEdges.length) return false;
-  const refEdgeCount=refEdges.length, drawnEdgeCount=drawnEdges.length;
-  if(drawnEdgeCount<refEdgeCount) return false;
-  if(drawnEdgeCount>Math.ceil(refEdgeCount*1.45)) return false;
-  const refUsed=new Set(refEdges.flat()), drawnUsed=new Set(drawnEdges.flat());
-  if(drawnUsed.size<refUsed.size) return false;
-  if(drawnUsed.size>Math.ceil(refUsed.size*1.45)) return false;
+/* How well the traced figure matches the reference — judged as SHAPE + PATTERN,
+   not just line/star counts. Returns {f1, meanErr}:
+     • f1      — overlap between the child's connections and the reference
+                 connections after lining the stars up by position (recall =
+                 fraction of reference lines drawn, precision = fraction of the
+                 child's lines that belong to the figure; missing lines AND extra
+                 scribbles both pull it down). This is the "same pattern" score.
+     • meanErr — how far the traced figure's shape sits from the reference shape
+                 once centred + scaled. A W drawn on different stars / at different
+                 proportions stays low; a straight line or a V (same connections,
+                 different shape) is high. This is the "actually looks like it" score.
+   Correspondence uses the best position assignment (no hard cutoff) so a correct
+   shape drawn on non-canonical stars still scores well; the field places
+   constellations upright (uniform scale + translation, no rotation), so we compare
+   normalised positions directly. A square padded cost matrix lets any missing /
+   extra star fall onto a dummy without breaking the assignment.                 */
+const SHAPE_SIM=0.95;      // ≥ 95% of the reference's lines must be drawn
+const SHAPE_GEOM=0.30;     // ...and the figure must resemble the reference shape (mean star offset)
+const SHAPE_MINPREC=0.40;  // reject only a runaway amount of stray lines ("connect everything"); travel lines are fine
+function _shapeMatchScore(refStars,refEdges, drawnStars,drawnEdges){
+  const NONE={f1:0, meanErr:9};
+  if(!drawnEdges.length) return NONE;
+  const refUsed=[...new Set(refEdges.flat())].sort((a,b)=>a-b);
+  const drawnUsed=[...new Set(drawnEdges.flat())].sort((a,b)=>a-b);
+  // sanity bounds so a wildly different amount of drawing can't score as "similar"
+  if(drawnUsed.length < Math.floor(refUsed.length*0.7)) return NONE;
+  if(drawnUsed.length > refUsed.length+3) return NONE;
 
-  const refPts=_samplePts(refStars,refEdges,8), drawnPts=_samplePts(drawnStars,drawnEdges,8);
-  const A=_normSet(refPts), B=_normSet(drawnPts);
-  // rotation-tolerant: a tilted version of the same shape still counts
-  return _bestRotChamfer(A,B) <= (tol||.18);
+  const R=_normSet(refUsed.map(i=>refStars[i]));
+  const D=_normSet(drawnUsed.map(i=>drawnStars[i]));
+  const N=Math.max(R.length, D.length);
+  const cost=[];
+  for(let k=0;k<N;k++){ const row=[];
+    for(let j=0;j<N;j++){
+      if(k<D.length && j<R.length){ const dx=D[k].x-R[j].x, dy=D[k].y-R[j].y; row.push(dx*dx+dy*dy); }
+      else row.push(0);                        // dummy pad for a missing / extra star
+    }
+    cost.push(row);
+  }
+  const asg=_hungarian(cost);                  // drawn row k -> column asg[k]
+  const drawnToRef=new Map(); let sum=0, cnt=0;
+  for(let k=0;k<D.length;k++){
+    const col=asg[k];
+    if(col>=R.length) continue;                // matched a dummy column (a stray drawn star)
+    sum+=Math.sqrt(cost[k][col]); cnt++;       // geometric offset of this star from its match
+    drawnToRef.set(drawnUsed[k], refUsed[col]);
+  }
+
+  // Reduce the child's strokes to the SET of distinct connections they made
+  // (mapped onto reference stars). We judge the PATTERN, not the stroke count — so
+  // re-tracing the same line, as you often must to get around a branched figure,
+  // never counts against them; only genuinely different connections matter.
+  const drawn=new Set();
+  for(const [a,b] of drawnEdges){
+    const ra=drawnToRef.get(a), rb=drawnToRef.get(b);
+    if(ra==null||rb==null||ra===rb) continue;  // stroke touching a stray / unmatched star
+    drawn.add(Math.min(ra,rb)+"-"+Math.max(ra,rb));
+  }
+  const targetSet=new Set(keyset(refEdges));
+  let tp=0; drawn.forEach(k=>{ if(targetSet.has(k)) tp++; });
+  const recall    = targetSet.size ? tp/targetSet.size : 0;   // fraction of the reference lines the child drew
+  const precision = drawn.size     ? tp/drawn.size     : 0;   // fraction of the child's lines that belong to the figure
+  return {recall, precision, meanErr: cnt ? sum/cnt : 9, drawnCount: drawn.size, refCount: targetSet.size};
+}
+function _visualShapeMatch(refStars,refEdges, drawnStars,drawnEdges, tol){
+  const s=_shapeMatchScore(refStars,refEdges,drawnStars,drawnEdges);
+  // 1) Completion — you must have drawn a whole figure's worth of distinct lines,
+  //    so "found it" can't fire while you're still only part-way through tracing.
+  if(s.drawnCount < s.refCount) return false;
+  // 2) Coverage — you must have traced ≥95% of the reference's lines, and the
+  //    figure must resemble the reference shape (right proportions-ish). Extra
+  //    lines drawn just to TRAVEL between stars are NOT held against you; re-tracing
+  //    the same line is a no-op. Only a runaway amount of stray connections (very
+  //    low precision, i.e. "connect everything") is rejected so it can't be cheesed.
+  return s.recall >= SHAPE_SIM && s.precision >= SHAPE_MINPREC && s.meanErr <= SHAPE_GEOM;
 }
 function shapesMatch(refStars,refEdges, drawnStars,drawnEdges, tol){
   if(!drawnEdges.length) return false;
