@@ -620,7 +620,7 @@ function toolboxItems(){
 }
 const HINTS = [
   {who:"Kabir", text:"Will this help it glow?", kabir:"kabirThink", voice:"will this help it glow.wav"},
-  {who:"Meera", text:"Useful, but not for our light.", meera:"meeraThink"},
+  {who:"Meera", text:"Useful, but not for our light.", meera:"meeraThink", voice:"useful but not for our light.wav"},
   {who:"Kabir", text:"Look for parts that use electricity.", kabir:"kabirThink"},
 ];
 let hintIdx = 0;
@@ -802,7 +802,7 @@ function onBatteryTap(){
     bEl.classList.remove("glowtap");
     bEl.classList.add("inspect");
     snd.click();
-    setDialogue([{who:"Meera", text:"Look closely. Tap again to turn it.", meera:"meeraThink"}]);
+    setDialogue([{who:"Meera", text:"Look closely. Tap again to turn it.", meera:"meeraThink", voice:"look closely. tap again to turn it.wav"}]);
     return;
   }
   // Second tap: reverse polarity WHILE still enlarged. The LED is already correct and the
