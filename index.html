@@ -3566,9 +3566,34 @@ function shapesMatch(refStars,refEdges, drawnStars,drawnEdges, tol){
 /* ---------- SCENE 8: FINAL SCENES (3 narrated closing pictures) ---------- */
 SCENES.reward=()=>{
   state.currentScene="reward";
-  // closing video → straight into the light-source (projector) game
-  videoScene("videos/video-12.mp4","Continue ➜",()=>{ window.location.href="light-source.html"; });
+  // closing video → a Continue button (a real click is needed so Activity 2's
+  // intro video is allowed to autoplay WITH sound inside the iframe)
+  videoScene("videos/video-12.mp4","Continue ➜",showLightSourceGate);
 };
+function showLightSourceGate(){
+  screen.innerHTML="";
+  const s=document.createElement("div"); s.className="scene";
+  s.style.cssText="position:relative;background:var(--indigo-900);display:flex;align-items:center;justify-content:center";
+  const sky=document.createElement("div"); sky.className="sky-bg"; twinkles(sky,80); s.appendChild(sky);
+  const c=document.createElement("div"); c.className="center"; c.style.zIndex="1";
+  c.appendChild(mkBtn("Continue ➜","pulse",openLightSource));
+  s.appendChild(c); screen.appendChild(s);
+}
+/* Embed Activity 2 (light-source) as a full-screen iframe so there's no page reload
+   (keeps audio/video autoplay unlocked). It messages back "ls-restart" when done. */
+function openLightSource(){
+  if(document.getElementById("ls-frame")) return;
+  const f=document.createElement("iframe");
+  f.id="ls-frame"; f.src="light-source.html"; f.allow="autoplay; fullscreen";
+  f.style.cssText="position:fixed;inset:0;width:100%;height:100%;border:0;z-index:99999;background:#000";
+  document.body.appendChild(f);
+}
+window.addEventListener("message",e=>{
+  if(e.data==="ls-restart"){
+    const f=document.getElementById("ls-frame"); if(f) f.remove();
+    state=NEW_STATE(); show("start");
+  }
+});
 
 /* ---------- SCENE 9: FINALE (closing scene with the park images) ---------- */
 SCENES.finale=()=>{
