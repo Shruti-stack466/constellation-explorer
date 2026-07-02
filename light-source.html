@@ -300,7 +300,7 @@
   #introvideo.show{display:block;animation:fadeIn .3s;}
   #iv-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;}
   #iv-skip{position:absolute;right:3vw;bottom:4vh;z-index:3;
-    padding:8px 18px;font-size:clamp(12px,1.2vw,15px);box-shadow:0 5px 14px rgba(0,0,0,.35);}
+    padding:12px 28px;font-size:clamp(15px,1.7vw,20px);box-shadow:0 5px 14px rgba(0,0,0,.35);}
   /* video subtitles */
   .videocap{position:absolute;left:50%;bottom:11vh;transform:translateX(-50%);z-index:4;
     max-width:80vw;text-align:center;pointer-events:none;opacity:0;transition:opacity .15s;
@@ -318,6 +318,9 @@
     padding:8px 18px;font-size:clamp(12px,1.2vw,15px);box-shadow:0 5px 14px rgba(0,0,0,.35);}
   #fb-restart{position:absolute;left:3vw;bottom:4vh;z-index:3;display:none;
     padding:8px 18px;font-size:clamp(12px,1.2vw,15px);box-shadow:0 5px 14px rgba(0,0,0,.35);}
+  #fb-restart.glowbtn{animation:btnGlow 1.2s ease-in-out infinite;}
+  @keyframes btnGlow{0%,100%{box-shadow:0 5px 14px rgba(0,0,0,.35);transform:scale(1)}
+    50%{box-shadow:0 0 24px rgba(255,211,107,.95),0 5px 14px rgba(0,0,0,.4);transform:scale(1.07)}}
   #sb-dots{display:flex;gap:8px;}
   .sb-dot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.5);transition:background .2s,transform .2s;}
   .sb-dot.on{background:#ffd36b;transform:scale(1.25);}
@@ -1211,13 +1214,16 @@ function renderFinalScene(){
     b.innerHTML = `<span class="sb-who">${l.who}</span>${l.text}`;
     c.appendChild(b);
   });
-  const spoken = s.text.find(l=>l.voice);
-  playVoice(spoken ? spoken.voice : null);
-  const nextBtn = $("#fb-next");
   const last = fbIndex >= FINAL_SCENES.length-1;
-  nextBtn.style.display = last ? "none" : "";   // last screen: no Next
+  const nextBtn = $("#fb-next");
+  nextBtn.style.display = last ? "none" : "";          // last screen: no Next
   nextBtn.textContent = "Next ▶";
-  $("#fb-restart").style.display = last ? "" : "none";   // last screen: show Restart
+  const restartBtn = $("#fb-restart");
+  restartBtn.classList.remove("glowbtn");
+  restartBtn.style.display = last ? "inline-block" : "none";   // last screen: show Restart
+  // play the line; on the last scene, make Restart glow once the narration ends
+  const spoken = s.text.find(l=>l.voice);
+  playVoice(spoken ? spoken.voice : null, last ? ()=>restartBtn.classList.add("glowbtn") : null);
 }
 function showFinalScenes(){
   fbIndex = 0;
