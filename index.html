@@ -517,6 +517,16 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   backdrop-filter:blur(16px) saturate(1.05);-webkit-backdrop-filter:blur(16px) saturate(1.05);
   box-shadow:0 10px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.09);transition:transform .15s,box-shadow .2s;animation:huntFieldIn .6s ease .2s both}
 .discover-sound:hover{transform:scale(1.06)}
+.discover-skip{position:absolute;top:14px;right:70px;z-index:7;padding:10px 16px;border-radius:16px;cursor:pointer;
+  font:inherit;font-weight:800;font-size:14px;color:#e7ecf5;
+  background:linear-gradient(180deg,rgba(15,23,42,.7),rgba(30,41,59,.5));border:1px solid rgba(125,211,252,.2);
+  backdrop-filter:blur(16px) saturate(1.05);-webkit-backdrop-filter:blur(16px) saturate(1.05);
+  box-shadow:0 10px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.09);transition:transform .15s;animation:huntFieldIn .6s ease .2s both}
+.discover-skip:hover{transform:scale(1.05)}
+.videocap{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);z-index:7;
+  max-width:80vw;text-align:center;pointer-events:none;opacity:0;transition:opacity .15s;
+  color:#fff;font-size:clamp(15px,2vw,24px);line-height:1.35;font-weight:600;
+  text-shadow:0 2px 4px rgba(0,0,0,.9);background:rgba(0,0,0,.5);padding:6px 16px;border-radius:10px}
 .discover-sound:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .discover-sound.snd-off{filter:grayscale(.6) brightness(.9)}
 /* "Next / Finish" button — bottom-right corner */
@@ -2126,6 +2136,22 @@ SCENES.start=()=>{
 /* ---------- THE 7-SCENE PICTURE STORY ---------- */
 /* Full-screen video scene. Auto-advances to the next page ~0.7s before the clip ends, so
    its blurry frozen last frame is never shown. A Skip button lets the child jump ahead. */
+/* Video subtitles — fill each list with {t: startSeconds, e: endSeconds, text:"..."} */
+const VIDEO_CUES={
+  // intro ("Let's explore") — from initial_scene_activity_2_subtitles_with_speakers.srt
+  "videos/video-11.mp4":[
+    { t:0.0,  e:5.0,  text:"Narrator: It was a beautiful day, and Kabir and Meera were spending some time in the park." },
+    { t:5.0,  e:10.0, text:"Kabir: Hey, Meera, do you also think that cloud looks like a smiling face?" },
+    { t:10.0, e:12.2, text:"Meera: Yes, it does!" },
+    { t:12.2, e:16.2, text:"Meera: Look, that cloud also looks like a UFO." },
+    { t:16.2, e:20.8, text:"Kabir: But can we see these shapes in the sky too?" },
+    { t:20.8, e:24.6, text:"Meera: Hmm, let's find out tonight." },
+    { t:24.6, e:29.2, text:"Narrator: Now, it's time to find shapes and patterns in stars." },
+    { t:29.2, e:31.9, text:"Kabir and Meera: Will you help us?" },
+  ],
+  "videos/video-13.mp4":[],   // Meera's constellation explanation
+  "videos/video-12.mp4":[],   // closing video
+};
 function videoScene(src, doneLabel, onAdvance, maxSecs, dissolveMs){
   Speech.stop(); stopStoryAudio(); stopHuntAudio();
   document.getElementById("chrome").classList.add("hidden");        // full-screen video, like the intro
@@ -2145,6 +2171,15 @@ function videoScene(src, doneLabel, onAdvance, maxSecs, dissolveMs){
   const bar=document.createElement("div");
   bar.style.cssText="position:absolute;right:18px;bottom:18px;z-index:6;display:flex;gap:12px";
   s.appendChild(bar);
+
+  // subtitles for this clip (see VIDEO_CUES); fill each cue with {t,e,text}
+  const cap=document.createElement("div"); cap.className="videocap"; s.appendChild(cap);
+  const cues=VIDEO_CUES[src]||[];
+  video.addEventListener("timeupdate",()=>{
+    const ct=video.currentTime, cue=cues.find(c=>ct>=c.t&&ct<c.e);
+    cap.textContent=cue?cue.text:""; cap.style.opacity=cue?"1":"0";
+  });
+
   screen.appendChild(s);
 
   let done=false;
@@ -2901,6 +2936,13 @@ SCENES.discover=()=>{
   sndBtn.setAttribute("aria-label","Turn sound on or off"); sndBtn.title="Turn sound on or off";
   sndBtn.onclick=()=>{ toggleNarration(); sndBtn.firstChild.textContent=state.narrationOn?"🔊":"🔇"; sndBtn.classList.toggle("snd-off",!state.narrationOn); };
   s.appendChild(sndBtn);
+
+  // Skip this constellation activity → jump to the next one (or the ending after the last).
+  const skipBtn=document.createElement("button"); skipBtn.type="button"; skipBtn.className="discover-skip";
+  skipBtn.textContent="Skip ➜";
+  skipBtn.setAttribute("aria-label","Skip this constellation"); skipBtn.title="Skip this constellation";
+  skipBtn.onclick=()=>{ Speech.stop(); gotoStep((state.huntStep||0)+1); };
+  s.appendChild(skipBtn);
 
   screen.appendChild(s);
 

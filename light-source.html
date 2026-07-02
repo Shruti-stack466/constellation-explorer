@@ -295,6 +295,19 @@
   #sb-back{left:3vw;}                          /* Back → bottom-left corner */
   #sb-next{right:3vw;}                         /* Next → bottom-right corner */
 
+  /* ---------- Intro video (Activity 2 opening scene) ---------- */
+  #introvideo{position:absolute;inset:0;z-index:70;display:none;background:#000;}
+  #introvideo.show{display:block;animation:fadeIn .3s;}
+  #iv-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;}
+  #iv-skip{position:absolute;right:3vw;bottom:4vh;z-index:3;
+    padding:8px 18px;font-size:clamp(12px,1.2vw,15px);box-shadow:0 5px 14px rgba(0,0,0,.35);}
+  /* video subtitles */
+  .videocap{position:absolute;left:50%;bottom:11vh;transform:translateX(-50%);z-index:4;
+    max-width:80vw;text-align:center;pointer-events:none;opacity:0;transition:opacity .15s;
+    color:#fff;font-size:clamp(15px,2vw,24px);line-height:1.35;font-weight:600;
+    text-shadow:0 2px 4px rgba(0,0,0,.9);
+    background:rgba(0,0,0,.5);padding:6px 16px;border-radius:10px;}
+
   /* ---------- Closing scenes (after the finale) ---------- */
   #finalbook{position:absolute;inset:0;z-index:70;display:none;background:#000;}
   #finalbook.show{display:block;animation:fadeIn .3s;}
@@ -302,6 +315,8 @@
   #fb-text{position:absolute;left:50%;bottom:13vh;transform:translateX(-50%);z-index:3;
     display:flex;flex-direction:column;gap:9px;align-items:center;width:min(76vw,840px);pointer-events:none;}
   #fb-next{position:absolute;right:3vw;bottom:4vh;z-index:3;
+    padding:8px 18px;font-size:clamp(12px,1.2vw,15px);box-shadow:0 5px 14px rgba(0,0,0,.35);}
+  #fb-restart{position:absolute;left:3vw;bottom:4vh;z-index:3;display:none;
     padding:8px 18px;font-size:clamp(12px,1.2vw,15px);box-shadow:0 5px 14px rgba(0,0,0,.35);}
   #sb-dots{display:flex;gap:8px;}
   .sb-dot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.5);transition:background .2s,transform .2s;}
@@ -328,20 +343,17 @@
 
   <div id="actionbar"></div>
 
-  <div id="storybook">
-    <div id="book"><img id="sb-base" alt="Story scene"></div>
-    <div id="sb-text"></div>
-    <div id="sb-controls">
-      <button class="btn btn-sec" id="sb-back" hidden>◀ Back</button>
-      <div id="sb-dots"></div>
-      <button class="btn" id="sb-next">Next ▶</button>
-    </div>
+  <div id="introvideo">
+    <video id="iv-video" playsinline preload="auto"></video>
+    <div id="iv-cap" class="videocap"></div>
+    <button class="btn" id="iv-skip">Skip ▶</button>
   </div>
 
   <div id="finalbook">
     <img id="fb-base" alt="Final scene">
     <div id="fb-text"></div>
     <button class="btn" id="fb-next">Next ▶</button>
+    <button class="btn" id="fb-restart">↩ Restart</button>
   </div>
 </div>
 
@@ -1145,84 +1157,48 @@ function checkPartsComplete(){
   }
 }
 
-/* ============ Storybook intro (flipbook) ============ */
-const SCENES = [
-  V("scene 1.png"), V("scene 2.png"), V("scene 3.png"),
-  V("scene 4.png"), V("scene 5.png"), V("scene6.png"),
+/* ============ Intro video (Activity 2 opening scene) ============ */
+/* Subtitles: fill each entry with {t: startSeconds, e: endSeconds, text:"..."} */
+const INTRO_CUES = [
+  // { t:0, e:4, text:"..." },
 ];
-let sbIndex = 0, sbBusy = false;
-
-/* Narration (scene 1) + character dialogue for each story scene */
-const SCENE_TEXT = [
-  [{voice:"1 scene narration.wav"}],            // scene 1: narration audio only, no text box
-  [{who:"Meera", text:"See — this card has tiny holes! If we shine light through them, we can make different constellations on our wall.", voice:"see this card has.wav"}],
-  [{who:"Kabir", text:"Let's darken the room first, then use the torch and card to make constellations on the wall.", voice:"darken room first.wav"}],
-  [{who:"Kabir", text:"Hmm… this torch isn't turning on.", voice:"torch is not turning on.wav"}],
-  [{who:"Meera", text:"The torch is just a light source for our projector. Why don't we build our own light source?", voice:"torch is just a light source.wav"}],
-  [{who:"Kabir", text:"Yeah! We can do that.", voice:"yeah we can do that.wav"}],
-];
-function renderSceneText(i){
-  const c = $("#sb-text");
-  c.innerHTML = "";
-  const lines = SCENE_TEXT[i] || [];
-  lines.forEach(l=>{
-    if(!l.narration && !l.text) return;          // voice-only line: no bubble
-    const b = document.createElement("div");
-    if(l.narration){ b.className = "sb-bubble narration"; b.textContent = l.narration; }
-    else { b.className = "sb-bubble"; b.innerHTML = `<span class="sb-who">${l.who}</span>${l.text}`; }
-    c.appendChild(b);
-  });
-  // Play this scene's narration; when the clip ends, move to the next scene on its own.
-  const spoken = lines.find(l=>l.voice);
-  playVoice(spoken ? spoken.voice : null, spoken ? ()=>turnPage(1) : null, true);
-}
-/* Autoplay is blocked until the first gesture — replay the current scene's voice then. */
-window.addEventListener("pointerdown", function primeVoice(){
-  if(!voiceUnlocked && $("#storybook").classList.contains("show")){
-    const spoken = (SCENE_TEXT[sbIndex] || []).find(l=>l.voice);
-    if(spoken) playVoice(spoken.voice, ()=>turnPage(1), true);
-  }
-}, { once:true });
-
-function showStorybook(){
-  sbIndex = 0; sbBusy = false;
-  $("#sb-base").src = SCENES[0];
-  $("#storybook").classList.add("show");
-  renderSceneText(0);
-  updateSbControls();
-}
-function updateSbControls(){
-  $("#sb-back").hidden = sbIndex === 0;
-  $("#sb-next").textContent = sbIndex < SCENES.length-1 ? "Next ▶" : "Start ▶";
-  const dots = $("#sb-dots"); dots.innerHTML = "";
-  SCENES.forEach((_,i)=>{
-    const d = document.createElement("span");
-    d.className = "sb-dot" + (i===sbIndex ? " on" : "");
-    dots.appendChild(d);
+function bindCaptions(vid, capEl, cues){
+  if(!capEl) return;
+  capEl.textContent = ""; capEl.style.opacity = "0";
+  vid.addEventListener("timeupdate", ()=>{
+    const ct = vid.currentTime;
+    const cue = cues.find(c=> ct>=c.t && ct<c.e);
+    capEl.textContent = cue ? cue.text : "";
+    capEl.style.opacity = cue ? "1" : "0";
   });
 }
-function turnPage(dir){
-  if(dir>0 && sbIndex === SCENES.length-1){ startGameFromStory(); return; }
-  const target = sbIndex + dir;
-  if(target < 0 || target > SCENES.length-1) return;
-  ac(); snd.click();
-  $("#sb-text").innerHTML = "";              // clear old text before the swap
-  $("#sb-base").src = SCENES[target];        // instant swap, no page-flip animation
-  sbIndex = target;
-  renderSceneText(target);
-  updateSbControls();
-}
-function startGameFromStory(){
-  stopVoice();
-  clearDlgTimer();                            // cancel any pending scene auto-advance
-  $("#storybook").classList.remove("show");
-  goto("partsIntro");
+function playIntroVideo(){
+  stopVoice(); clearDlgTimer();
+  const box = $("#introvideo"), vid = $("#iv-video");
+  box.classList.add("show");
+  let done = false;
+  const finish = ()=>{
+    if(done) return; done = true;
+    try{ vid.pause(); vid.removeAttribute("src"); vid.load(); }catch(e){}
+    box.classList.remove("show");
+    goto("partsIntro");
+  };
+  vid.src = "videos/inital scene activity 2.mp4";
+  bindCaptions(vid, $("#iv-cap"), INTRO_CUES);
+  vid.addEventListener("ended", finish, { once:true });
+  $("#iv-skip").onclick = ()=>{ ac(); snd.click(); finish(); };
+  const p = vid.play();
+  if(p && p.catch) p.catch(()=>{                 // autoplay blocked -> start on first gesture
+    const kick = ()=>{ vid.play().catch(()=>{}); };
+    window.addEventListener("pointerdown", kick, { once:true });
+  });
 }
 
 /* ============ Closing scenes (shown after the finale's Continue) ============ */
 const FINAL_SCENES = [
   { img:V("final scene 1.png"), text:[{who:"Kabir", text:"Move the light toward the wall and place the card in front of it.", voice:"Move the light toward the wall and place the card in front of it.wav"}] },
   { img:V("final scene 2.png"), text:[{who:"Meera", text:"Look! We can now see the pattern on our wall.", voice:"Look! We can now see the pattern on our wall.wav"}] },
+  { img:V("final scene 3.png"), text:[{who:"Kabir", text:"Thank you for helping us! Now it's your turn — make your own constellation projector.", voice:"thankyou for helping us.wav"}] },
 ];
 let fbIndex = 0;
 function renderFinalScene(){
@@ -1239,8 +1215,9 @@ function renderFinalScene(){
   playVoice(spoken ? spoken.voice : null);
   const nextBtn = $("#fb-next");
   const last = fbIndex >= FINAL_SCENES.length-1;
-  nextBtn.style.display = last ? "none" : "";   // last screen: no button, just stop here
+  nextBtn.style.display = last ? "none" : "";   // last screen: no Next
   nextBtn.textContent = "Next ▶";
+  $("#fb-restart").style.display = last ? "" : "none";   // last screen: show Restart
 }
 function showFinalScenes(){
   fbIndex = 0;
@@ -1255,15 +1232,14 @@ function finalNext(){
   } else {
     stopVoice();
     $("#finalbook").classList.remove("show");
-    showStorybook();                            // loop back to the very beginning
+    playIntroVideo();                           // loop back to the very beginning
   }
 }
 $("#fb-next").addEventListener("click", finalNext);
-$("#sb-next").addEventListener("click", ()=> turnPage(1));
-$("#sb-back").addEventListener("click", ()=> turnPage(-1));
+$("#fb-restart").addEventListener("click", ()=>{ window.location.href="index.html"; });
 
 /* ============ Boot ============ */
-window.addEventListener("load", showStorybook);
+window.addEventListener("load", playIntroVideo);
 </script>
 </body>
 </html>
