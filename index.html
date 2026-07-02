@@ -1715,8 +1715,8 @@ function gotoStep(step){
   state.huntStep=step;
   if(step>=HUNT_SEQ.length){
     // activity finished → Meera explains the constellations (cut to 7s of the 9s
-    // clip), then a 0.12s dissolve into the closing scene
-    videoScene("videos/video-13.mp4","Continue ➜",()=>show("reward"), 7, 120);
+    // clip), then a hard cut into the closing scene (no dissolve)
+    videoScene("videos/video-13.mp4","Continue ➜",()=>show("reward"), 7);
     return;
   }
   const c=byId(HUNT_SEQ[step]);
@@ -3524,7 +3524,8 @@ function shapesMatch(refStars,refEdges, drawnStars,drawnEdges, tol){
 /* ---------- SCENE 8: FINAL SCENES (3 narrated closing pictures) ---------- */
 SCENES.reward=()=>{
   state.currentScene="reward";
-  videoScene("videos/video-12.mp4","↻ Play Again",()=>{ state=NEW_STATE(); show("start"); });
+  // closing video → straight into the light-source (projector) game
+  videoScene("videos/video-12.mp4","Continue ➜",()=>{ window.location.href="light-source.html"; });
 };
 
 /* ---------- SCENE 9: FINALE (closing scene with the park images) ---------- */
