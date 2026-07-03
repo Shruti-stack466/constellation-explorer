@@ -204,14 +204,10 @@
     filter:drop-shadow(0 2px 3px rgba(0,0,0,.3));
     stroke-dasharray:1400;stroke-dashoffset:1400;transition:stroke-dashoffset .55s ease;}
   .seg.on,.switchlink.on{stroke-dashoffset:0;}
-  /* energised circuit: soft solid golden glow on the loop + a small golden ball that
-     flows continuously around it (no dashed/marching-ants line) */
-  #current{fill:none;stroke:rgba(255,236,140,.6);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;opacity:0;transition:opacity .3s;
+  #current{fill:none;stroke:#fff36b;stroke-width:5;stroke-linecap:round;stroke-dasharray:14 22;opacity:0;
     filter:drop-shadow(0 0 6px #ffe14d) drop-shadow(0 0 10px #ffd21a);}
-  #current.flow{opacity:1;}
-  #current-ball{fill:#fff3a0;opacity:0;transition:opacity .3s;
-    filter:drop-shadow(0 0 5px #ffe14d) drop-shadow(0 0 12px #ffd21a);}
-  #current-ball.flow{opacity:1;}
+  #current.flow{opacity:1;animation:flow .7s linear infinite;}
+  @keyframes flow{to{stroke-dashoffset:-72;}}
   #gap-spark{opacity:0;transition:opacity .2s;}
   #gap-spark line{stroke:#ff5a5a;stroke-width:4;stroke-linecap:round;filter:drop-shadow(0 0 4px #ff5a5a);}
   #gap-spark.show{opacity:1;}
@@ -681,11 +677,7 @@ function buildStageB(){
       <polyline class="seg" id="segRtop" points="320,70 550,70 550,132"/>
       <polyline class="seg" id="segRbot" points="550,148 550,330 320,330"/>
       <line class="switchlink" id="switchlink" x1="550" y1="132" x2="550" y2="148"/>
-      <rect id="current" x="90" y="70" width="460" height="260" rx="14"/>
-      <circle id="current-ball" r="8" cx="108" cy="70">
-        <animateMotion dur="2.6s" repeatCount="indefinite" rotate="auto"
-          path="M108,70 L532,70 Q550,70 550,88 L550,312 Q550,330 532,330 L108,330 Q90,330 90,312 L90,88 Q90,70 108,70 Z"/>
-      </circle>
+      <rect id="current" x="90" y="70" width="460" height="260" rx="10"/>
       <g id="gap-spark">
         <line x1="543" y1="133" x2="557" y2="147"/>
         <line x1="557" y1="133" x2="543" y2="147"/>
@@ -768,8 +760,6 @@ function updateBoard(){
   const working = isWorking();
   lEl.classList.toggle("lit", working);
   board.querySelector("#current").classList.toggle("flow", working);
-  const cball = board.querySelector("#current-ball");
-  if(cball) cball.classList.toggle("flow", working);   // golden ball flows continuously while lit
 }
 function isWorking(){
   return game.placed.battery && game.placed.led && game.placed.switch && game.placed.wires &&
