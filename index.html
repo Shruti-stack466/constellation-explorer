@@ -3597,8 +3597,16 @@ SCENES.reward=()=>{
 function showLightSourceGate(){
   screen.innerHTML="";
   const s=document.createElement("div"); s.className="scene";
-  s.style.cssText="position:relative;background:var(--indigo-900);display:flex;align-items:center;justify-content:center";
-  const sky=document.createElement("div"); sky.className="sky-bg"; twinkles(sky,80); s.appendChild(sky);
+  s.style.cssText="position:relative;background:var(--indigo-900);display:flex;align-items:center;justify-content:center;overflow:hidden";
+  // Persistent night-sky star background. The shared .sky-bg class sits at z-index:-1,
+  // which renders BEHIND the scene's solid indigo fill — so the stars only flashed by
+  // during the transition, then vanished. Pin it at z-index:0 (above the fill, below the
+  // button) so the star field stays visible the whole time the child is on this screen,
+  // until they tap Continue.
+  const sky=document.createElement("div"); sky.className="sky-bg";
+  sky.style.cssText="position:absolute;inset:0;z-index:0;overflow:hidden";
+  twinkles(sky,140);
+  s.appendChild(sky);
   const c=document.createElement("div"); c.className="center"; c.style.zIndex="1";
   c.appendChild(mkBtn("Continue ➜","pulse",openLightSource));
   s.appendChild(c); screen.appendChild(s);
