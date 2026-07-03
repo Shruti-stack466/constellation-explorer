@@ -192,9 +192,11 @@
   .ph-hint{font-size:clamp(14px,1.9vw,28px);line-height:1;text-align:center;opacity:.95;}
   .ph-icon{width:clamp(18px,2.2vw,36px);height:auto;object-fit:contain;}
   .ph-icon.knockout{mix-blend-mode:multiply;}      /* hides the white JPEG background */
-  #wire-hint{position:absolute;left:8.5%;top:50%;transform:translate(-50%,-50%);text-align:center;line-height:1;}
-  /* thin dashed line = the wire placeholder */
-  #loop-ph{fill:none;stroke:rgba(255,249,235,.28);stroke-width:4;stroke-linejoin:round;stroke-linecap:round;transition:opacity .4s;}
+  /* wire icon sits ON the loop's left edge (the placeholder line itself) */
+  #wire-hint{position:absolute;left:14%;top:50%;transform:translate(-50%,-50%);text-align:center;line-height:1;z-index:4;}
+  /* thin white-gold loop = the wire placeholder (softly rounded corners) */
+  #loop-ph{fill:none;stroke:rgba(255,241,205,.5);stroke-width:3.5;stroke-linejoin:round;stroke-linecap:round;
+    filter:drop-shadow(0 0 2px rgba(255,221,150,.55));transition:opacity .4s;}
   #loop-ph.hide{opacity:0;}
   #board{position:relative;width:100%;flex:1;}
   #board svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
@@ -202,10 +204,14 @@
     filter:drop-shadow(0 2px 3px rgba(0,0,0,.3));
     stroke-dasharray:1400;stroke-dashoffset:1400;transition:stroke-dashoffset .55s ease;}
   .seg.on,.switchlink.on{stroke-dashoffset:0;}
-  #current{fill:none;stroke:#fff36b;stroke-width:5;stroke-linecap:round;stroke-dasharray:14 22;opacity:0;
+  /* energised circuit: soft solid golden glow on the loop + a small golden ball that
+     flows continuously around it (no dashed/marching-ants line) */
+  #current{fill:none;stroke:rgba(255,236,140,.6);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;opacity:0;transition:opacity .3s;
     filter:drop-shadow(0 0 6px #ffe14d) drop-shadow(0 0 10px #ffd21a);}
-  #current.flow{opacity:1;animation:flow .7s linear infinite;}
-  @keyframes flow{to{stroke-dashoffset:-72;}}
+  #current.flow{opacity:1;}
+  #current-ball{fill:#fff3a0;opacity:0;transition:opacity .3s;
+    filter:drop-shadow(0 0 5px #ffe14d) drop-shadow(0 0 12px #ffd21a);}
+  #current-ball.flow{opacity:1;}
   #gap-spark{opacity:0;transition:opacity .2s;}
   #gap-spark line{stroke:#ff5a5a;stroke-width:4;stroke-linecap:round;filter:drop-shadow(0 0 4px #ff5a5a);}
   #gap-spark.show{opacity:1;}
@@ -253,11 +259,9 @@
     box-shadow:0 3px 6px rgba(0,0,0,.3);letter-spacing:1px;transition:background .2s;z-index:3;}
   .comp.switch-on .switch-badge{background:var(--glow-green);}
 
-  /* wire-set drop zone */
+  /* wire-set drop zone — invisible hit target; the white-gold loop + wire icon is the visible cue */
   #wirezone{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-    width:58%;height:56%;border-radius:20px;border:4px dashed transparent;transition:.2s;z-index:3;pointer-events:none;}
-  #wirezone.active{border-color:rgba(255,224,138,.85);background:rgba(255,224,138,.1);animation:zonePulse 1.2s infinite;}
-  @keyframes zonePulse{0%,100%{box-shadow:0 0 0 rgba(255,224,138,0)}50%{box-shadow:0 0 24px rgba(255,224,138,.6)}}
+    width:58%;height:56%;z-index:3;pointer-events:none;}
 
   .board-greenpulse{animation:boardPulse .9s ease-out;}
   @keyframes boardPulse{0%{filter:drop-shadow(0 0 0 rgba(87,227,137,0))}45%{filter:drop-shadow(0 0 30px rgba(87,227,137,.9))}100%{filter:drop-shadow(0 0 0 rgba(87,227,137,0))}}
@@ -672,12 +676,16 @@ function buildStageB(){
   board.id = "board";
   board.innerHTML = `
     <svg viewBox="0 0 640 400" preserveAspectRatio="none">
-      <path id="loop-ph" d="M90,70 L265,70 M375,70 L550,70 L550,145 M550,255 L550,330 L375,330 M265,330 L90,330 L90,70"/>
+      <path id="loop-ph" d="M108,70 L265,70 M375,70 L532,70 Q550,70 550,88 L550,145 M550,255 L550,312 Q550,330 532,330 L375,330 M265,330 L108,330 Q90,330 90,312 L90,88 Q90,70 108,70"/>
       <polyline class="seg" id="segL"    points="320,330 90,330 90,70 320,70"/>
       <polyline class="seg" id="segRtop" points="320,70 550,70 550,132"/>
       <polyline class="seg" id="segRbot" points="550,148 550,330 320,330"/>
       <line class="switchlink" id="switchlink" x1="550" y1="132" x2="550" y2="148"/>
-      <rect id="current" x="90" y="70" width="460" height="260" rx="10"/>
+      <rect id="current" x="90" y="70" width="460" height="260" rx="14"/>
+      <circle id="current-ball" r="8" cx="108" cy="70">
+        <animateMotion dur="2.6s" repeatCount="indefinite" rotate="auto"
+          path="M108,70 L532,70 Q550,70 550,88 L550,312 Q550,330 532,330 L108,330 Q90,330 90,312 L90,88 Q90,70 108,70 Z"/>
+      </circle>
       <g id="gap-spark">
         <line x1="543" y1="133" x2="557" y2="147"/>
         <line x1="557" y1="133" x2="543" y2="147"/>
@@ -760,6 +768,8 @@ function updateBoard(){
   const working = isWorking();
   lEl.classList.toggle("lit", working);
   board.querySelector("#current").classList.toggle("flow", working);
+  const cball = board.querySelector("#current-ball");
+  if(cball) cball.classList.toggle("flow", working);   // golden ball flows continuously while lit
 }
 function isWorking(){
   return game.placed.battery && game.placed.led && game.placed.switch && game.placed.wires &&
@@ -1021,7 +1031,7 @@ const STATES = {
 
   /* Guided placement order: power source -> LED -> switch & wire */
   placeParts(){
-    setInstruction("Drag each part onto its matching spot to build the circuit.");
+    setInstruction(null);                      // no top banner text on the build screen
     curKabir="kabirHappy"; curMeera="meeraHappy";
     setCompanions("kabirHappy","meeraHappy");
     renderBTray(BUILD_TYPES);                  // all components draggable
