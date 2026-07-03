@@ -314,11 +314,7 @@
   /* ---------- Closing scenes (after the finale) ---------- */
   #finalbook{position:absolute;inset:0;z-index:70;display:none;background:#000;}
   #finalbook.show{display:block;animation:fadeIn .3s;}
-  #fb-base{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
-  #fb-text{position:absolute;left:50%;bottom:13vh;transform:translateX(-50%);z-index:3;
-    display:flex;flex-direction:column;gap:9px;align-items:center;width:min(76vw,840px);pointer-events:none;}
-  #fb-next{position:absolute;right:3vw;bottom:4vh;z-index:3;
-    padding:8px 18px;font-size:clamp(12px,1.2vw,15px);box-shadow:0 5px 14px rgba(0,0,0,.35);}
+  #fb-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;}
   #fb-restart{position:absolute;left:3vw;bottom:4vh;z-index:3;display:none;
     padding:8px 18px;font-size:clamp(12px,1.2vw,15px);box-shadow:0 5px 14px rgba(0,0,0,.35);}
   #fb-restart.glowbtn{animation:btnGlow 1.2s ease-in-out infinite;}
@@ -356,9 +352,7 @@
   </div>
 
   <div id="finalbook">
-    <img id="fb-base" alt="Final scene">
-    <div id="fb-text"></div>
-    <button class="btn" id="fb-next">Next ▶</button>
+    <video id="fb-video" playsinline preload="auto"></video>
     <button class="btn" id="fb-restart">↩ Restart</button>
   </div>
 </div>
@@ -1200,52 +1194,27 @@ function playIntroVideo(){
   });
 }
 
-/* ============ Closing scenes (shown after the finale's Continue) ============ */
-const FINAL_SCENES = [
-  { img:V("final scene 1.png"), text:[{who:"Kabir", text:"Move the light toward the wall and place the card in front of it.", voice:"Move the light toward the wall and place the card in front of it.wav"}] },
-  { img:V("final scene 2.png"), text:[{who:"Meera", text:"Look! We can now see the pattern on our wall.", voice:"Look! We can now see the pattern on our wall.wav"}] },
-  { img:V("final scene 3.png"), text:[{who:"Kabir", text:"Thank you for helping us! Now it's your turn — make your own constellation projector.", voice:"thankyou for helping us.wav"}] },
-];
-let fbIndex = 0;
-function renderFinalScene(){
-  const s = FINAL_SCENES[fbIndex];
-  $("#fb-base").src = s.img;
-  const c = $("#fb-text"); c.innerHTML = "";
-  s.text.forEach(l=>{
-    const b = document.createElement("div");
-    b.className = "sb-bubble";
-    b.innerHTML = `<span class="sb-who">${l.who}</span>${l.text}`;
-    c.appendChild(b);
-  });
-  const last = fbIndex >= FINAL_SCENES.length-1;
-  const nextBtn = $("#fb-next");
-  nextBtn.style.display = last ? "none" : "";          // last screen: no Next
-  nextBtn.textContent = "Next ▶";
-  const restartBtn = $("#fb-restart");
-  restartBtn.classList.remove("glowbtn");
-  restartBtn.style.display = last ? "inline-block" : "none";   // last screen: show Restart
-  // play the line; on the last scene, make Restart glow once the narration ends
-  const spoken = s.text.find(l=>l.voice);
-  playVoice(spoken ? spoken.voice : null, last ? ()=>restartBtn.classList.add("glowbtn") : null);
-}
+/* ============ Closing scene (shown after the finale's Continue) ============ */
 function showFinalScenes(){
-  fbIndex = 0;
-  renderFinalScene();
-  $("#finalbook").classList.add("show");
+  stopVoice(); clearDlgTimer();
+  const box = $("#finalbook"), vid = $("#fb-video"), restartBtn = $("#fb-restart");
+  restartBtn.style.display = "none";
+  restartBtn.classList.remove("glowbtn");
+  box.classList.add("show");
+  const reveal = ()=>{
+    restartBtn.style.display = "inline-block";
+    restartBtn.classList.add("glowbtn");
+  };
+  vid.src = "videos/final scene activity 2.mp4";
+  vid.addEventListener("ended", reveal, { once:true });
+  const p = vid.play();
+  if(p && p.catch) p.catch(()=>{                 // autoplay blocked -> start on first gesture
+    const kick = ()=>{ vid.play().catch(()=>{}); };
+    window.addEventListener("pointerdown", kick, { once:true });
+  });
 }
-function finalNext(){
-  ac(); snd.click();
-  if(fbIndex < FINAL_SCENES.length-1){
-    fbIndex++;
-    renderFinalScene();
-  } else {
-    stopVoice();
-    $("#finalbook").classList.remove("show");
-    playIntroVideo();                           // loop back to the very beginning
-  }
-}
-$("#fb-next").addEventListener("click", finalNext);
 $("#fb-restart").addEventListener("click", ()=>{
+  try{ $("#fb-video").pause(); }catch(e){}
   // embedded in the constellation game (iframe) → ask it to restart; else navigate.
   if(window.self !== window.top){ window.parent.postMessage("ls-restart","*"); }
   else { window.location.href="index.html"; }
