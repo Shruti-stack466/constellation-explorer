@@ -1415,6 +1415,7 @@ const Sfx = (()=>{
   const ac = window.AudioContext||window.webkitAudioContext;
   function tone(freq,dur,type,gain){
     if(!ac) return;
+    if(!state.narrationOn) return;               // sound toggle off → no UI blips either
     try{
       ctx = ctx||new ac();
       const o=ctx.createOscillator(), g=ctx.createGain();
@@ -1485,6 +1486,7 @@ function renderProgress(){
 // star-tap click sounds — alternate 1 → 2 → 1 … on every star selection (Activities 1 & 2)
 let _starSelN=0;
 function playStarSelect(){
+  if(!state.narrationOn) return;                 // sound toggle off → no click sounds either
   const f=(_starSelN++%2===0)?"star selection sound 1.mp3":"star selection sound 2.mp3";
   try{ const a=new Audio(encodeURI("Audio/"+f)); a.play().catch(()=>{}); }catch(e){}
 }
@@ -1831,11 +1833,27 @@ function duo(caption){
 const screen=document.getElementById("screen");
 const SCENES={};
 
+/* Cross-fade between screens: lift the old scene out of #screen and float it on top
+   (frozen, non-interactive) while the next scene builds underneath, then fade it out.
+   Without this, screen.innerHTML="" shows the dark page background for ~0.5–1s while
+   the new scene fades in from opacity:0 — the "black blink" between screens. */
+function crossFadeOldScene(){
+  const old=screen.firstElementChild;
+  if(!old) return;
+  old.style.animation="none";                     // never replay the scene's fade-IN when re-appended
+  old.style.position="fixed"; old.style.inset="0"; old.style.zIndex="9990";
+  old.style.pointerEvents="none"; old.style.transition="opacity .3s ease";
+  document.body.appendChild(old);                 // survives screen.innerHTML="" in the next scene
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ old.style.opacity="0"; }));
+  setTimeout(()=>{ if(old.parentNode) old.parentNode.removeChild(old); },460);
+}
+
 function show(name){
   Speech.stop();
   if(typeof stopStoryAudio==="function") stopStoryAudio();   // never let story narration bleed into gameplay
   if(typeof stopHuntAudio==="function") stopHuntAudio();
   if(typeof stopLineAudio==="function") stopLineAudio();
+  crossFadeOldScene();                                       // smooth hand-off — no dark flash
   state.currentScene=name;
   const chrome=document.getElementById("chrome");
   // discover has its own in-scene controls (full-screen star field), so hide the top chrome there
@@ -2153,7 +2171,10 @@ const VIDEO_CUES={
   "videos/video-12.mp4":[],   // closing video
 };
 function videoScene(src, doneLabel, onAdvance, maxSecs, dissolveMs){
-  Speech.stop(); stopStoryAudio(); stopHuntAudio();
+  Speech.stop(); stopStoryAudio(); stopHuntAudio(); stopLineAudio();  // no narration may bleed over the video
+  state.currentScene="video";       // invalidates any pending scene-guarded timers (e.g. discover's sayThen chain)
+  if(dissolveMs==null) dissolveMs=400;                              // default: melt into the next scene, no hard cut
+  crossFadeOldScene();                                              // old screen fades over the arriving video
   document.getElementById("chrome").classList.add("hidden");        // full-screen video, like the intro
   screen.innerHTML="";
   const s=document.createElement("div"); s.className="scene";
@@ -2163,6 +2184,7 @@ function videoScene(src, doneLabel, onAdvance, maxSecs, dissolveMs){
   video.src=encodeURI(src);
   video.poster=encodeURI(src.replace(/\.mp4$/i,".poster.webp"));   // first frame shows instantly — no black gap while buffering
   video.setAttribute("playsinline",""); video.controls=false; video.preload="auto";
+  video.muted=!state.narrationOn;                                  // honour the sound toggle
   // fill the screen with no black bars; centre the frame so the small overflow is split
   // evenly (only ~half is cropped from the bottom, instead of all of it)
   video.style.cssText="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;background:#000;z-index:0";
@@ -2193,6 +2215,7 @@ function videoScene(src, doneLabel, onAdvance, maxSecs, dissolveMs){
       // frame, build the next scene underneath, then fade the old frame out so one
       // video melts into the next instead of hard-cutting.
       const fade=s;
+      fade.style.animation="none";                     // re-appending would replay the .scene fade-IN (a black flash)
       fade.style.position="fixed"; fade.style.inset="0"; fade.style.zIndex="9999";
       fade.style.pointerEvents="none"; fade.style.transition="opacity "+dissolveMs+"ms ease";
       document.body.appendChild(fade);                 // survives #screen being cleared by the next scene
@@ -2213,6 +2236,7 @@ function videoScene(src, doneLabel, onAdvance, maxSecs, dissolveMs){
     if(video.duration && isFinite(video.duration) && video.currentTime >= video.duration-0.7) advance();
   });
   video.addEventListener("ended",advance);   // fallback if timeupdate misses it
+  video.addEventListener("error",()=>{ if(video.getAttribute("src")) advance(); });  // missing/broken clip → don't strand the child on black
 
   // arriving here is always via a user tap, so autoplay-with-sound is allowed;
   // if a browser still blocks it, show a centred Play button.
@@ -3578,18 +3602,36 @@ function showLightSourceGate(){
   const c=document.createElement("div"); c.className="center"; c.style.zIndex="1";
   c.appendChild(mkBtn("Continue ➜","pulse",openLightSource));
   s.appendChild(c); screen.appendChild(s);
+  preloadLightSource();     // Activity 2 loads invisibly BEHIND the gate while the child reads it
 }
 /* Embed Activity 2 (light-source) as a full-screen iframe so there's no page reload
-   (keeps audio/video autoplay unlocked). It messages back "ls-restart" when done. */
-function openLightSource(){
-  if(document.getElementById("ls-frame")) return;
-  const f=document.createElement("iframe");
+   (keeps audio/video autoplay unlocked). It messages back "ls-restart" when done.
+   The iframe is created invisible while the Continue gate shows: the page parses and
+   buffers its intro video but plays NOTHING until we post "ls-start" on the child's
+   click — so Continue reveals Activity 2 instantly, with no black loading break. */
+let lsWanted=false;
+function preloadLightSource(){
+  let f=document.getElementById("ls-frame");
+  if(f) return f;
+  f=document.createElement("iframe");
   f.id="ls-frame"; f.src="light-source.html"; f.allow="autoplay; fullscreen";
-  f.style.cssText="position:fixed;inset:0;width:100%;height:100%;border:0;z-index:99999;background:#000";
+  f.style.cssText="position:fixed;inset:0;width:100%;height:100%;border:0;z-index:99999;background:#000;opacity:0;pointer-events:none;transition:opacity .35s ease";
   document.body.appendChild(f);
+  return f;
+}
+function openLightSource(){
+  lsWanted=true;
+  const f=preloadLightSource();                              // normally already loaded behind the gate
+  f.style.pointerEvents="auto"; f.style.opacity="1";
+  try{ f.contentWindow.postMessage("ls-start","*"); }catch(e){}
 }
 window.addEventListener("message",e=>{
+  if(e.data==="ls-ready" && lsWanted){                       // iframe finished loading AFTER the click → start it now
+    const f=document.getElementById("ls-frame");
+    if(f){ try{ f.contentWindow.postMessage("ls-start","*"); }catch(err){} }
+  }
   if(e.data==="ls-restart"){
+    lsWanted=false;
     const f=document.getElementById("ls-frame"); if(f) f.remove();
     state=NEW_STATE(); show("start");
   }
@@ -3712,7 +3754,8 @@ document.getElementById("narrToggle").onclick=toggleNarration;
     "videos/video-13.poster.webp"
   ];
   imgs.forEach(function(u){ var im=new Image(); im.src=encodeURI(u); });   // images are tiny — fetch all at once
-  var vids=["videos/video-11.mp4","videos/video-12.mp4","videos/video-13.mp4"];
+  var vids=["videos/video-11.mp4","videos/video-12.mp4","videos/video-13.mp4",
+    "videos/inital scene activity 2.mp4","videos/final scene activity 2.mp4"];   // Activity 2 (iframe) starts instantly too
   var i=0;                                                                  // videos one-at-a-time so they don't fight for bandwidth
   (function next(){
     if(i>=vids.length) return;

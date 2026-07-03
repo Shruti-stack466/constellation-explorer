@@ -314,7 +314,9 @@
   /* ---------- Closing scenes (after the finale) ---------- */
   #finalbook{position:absolute;inset:0;z-index:70;display:none;background:#000;}
   #finalbook.show{display:block;animation:fadeIn .3s;}
-  #fb-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;}
+  /* keep the bottom of the closing frame in view: bias the cover-crop upward so the
+     overflow is taken almost entirely from the TOP, not split top/bottom */
+  #fb-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 88%;background:#000;}
   #fb-restart{position:absolute;left:3vw;bottom:4vh;z-index:3;display:none;
     padding:8px 18px;font-size:clamp(12px,1.2vw,15px);box-shadow:0 5px 14px rgba(0,0,0,.35);}
   #fb-restart.glowbtn{animation:btnGlow 1.2s ease-in-out infinite;}
@@ -444,7 +446,6 @@ const game = {
   ledCorrect:false,
   switchOn:false,
   awaitBatteryTap:false,
-  awaitLedTap:false,
   playStep:0,           // 0 = waiting to turn off, 1 = waiting to turn on
 };
 const NEED = { battery:1, led:1, switch:1, wire:1 };
@@ -710,7 +711,6 @@ function buildStageB(){
   stage.appendChild(bottom);
 
   board.querySelector("#battery").addEventListener("click", onBatteryTap);
-  board.querySelector("#led").addEventListener("click", onLedTap);
   board.querySelector("#switch").addEventListener("click", onSwitchTap);
 }
 /* bottom parts strip: bare draggable images, no cards, no names */
@@ -828,30 +828,6 @@ function onBatteryTap(){
     lEl.classList.remove("grow");
     goto("lightSourceWorking");
   }, 12200);
-}
-function onLedTap(){
-  if(game.state!=="batteryCorrectButStillOff" || !game.awaitLedTap || game.ledCorrect) return;
-  const lEl = board.querySelector("#led");
-  if(!game.ledInspecting){
-    // First tap: enlarge (no card, +50%) so the child observes which way it faces
-    game.ledInspecting = true;
-    lEl.classList.remove("glowtap");
-    lEl.classList.add("inspect");
-    snd.click();
-    setDialogue([{who:"Meera", text:"See which way the LED faces. Tap again to turn it the right way.", meera:"meeraThink"}]);
-    return;
-  }
-  // Second tap: reverse polarity WHILE still enlarged, then settle back into the placeholder
-  game.ledInspecting = false;
-  game.awaitLedTap = false;
-  game.ledCorrect = true;
-  snd.bigwin();
-  updateBoard();                              // flip to correct polarity at 200% size -> glow + current
-  greenPulseBoard();
-  setInstruction(null);
-  // let the child watch it turn around at full size for a moment, then shrink it back into place
-  setTimeout(()=>lEl.classList.remove("inspect"), 1600);
-  goto("lightSourceWorking");
 }
 function onSwitchTap(){
   if(game.state!=="lightSourceWorking") return;
@@ -1028,17 +1004,6 @@ const STATES = {
     };
   },
 
-  partsSelected(){
-    setInstruction(null);
-    curKabir="kabirHappy"; curMeera="meeraHappy";
-    const box = $("#circuitbox");
-    if(box){ box.classList.remove("hot"); box.classList.add("done"); }
-    setDialogue([
-      {who:"Kabir", text:"Great! We have the parts for our light source.", kabir:"kabirHappy"},
-      {who:"Meera", text:"Now let's connect them and see if they work.", meera:"meeraHappy"},
-    ], ()=> setAction("Start Building", ()=>goto("buildIntro")) );
-  },
-
   /* ---------- PART B ---------- */
   buildIntro(){
     setPortrait(false);
@@ -1046,8 +1011,8 @@ const STATES = {
     setCompanions("kabirHappy","meeraHappy");
     game.placed = { battery:false, led:false, switch:false, wires:false };
     game.batteryCorrect=false; game.ledCorrect=true; game.switchOn=false;
-    game.awaitBatteryTap=false; game.awaitLedTap=false; game.playStep=0;
-    game.batteryInspecting=false; game.ledInspecting=false;
+    game.awaitBatteryTap=false; game.playStep=0;
+    game.batteryInspecting=false;
     buildStageB();
     renderBTray([]);
     updateBoard();
@@ -1095,20 +1060,6 @@ const STATES = {
     });
   },
 
-  batteryCorrectButStillOff(){
-    setInstruction(null);
-    curKabir="kabirThink"; curMeera="meeraThink";
-    setCompanions("kabirThink","meeraThink");
-    setDialogue([
-      {who:"Kabir", text:"The power source looks right now...", kabir:"kabirThink"},
-      {who:"Kabir", text:"But the light still isn't glowing.", kabir:"kabirThink"},
-      {who:"Meera", text:"Let's check our LED.", meera:"meeraThink"},
-    ], ()=>{
-      game.awaitLedTap = true;
-      board.querySelector("#led").classList.add("glowtap");
-    });
-  },
-
   lightSourceWorking(){
     setInstruction(null);
     curKabir="kabirCelebrate"; curMeera="meeraHappy";
@@ -1144,19 +1095,6 @@ const STATES = {
   },
 };
 
-/* ---- chooseParts completion ---- */
-function checkPartsComplete(){
-  const done = game.collected.battery>=1 && game.collected.led>=1 &&
-               game.collected.switch>=1 && game.collected.wire>=1;
-  if(done){
-    const box = $("#circuitbox");
-    if(box){ box.classList.remove("hot"); box.classList.add("done"); }
-    snd.bigwin();
-    setInstruction(null);
-    setTimeout(()=>goto("partsSelected"), 700);
-  }
-}
-
 /* ============ Intro video (Activity 2 opening scene) ============ */
 /* Subtitles: fill each entry with {t: startSeconds, e: endSeconds, text:"..."} */
 const INTRO_CUES = [
@@ -1181,11 +1119,14 @@ function playIntroVideo(){
     if(done) return; done = true;
     try{ vid.pause(); vid.removeAttribute("src"); vid.load(); }catch(e){}
     box.classList.remove("show");
+    // warm the cache for the closing video while the child plays, so it starts instantly
+    try{ fetch(encodeURI("videos/final scene activity 2.mp4")).catch(()=>{}); }catch(e){}
     goto("partsIntro");
   };
-  vid.src = "videos/inital scene activity 2.mp4";
+  if(!vid.getAttribute("src")) vid.src = "videos/inital scene activity 2.mp4";   // may already be buffered by the boot preload
   bindCaptions(vid, $("#iv-cap"), INTRO_CUES);
   vid.addEventListener("ended", finish, { once:true });
+  vid.addEventListener("error", ()=>{ if(vid.getAttribute("src")) finish(); });   // missing/broken clip → straight into the game
   $("#iv-skip").onclick = ()=>{ ac(); snd.click(); finish(); };
   const p = vid.play();
   if(p && p.catch) p.catch(()=>{                 // autoplay blocked -> start on first gesture
@@ -1207,6 +1148,7 @@ function showFinalScenes(){
   };
   vid.src = "videos/final scene activity 2.mp4";
   vid.addEventListener("ended", reveal, { once:true });
+  vid.addEventListener("error", ()=>{ if(vid.getAttribute("src")) reveal(); });   // missing/broken clip → still show Restart
   const p = vid.play();
   if(p && p.catch) p.catch(()=>{                 // autoplay blocked -> start on first gesture
     const kick = ()=>{ vid.play().catch(()=>{}); };
@@ -1221,7 +1163,24 @@ $("#fb-restart").addEventListener("click", ()=>{
 });
 
 /* ============ Boot ============ */
-window.addEventListener("load", playIntroVideo);
+/* Embedded in the constellation game: the parent preloads this page invisibly behind
+   its Continue gate. On load we BUFFER the intro video (nothing plays) and report
+   "ls-ready"; the intro only starts on "ls-start" — the child's Continue click — so
+   Activity 2 opens instantly, with autoplay + sound still allowed by that click.
+   Opened standalone: play on load, exactly as before. */
+if(window.self !== window.top){
+  let started = false;
+  window.addEventListener("message", e=>{
+    if(e.data==="ls-start" && !started){ started = true; playIntroVideo(); }
+  });
+  window.addEventListener("load", ()=>{
+    const vid = $("#iv-video");
+    if(!vid.getAttribute("src")){ vid.src = "videos/inital scene activity 2.mp4"; try{ vid.load(); }catch(e){} }  // buffer only
+    try{ window.parent.postMessage("ls-ready","*"); }catch(e){}
+  });
+} else {
+  window.addEventListener("load", playIntroVideo);
+}
 </script>
 </body>
 </html>
