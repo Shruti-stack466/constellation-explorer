@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Glow-Box Mystery</title>
+<style>
+  /* Soft magical Star-Lab type system — loads from the web, falls back to system-ui offline */
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap');
+
+  :root{
+    /* ---- Star-Lab pastel palette (same as light-source) ---- */
+    --bg-lavender:#eee8ff;
+    --bg-dusk-blue:#ddebff;
+    --bg-cream:#fff7df;
+    --panel-cream:#fff4d8;
+    --panel-border:#ffe19a;
+
+    --launchpad-yellow:#fff1b8;
+    --launchpad-border:#ffd86b;
+    --launchpad-glow:rgba(255,216,77,.45);
+
+    --accent-violet:#8b6fe8;
+    --accent-violet-dark:#5d49c9;
+    --accent-orange:#ff9f43;
+    --accent-yellow:#ffd85c;
+
+    --success-green:#62d58b;
+    --success-glow:rgba(98,213,139,.35);
+    --error-coral:#ff7a7a;
+
+    --text-primary:#2f285f;
+    --text-secondary:#5f5a7a;
+
+    --shadow-soft:0 10px 28px rgba(93,73,201,.12);
+    --shadow-card:0 8px 18px rgba(93,73,201,.14);
+    --shadow-button:0 6px 0 rgba(190,120,34,.35);
+
+    --font-heading:'Fredoka','Baloo 2',system-ui,sans-serif;
+    --font-body:'Nunito','Poppins',system-ui,sans-serif;
+
+    --panel:#ffffff;
+    --glow-green:#62d58b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;overflow:hidden;font-family:var(--font-body);}
+  #game{
+    position:fixed;inset:0;
+    background:
+      radial-gradient(circle at 18% 16%, rgba(255,243,199,.85), transparent 30%),
+      radial-gradient(circle at 86% 12%, rgba(221,240,255,.95), transparent 32%),
+      linear-gradient(135deg,#eee8ff 0%,#ddebff 52%,#fff4d8 100%);
+    user-select:none;touch-action:none;
+  }
+
+  /* ---------- Soft room atmosphere (same treatment as light-source) ---------- */
+  #room-bg{
+    position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;
+    filter:saturate(1.45) contrast(1.18) brightness(.97);transform:scale(1.02);
+    opacity:1;pointer-events:none;
+  }
+  #pastel-overlay{
+    position:absolute;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(circle at 50% 55%, rgba(255,220,120,.10), transparent 58%),
+      linear-gradient(135deg, rgba(238,232,255,.05), rgba(255,246,220,.04) 60%, rgba(238,232,255,.05));
+  }
+  #pattern-layer{
+    position:absolute;inset:0;z-index:0;opacity:.07;pointer-events:none;
+    background-image:
+      radial-gradient(rgba(139,111,232,.55) 1.4px, transparent 1.6px),
+      radial-gradient(rgba(255,159,67,.5) 1.2px, transparent 1.4px);
+    background-size:64px 64px, 96px 96px;
+    background-position:0 0, 32px 32px;
+  }
+
+  /* ---------- Companion standees (coach corner: lower sides) ---------- */
+  #kabir,#meera{
+    position:absolute;
+    height:min(62vh,600px);
+    filter:drop-shadow(0 10px 16px rgba(0,0,0,.42));
+    transition:transform .3s, filter .3s;
+    z-index:25;pointer-events:none;
+  }
+  #kabir{left:-14vw;bottom:-12vh;}
+  #meera{right:-14vw;bottom:-7vh;}
+  #kabir.speaking,#meera.speaking{
+    transform:translateY(-10px) scale(1.04);
+    filter:drop-shadow(0 16px 20px rgba(0,0,0,.5)) drop-shadow(0 0 14px rgba(255,235,150,.65));
+  }
+
+  /* ---------- Floating dialogue bubble (near the speaker) ---------- */
+  #dialogue{
+    position:absolute;z-index:30;cursor:pointer;
+    width:min(20vw,270px);
+    background:var(--panel);
+    border:2px solid #d8ccff;
+    border-radius:22px;
+    padding:12px 22px 12px 14px;
+    box-shadow:var(--shadow-card);
+    transition:opacity .25s;
+    left:1.5vw;bottom:46vh;
+  }
+  #dialogue::after{
+    content:"";position:absolute;bottom:-11px;width:0;height:0;
+    border-left:10px solid transparent;border-right:10px solid transparent;
+    border-top:12px solid var(--panel);
+    left:26px;
+  }
+  #dialogue.anchor-right::after{left:auto;right:26px;}
+  #dialogue.anchor-center::after{left:50%;transform:translateX(-50%);}
+  #dialogue .speaker{display:inline-flex;background:var(--accent-violet);color:#fff;
+    border-radius:999px;padding:3px 12px;font-family:var(--font-body);font-weight:900;
+    font-size:clamp(11px,1vw,14px);margin-bottom:6px;letter-spacing:.3px;}
+  #dialogue .line{color:var(--text-primary);font-family:var(--font-body);font-weight:700;
+    font-size:clamp(13px,1.25vw,17px);line-height:1.3;min-height:1.3em;}
+  #dialogue .next{position:absolute;right:12px;bottom:8px;color:var(--accent-violet);font-size:17px;animation:bob 1s infinite;}
+  @keyframes bob{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+  #dialogue.hide{opacity:0;pointer-events:none;}
+
+  /* ---------- Action button ---------- */
+  #actionbar{position:absolute;left:50%;bottom:4.5vh;transform:translateX(-50%);z-index:40;display:flex;gap:12px;}
+  .btn{
+    min-height:56px;
+    background:linear-gradient(180deg,#ffe879 0%,#ffd85c 100%);
+    color:#4c3478;font-family:var(--font-heading);font-weight:700;font-size:clamp(16px,1.9vw,22px);
+    border:2px solid #ffbd35;border-radius:999px;padding:13px 40px;
+    box-shadow:var(--shadow-button);cursor:pointer;
+    transition:transform .14s, box-shadow .14s;animation:btnIn .4s ease-out;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 8px 0 rgba(190,120,34,.35);}
+  .btn:active{transform:translateY(3px);box-shadow:0 3px 0 rgba(190,120,34,.35);}
+  .btn:focus-visible{outline:3px solid #ffffff;outline-offset:3px;}
+  @keyframes btnIn{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+
+  /* ---------- Workbench stage ---------- */
+  #stage{
+    position:absolute;left:50%;top:46%;z-index:5;
+    transform:translate(-50%,-50%);
+    width:min(62vw,1020px);
+    height:min(70vh,720px);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .bench-panel{
+    position:relative;width:100%;height:100%;padding:2.4% 3%;
+    background:
+      radial-gradient(circle at center, rgba(255,248,190,.7), transparent 62%),
+      #fff9dc;
+    border:2px solid var(--launchpad-border);
+    border-radius:32px;
+    box-shadow:0 0 30px rgba(255,216,77,.28);
+    animation:benchIn .6s ease-out;
+  }
+  @keyframes benchIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+
+  #board{position:absolute;inset:3% 3% 4% 3%;}
+  #board svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;touch-action:none;z-index:4;pointer-events:none;}
+
+  /* ---------- Wires ---------- */
+  .wbase{fill:none;stroke:#c2bcd8;stroke-width:9;stroke-linecap:round;stroke-linejoin:round;
+    filter:drop-shadow(0 1px 2px rgba(90,80,120,.22));transition:stroke .4s, filter .4s;}
+  #board.live .wbase{stroke:#ffce4d;filter:drop-shadow(0 0 10px rgba(255,197,52,.85));}
+  .wcur{fill:none;stroke-linecap:round;stroke-linejoin:round;opacity:0;transition:opacity .4s;}
+  #board.live.mode-light .wcur{opacity:1;stroke:#fff7d0;stroke-width:3.5;stroke-dasharray:16 26;
+    animation:flow .9s linear infinite;}
+  #board.live.mode-faint .wcur{opacity:.85;stroke:rgba(139,111,232,.7);stroke-width:5;stroke-dasharray:2.5 30;
+    animation:flow 2.4s linear infinite;}
+  #board.live.mode-stream .wcur{opacity:1;stroke:#ffd84d;stroke-width:6;stroke-dasharray:4 20;
+    animation:flow .7s linear infinite;
+    filter:drop-shadow(0 0 6px #ffe14d) drop-shadow(0 0 10px #ffd21a);}
+  @keyframes flow{to{stroke-dashoffset:-96;}}
+  .whit{fill:none;stroke:rgba(0,0,0,0);stroke-width:34;stroke-linecap:round;stroke-linejoin:round;cursor:pointer;pointer-events:stroke;}
+  .wtemp{fill:none;stroke:rgba(120,95,225,.72);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;
+    stroke-dasharray:11 14;pointer-events:none;}
+
+  /* ---------- Terminals (HTML dots that sit ON the image's terminals) ---------- */
+  .tdot{position:absolute;transform:translate(-50%,-50%);
+    width:clamp(15px,1.8vw,23px);height:clamp(15px,1.8vw,23px);border-radius:50%;
+    background:rgba(255,255,255,.94);border:3px solid #ff9f43;
+    box-shadow:0 1px 4px rgba(120,80,20,.5);cursor:crosshair;touch-action:none;z-index:9;
+    transition:background .25s, border-color .25s, transform .15s;}
+  .tdot::after{content:"";position:absolute;inset:-13px;border-radius:50%;}  /* fat invisible touch pad */
+  .tdot.pos{border-color:#e23b3b;}
+  .tdot.neg{border-color:#2f6bd8;}
+  .tdot.pulse{animation:termPulse 1.5s ease-in-out infinite;}
+  @keyframes termPulse{0%,100%{box-shadow:0 1px 4px rgba(120,80,20,.5), 0 0 3px rgba(255,180,50,.4)}
+    50%{box-shadow:0 1px 4px rgba(120,80,20,.5), 0 0 14px rgba(255,180,50,.95)}}
+  .tdot.busy{background:#fff3c7;border-color:#c2a64d;animation:none;}
+  #board.live .tdot.busy{background:#ffd84d;border-color:#ffbb33;
+    box-shadow:0 0 10px rgba(255,216,77,.95);}
+  .tdot.sel{background:#ffd84d;border-color:#ff9f43;transform:translate(-50%,-50%) scale(1.28);animation:termPulse .8s ease-in-out infinite;}
+  .tdot.cand{background:#8ee6b4;border-color:#39b57a;animation:termPulse .8s ease-in-out infinite;}
+
+  /* ---------- Components ---------- */
+  .comp{position:absolute;transform:translate(-50%,-50%);aspect-ratio:1/1;
+    display:flex;align-items:center;justify-content:center;z-index:5;}
+  .comp .cimg{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(0,0,0,.35));}
+
+  /* the bulb is dark until current flows */
+  #bulb .cimg{filter:brightness(.55) saturate(.55) drop-shadow(0 4px 8px rgba(0,0,0,.35));transition:filter .4s;}
+  #bulb.lit .cimg{filter:brightness(1.05) saturate(1.1) drop-shadow(0 0 16px rgba(255,224,110,.9));}
+  #bulb.firstglow{animation:glowPop .8s ease-out;}
+  @keyframes glowPop{0%{transform:translate(-50%,-50%) scale(1)}
+    40%{transform:translate(-50%,-50%) scale(1.18)}100%{transform:translate(-50%,-50%) scale(1)}}
+  .ledglow{position:absolute;inset:-45%;border-radius:50%;pointer-events:none;z-index:-1;opacity:0;transition:opacity .4s;
+    background:radial-gradient(circle,rgba(255,243,150,.95) 0%,rgba(255,220,80,.5) 35%,rgba(255,210,40,0) 70%);}
+  .comp.lit .ledglow{opacity:1;animation:pulseGlow 1.4s ease-in-out infinite;}
+  @keyframes pulseGlow{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.12);opacity:1}}
+
+  /* battery + / – terminal badges */
+  .polbadge{position:absolute;top:50%;transform:translateY(-50%);
+    width:1.3em;height:1.3em;line-height:1.24em;text-align:center;border-radius:50%;
+    color:#fff;font-weight:900;font-size:clamp(13px,1.5vw,21px);
+    border:2px solid #fff;box-shadow:0 2px 7px rgba(0,0,0,.5);z-index:2;pointer-events:none;}
+  .polbadge.neg{left:12%;background:#2f6bd8;}
+  .polbadge.pos{right:12%;background:#e23b3b;}
+
+  /* switch */
+  #switch{cursor:pointer;}
+  .switch-badge{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);
+    background:#888;color:#fff;font-weight:800;font-size:12px;padding:2px 12px;border-radius:999px;
+    box-shadow:0 3px 6px rgba(0,0,0,.3);letter-spacing:1px;transition:background .2s;z-index:3;pointer-events:none;}
+  #switch.on .switch-badge{background:var(--glow-green);}
+  #switch.glowtap .cimg{animation:tapPulse 1.1s ease-in-out infinite;}
+  @keyframes tapPulse{0%,100%{filter:drop-shadow(0 0 4px rgba(255,224,138,.5))}
+    50%{filter:drop-shadow(0 0 22px rgba(255,224,138,.95))}}
+
+  /* ---------- Loose-wire pile ---------- */
+  #wirepile{position:absolute;left:2.5%;top:4%;z-index:6;display:flex;flex-direction:column;
+    align-items:center;gap:2px;transition:opacity .3s;}
+  #wirepile img{width:clamp(54px,5.5vw,84px);height:auto;object-fit:contain;
+    filter:drop-shadow(0 4px 8px rgba(0,0,0,.3));}
+  #wirepile .count{background:#ffffff;border:2px solid #d8ccff;border-radius:999px;
+    padding:2px 12px;font-weight:900;color:var(--text-primary);font-size:clamp(12px,1.1vw,15px);
+    box-shadow:var(--shadow-card);}
+  #wirepile.empty{opacity:.35;}
+  #wirepile.wiggle{animation:wiggle .5s;}
+  @keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+
+  .board-greenpulse{animation:boardPulse .9s ease-out;}
+  @keyframes boardPulse{0%{filter:drop-shadow(0 0 0 rgba(87,227,137,0))}
+    45%{filter:drop-shadow(0 0 30px rgba(87,227,137,.9))}100%{filter:drop-shadow(0 0 0 rgba(87,227,137,0))}}
+
+  .confetti{position:absolute;width:10px;height:14px;top:-20px;border-radius:2px;animation:fall linear forwards;z-index:61;}
+  @keyframes fall{to{transform:translateY(105vh) rotate(600deg);opacity:.4;}}
+
+  /* ---------- Entry gate (the "Check the Bulb" hand-over from the bridge) ----------
+     Night-sky opening styled to match the Constellation Explorer home scene
+     (deep navy→indigo, drifting nebulae, twinkling + big glowing stars, fireflies,
+     occasional shooting stars) — but with NO moon. The title/tagline/button keep
+     the Glow-Box typography below, untouched. */
+  #entry{position:absolute;inset:0;z-index:70;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:26px;
+    background:
+      radial-gradient(140% 100% at 50% -25%, #1b2360 0%, transparent 55%),
+      radial-gradient(120% 90% at 85% 115%, #251a55 0%, transparent 55%),
+      linear-gradient(180deg,#0c1234 0%,#0a0e26 55%,#0a0920 100%);
+    transition:opacity .6s;}
+  #entry.gone{opacity:0;pointer-events:none;}
+  #entry .eb-sky{position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none;}
+  #entry .eb-content{position:relative;z-index:2;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:26px;padding:0 22px;text-align:center;}
+  #entry .estars{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+  /* drifting nebula / cloud glow layers */
+  #entry .eb-nebula{position:absolute;border-radius:50%;filter:blur(60px);opacity:.5;pointer-events:none;}
+  #entry .eb-nebula.n1{width:64vw;height:64vw;left:-12vw;top:-14vw;
+    background:radial-gradient(circle,rgba(86,108,220,.6),transparent 66%);animation:ebNeb 28s ease-in-out infinite;}
+  #entry .eb-nebula.n2{width:60vw;height:60vw;right:-14vw;bottom:-18vw;
+    background:radial-gradient(circle,rgba(150,90,210,.55),transparent 66%);animation:ebNeb 34s ease-in-out infinite reverse;}
+  @keyframes ebNeb{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(3%,-3%) scale(1.08)}}
+  /* hundreds of tiny twinkling background stars */
+  #entry .eb-star{position:absolute;border-radius:50%;background:#fff;opacity:var(--o,.6);
+    box-shadow:0 0 3px rgba(255,255,255,.45);animation:ebTwinkle 3s ease-in-out infinite;}
+  @keyframes ebTwinkle{0%,100%{opacity:calc(var(--o,.6)*.35)}50%{opacity:var(--o,.6)}}
+  /* a few larger foreground stars with soft glow + 4-point spikes */
+  #entry .eb-bigstar{position:absolute;width:0;height:0;}
+  #entry .eb-bigstar .bs-core{position:absolute;left:0;top:0;width:6px;height:6px;border-radius:50%;
+    transform:translate(-50%,-50%);background:#fff;
+    box-shadow:0 0 7px 1px rgba(255,247,224,.9), 0 0 22px 6px rgba(255,212,94,.5);
+    animation:ebBig 4s ease-in-out infinite;}
+  #entry .eb-bigstar::before,#entry .eb-bigstar::after{content:"";position:absolute;left:0;top:0;
+    transform:translate(-50%,-50%);opacity:.45;
+    background:linear-gradient(90deg,transparent,rgba(255,247,224,.85),transparent);}
+  #entry .eb-bigstar::before{width:34px;height:2px;}
+  #entry .eb-bigstar::after{width:2px;height:34px;}
+  @keyframes ebBig{0%,100%{filter:none}50%{filter:brightness(1.25)}}
+  /* firefly-like floating sparkles */
+  #entry .eb-fly{position:absolute;width:4px;height:4px;border-radius:50%;background:#ffe9a8;
+    box-shadow:0 0 6px 2px rgba(255,212,94,.7);opacity:.7;animation:ebFly var(--d,9s) ease-in-out infinite;}
+  @keyframes ebFly{0%{transform:translate(0,0);opacity:.15}50%{transform:translate(var(--dx,0),var(--dy,-40px));opacity:.85}100%{transform:translate(0,0);opacity:.15}}
+  /* occasional shooting star */
+  #entry .eb-shoot{position:absolute;width:150px;height:2px;border-radius:2px;transform-origin:left center;
+    background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.95));
+    filter:drop-shadow(0 0 6px #fff);opacity:0;animation:ebShoot 1.15s ease-out forwards;}
+  #entry .eb-shoot::after{content:"";position:absolute;right:-2px;top:50%;width:5px;height:5px;border-radius:50%;
+    transform:translateY(-50%);background:#fff;box-shadow:0 0 8px 2px #fff;}
+  @keyframes ebShoot{0%{opacity:0;transform:translate(0,0) rotate(20deg) scaleX(.3)}
+    12%{opacity:1}100%{opacity:0;transform:translate(58vw,24vh) rotate(20deg) scaleX(1)}}
+  #entry h1{font-family:var(--font-heading);color:#fff3c8;font-size:clamp(26px,4vw,48px);
+    text-shadow:0 0 18px rgba(255,216,110,.55);letter-spacing:.5px;z-index:1;text-align:center;}
+  #entry p{color:#d9d2f5;font-weight:700;font-size:clamp(14px,1.6vw,19px);z-index:1;max-width:70vw;text-align:center;}
+  #entry .btn{z-index:1;animation:entryGlow 1.4s ease-in-out infinite;}
+  @keyframes entryGlow{0%,100%{box-shadow:var(--shadow-button)}
+    50%{box-shadow:0 0 26px rgba(255,216,110,.95),0 6px 0 rgba(190,120,34,.35)}}
+
+  /* ---------- Certificate finale ---------- */
+  #certificate{position:absolute;inset:0;z-index:65;display:none;align-items:center;justify-content:center;
+    background:rgba(30,22,64,.45);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);}
+  #certificate.show{display:flex;animation:fadeIn .4s;}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .cert-card{position:relative;width:min(70vw,640px);text-align:center;
+    background:
+      radial-gradient(circle at center, rgba(255,248,190,.8), transparent 70%),
+      #fff9dc;
+    border:3px solid var(--launchpad-border);border-radius:36px;
+    box-shadow:0 0 44px rgba(255,216,77,.5);
+    padding:5% 6%;animation:btnIn .5s ease-out;}
+  .cert-card .big{font-size:clamp(38px,5vw,64px);}
+  .cert-card h2{font-family:var(--font-heading);color:#4a2f8c;font-size:clamp(22px,2.8vw,36px);margin:8px 0 4px;}
+  .cert-card .sub{color:var(--text-secondary);font-weight:800;font-size:clamp(13px,1.4vw,18px);margin-bottom:14px;}
+  .word-chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;}
+  .word-chips span{background:#ffffff;border:2px solid #d8ccff;border-radius:999px;
+    padding:7px 18px;font-family:var(--font-heading);font-weight:700;color:var(--accent-violet-dark);
+    font-size:clamp(13px,1.4vw,18px);box-shadow:var(--shadow-card);}
+
+  /* ---------- Learning prompts ---------- */
+  #choices{
+    position:absolute;left:50%;bottom:4.5vh;transform:translateX(-50%);
+    z-index:42;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
+    width:min(86vw,760px);pointer-events:none;
+  }
+  #choices.show{pointer-events:auto;}
+  .choice-btn{
+    min-height:48px;border:2px solid #d8ccff;border-radius:999px;background:#ffffff;
+    color:var(--text-primary);font-family:var(--font-heading);font-weight:700;
+    font-size:clamp(14px,1.5vw,18px);padding:10px 22px;cursor:pointer;
+    box-shadow:var(--shadow-card);transition:transform .14s, border-color .14s, background .14s;
+  }
+  .choice-btn:hover{transform:translateY(-2px);border-color:var(--accent-violet);}
+  .choice-btn:active{transform:translateY(2px);}
+  .choice-btn:focus-visible{outline:3px solid #ffffff;outline-offset:3px;}
+  .choice-title{
+    flex-basis:100%;text-align:center;color:#4a2f8c;font-family:var(--font-heading);
+    font-weight:700;font-size:clamp(16px,1.7vw,22px);
+    text-shadow:0 1px 0 rgba(255,255,255,.75);
+  }
+  /* Level-1 headline: the task, front and centre at the top */
+  #headline{
+    position:absolute;top:16px;left:50%;transform:translateX(-50%);
+    z-index:36;display:none;align-items:center;gap:9px;
+    max-width:min(84vw,620px);padding:12px 26px;border-radius:999px;
+    background:#ffffff;border:2px solid #d8ccff;box-shadow:0 8px 20px rgba(93,73,201,.16);
+    color:#4a2f8c;font-family:var(--font-heading);font-weight:700;text-align:center;
+    font-size:clamp(15px,2vw,25px);line-height:1.15;
+  }
+  #headline.show{display:flex;animation:cardPop .3s ease-out;}
+  /* Concept reveal: pops up big in the centre of the screen, then fades away */
+  #concept-card{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    z-index:60;display:none;flex-direction:column;align-items:center;gap:8px;
+    max-width:min(78vw,600px);padding:26px 40px;border-radius:30px;
+    background:
+      radial-gradient(circle at center, rgba(255,248,190,.85), transparent 72%),
+      #fff9dc;
+    border:3px solid var(--launchpad-border);
+    box-shadow:0 0 46px rgba(255,216,77,.55), var(--shadow-soft);
+    color:var(--text-primary);font-weight:800;text-align:center;
+    font-size:clamp(17px,2.3vw,30px);line-height:1.3;pointer-events:none;
+  }
+  #concept-card.show{display:flex;animation:cardPopCenter .42s cubic-bezier(.2,1.3,.4,1);}
+  #concept-card.fadeout{animation:cardFade .5s ease-in forwards;}
+  #concept-card .term{font-family:var(--font-heading);color:var(--accent-violet-dark);font-size:1.15em;}
+  @keyframes cardPopCenter{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}
+    65%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+  @keyframes cardFade{from{opacity:1}to{opacity:0;transform:translate(-50%,-50%) scale(.92)}}
+  /* wire the child should try pulling — glows to draw the eye */
+  .wbase.hintwire{animation:hintWire 1s ease-in-out infinite;}
+  @keyframes hintWire{0%,100%{stroke:#c2bcd8;filter:drop-shadow(0 0 3px rgba(255,150,60,.4))}
+    50%{stroke:#ff7a7a;filter:drop-shadow(0 0 15px rgba(255,120,120,.95))}}
+  /* Back / Undo / Next controls */
+  #navbar{position:absolute;top:16px;left:20px;z-index:46;display:flex;gap:8px;}
+  .navbtn{min-height:42px;padding:8px 16px;border-radius:999px;background:#ffffff;border:2px solid #d8ccff;
+    color:var(--text-primary);font-family:var(--font-heading);font-weight:700;font-size:clamp(12px,1.3vw,16px);
+    box-shadow:var(--shadow-card);cursor:pointer;transition:transform .14s, border-color .14s, opacity .2s;}
+  .navbtn:hover{transform:translateY(-2px);border-color:var(--accent-violet);}
+  .navbtn:active{transform:translateY(1px);}
+  .navbtn:disabled{opacity:.38;cursor:default;transform:none;border-color:#d8ccff;}
+  .navbtn:focus-visible{outline:3px solid #ffffff;outline-offset:3px;}
+  #sky-callback{
+    position:absolute;inset:0;z-index:4;display:none;pointer-events:none;overflow:hidden;
+    background:
+      radial-gradient(circle at 50% 35%, rgba(255,232,120,.25), transparent 22%),
+      linear-gradient(180deg, rgba(27,20,70,.68), rgba(33,23,78,.34) 48%, rgba(238,232,255,0));
+  }
+  #sky-callback.show{display:block;animation:fadeIn .5s ease-out;}
+  #sky-callback .orion{
+    position:absolute;left:50%;top:27%;width:min(36vw,360px);height:min(32vh,280px);
+    transform:translateX(-50%);filter:drop-shadow(0 0 12px rgba(255,232,150,.8));
+  }
+  #sky-callback svg{width:100%;height:100%;overflow:visible;}
+  #sky-callback line{stroke:#ffe9a8;stroke-width:3;stroke-linecap:round;opacity:.9;}
+  #sky-callback circle{fill:#fff8d8;filter:drop-shadow(0 0 8px #ffd85c);}
+
+  @media (max-width: 820px) and (orientation: portrait){
+    #stage{top:39%;width:min(94vw,680px);height:min(52vh,470px);}
+    .bench-panel{border-radius:24px;}
+    #board{inset:4% 3% 5% 3%;}
+    #kabir,#meera{height:min(35vh,320px);}
+    #kabir{left:-19vw;bottom:-7vh;}
+    #meera{right:-18vw;bottom:-6vh;}
+    #dialogue{width:min(82vw,360px);max-width:calc(100vw - 28px);border-radius:18px;}
+    #actionbar{bottom:max(14px,env(safe-area-inset-bottom));}
+    #choices{bottom:max(14px,env(safe-area-inset-bottom));}
+    #concept-card{max-width:86vw;padding:20px 22px;font-size:clamp(16px,4.6vw,24px);}
+    #headline{top:max(10px,env(safe-area-inset-top));font-size:clamp(14px,3.8vw,19px);padding:9px 16px;}
+    #navbar{top:auto;bottom:max(12px,env(safe-area-inset-bottom));left:8px;gap:6px;}
+    .navbtn{min-height:38px;padding:6px 12px;font-size:14px;}
+    .btn{min-height:48px;padding:10px 24px;font-size:clamp(16px,5vw,20px);}
+    .choice-btn{min-height:46px;padding:9px 16px;font-size:clamp(14px,4vw,17px);}
+    #wirepile{left:1.5%;top:2%;}
+    #wirepile img{width:clamp(44px,13vw,64px);}
+    .cert-card{width:min(92vw,640px);border-radius:28px;padding:28px 22px;}
+    #entry{padding:0 22px;}
+    #entry p{max-width:88vw;}
+  }
+
+  @media (max-height: 560px) and (orientation: landscape){
+    #stage{top:46%;width:min(66vw,820px);height:min(68vh,430px);}
+    .bench-panel{border-radius:24px;}
+    #kabir,#meera{height:min(54vh,360px);}
+    #kabir{left:-12vw;bottom:-14vh;}
+    #meera{right:-12vw;bottom:-11vh;}
+    #dialogue{width:min(30vw,260px);border-radius:18px;}
+    #actionbar{bottom:10px;}
+    #choices{bottom:10px;width:min(68vw,660px);}
+    #concept-card{max-width:min(64vw,520px);padding:18px 26px;font-size:clamp(16px,2.6vw,26px);}
+    #navbar{top:10px;left:12px;gap:6px;}
+    .navbtn{min-height:38px;padding:6px 12px;font-size:13px;}
+    .btn{min-height:46px;padding:9px 24px;font-size:clamp(15px,2.2vw,19px);}
+    .cert-card{width:min(76vw,600px);padding:24px 28px;border-radius:28px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}
+  }
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="room-bg"></div>
+  <div id="pastel-overlay"></div>
+  <div id="pattern-layer"></div>
+  <div id="sky-callback">
+    <div class="orion" aria-hidden="true">
+      <svg viewBox="0 0 220 180">
+        <line x1="78" y1="28" x2="105" y2="60"></line>
+        <line x1="105" y1="60" x2="136" y2="32"></line>
+        <line x1="105" y1="60" x2="112" y2="92"></line>
+        <line x1="112" y1="92" x2="90" y2="138"></line>
+        <line x1="112" y1="92" x2="145" y2="136"></line>
+        <line x1="88" y1="88" x2="134" y2="96"></line>
+        <circle cx="78" cy="28" r="6"></circle>
+        <circle cx="136" cy="32" r="6"></circle>
+        <circle cx="105" cy="60" r="5"></circle>
+        <circle cx="88" cy="88" r="4"></circle>
+        <circle cx="112" cy="92" r="4"></circle>
+        <circle cx="134" cy="96" r="4"></circle>
+        <circle cx="90" cy="138" r="6"></circle>
+        <circle cx="145" cy="136" r="6"></circle>
+      </svg>
+    </div>
+  </div>
+  <div id="stage"></div>
+
+  <img id="kabir" alt="Kabir">
+  <img id="meera" alt="Meera">
+
+  <div id="dialogue" class="hide">
+    <div class="speaker"></div>
+    <div class="line"></div>
+    <span class="next">▶</span>
+  </div>
+
+  <div id="actionbar"></div>
+  <div id="choices"></div>
+  <div id="headline" aria-live="polite"></div>
+  <div id="concept-card" aria-live="polite"></div>
+  <div id="navbar">
+    <button id="nav-undo" class="navbtn" type="button" title="Undo last wire">⟲ Undo</button>
+    <button id="nav-next" class="navbtn" type="button" title="Go to next step">Next ▶</button>
+  </div>
+
+  <div id="certificate">
+    <div class="cert-card">
+      <div class="big">⭐</div>
+      <h2>Glow-Box Detective!</h2>
+      <div class="sub">You discovered how a bulb glows — just like a star gives light.</div>
+      <div class="word-chips"><span>⚡ Current</span><span>🔁 Circuit</span><span>🔘 Switch</span></div>
+      <button class="btn" id="cert-done">Finish ⭐</button>
+    </div>
+  </div>
+
+  <div id="entry">
+    <div class="eb-sky" id="eb-sky">
+      <div class="eb-nebula n1"></div>
+      <div class="eb-nebula n2"></div>
+      <div class="estars" id="estars"></div>
+    </div>
+    <div class="eb-content">
+      <h1>★ The Glow-Box Mystery</h1>
+      <p>Something makes the park bulb glow… can you find out what?</p>
+      <button class="btn" id="entry-btn">🔦 Check the Bulb</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ============ Assets ============ */
+const V = n => `Visuals/${n}`;
+const POSE = {
+  kabirHappy:     V("kabir standing.png"),
+  kabirThink:     V("kabir thinking.png"),
+  kabirCelebrate: V("kabir celebrating.png"),
+  meeraHappy:     V("meera standing.png"),
+  meeraThink:     V("meera thinking.png"),
+  meeraIdea:      V("pose-meera-idea.png"),
+  meeraCelebrate: V("pose-meera-celebrate.png"),
+};
+const IMG = {
+  battery: V("battery.png"),
+  bulb:    V("led.png"),
+  switch:  V("switch.png"),
+  switchOn:V("switch on.png"),
+  wire:    V("wires.png"),
+};
+document.getElementById("room-bg").style.backgroundImage =
+  `url("${V("room background with no character..png")}")`;
+
+/* ============ Audio removed — the Glow-Box game runs silently ============ */
+/* ac()/beep()/snd.* are kept as no-ops so the many call sites need no changes. */
+function ac(){ return null; }
+function beep(){ /* sound removed */ }
+const snd = {
+  click:()=>{}, connect:()=>{}, success:()=>{}, bigwin:()=>{}, bounce:()=>{}, off:()=>{}, pop:()=>{},
+};
+
+/* ============ Narration removed — lines auto-advance on a reading-time timer ============ */
+function loadVoices(){ /* audio removed */ }
+function stopVoice(){ /* audio removed */ }
+function speakLine(text, who, onEnd){
+  clearDlgTimer();
+  if(onEnd){
+    const delay = Math.min(7000, Math.max(2000, text.length*70 + 900));
+    dlgTimer = setTimeout(onEnd, delay);
+  }
+}
+
+/* ============ DOM refs ============ */
+const $ = s => document.querySelector(s);
+const gameEl = $("#game"), stageEl = $("#stage");
+const dlgBox = $("#dialogue"), dlgSpeaker = dlgBox.querySelector(".speaker"),
+      dlgLine = dlgBox.querySelector(".line"), dlgNext = dlgBox.querySelector(".next");
+const kabirEl = $("#kabir"), meeraEl = $("#meera"), actionbar = $("#actionbar");
+const choicesEl = $("#choices"), conceptEl = $("#concept-card"), skyCallbackEl = $("#sky-callback");
+
+let curKabir="kabirHappy", curMeera="meeraHappy";
+function setCompanions(kPose, mPose){
+  if(kPose) curKabir = kPose;
+  if(mPose) curMeera = mPose;
+  kabirEl.src = POSE[curKabir] || POSE.kabirHappy;
+  meeraEl.src = POSE[curMeera] || POSE.meeraHappy;
+}
+function speakingIs(who){
+  kabirEl.classList.toggle("speaking", who==="Kabir");
+  meeraEl.classList.toggle("speaking", who==="Meera");
+}
+
+/* ============ Dialogue queue (auto-advancing, tap to skip ahead) ============ */
+let dlgQueue = [], dlgDone = null, dlgTimer = null;
+function clearDlgTimer(){ if(dlgTimer){ clearTimeout(dlgTimer); dlgTimer = null; } }
+function compactPortrait(){
+  return !!(window.matchMedia && window.matchMedia("(max-width: 820px) and (orientation: portrait)").matches);
+}
+function positionDialogue(who){
+  dlgBox.classList.remove("anchor-right","anchor-center");
+  dlgBox.style.top = "auto";
+  dlgBox.style.transform = "";
+  if(compactPortrait()){
+    dlgBox.classList.add("anchor-center");
+    dlgBox.style.left = "50%";
+    dlgBox.style.right = "auto";
+    dlgBox.style.bottom = "16vh";
+    dlgBox.style.transform = "translateX(-50%)";
+    return;
+  }
+  if(who === "Meera"){
+    dlgBox.classList.add("anchor-right");
+    dlgBox.style.right = "11vw"; dlgBox.style.left = "auto";
+    dlgBox.style.bottom = "6vh";
+  } else {
+    dlgBox.style.left = "11vw"; dlgBox.style.right = "auto";
+    dlgBox.style.bottom = "6vh";
+  }
+}
+function setDialogue(lines, onDone){
+  dlgQueue = lines.slice(); dlgDone = onDone || null;
+  dlgBox.classList.remove("hide");
+  showNextLine();
+}
+function showNextLine(){
+  clearDlgTimer();
+  if(dlgQueue.length === 0){
+    dlgNext.style.display = "none";
+    stopVoice();
+    const cb = dlgDone; dlgDone = null;
+    if(cb) cb();
+    return;
+  }
+  const l = dlgQueue.shift();
+  dlgSpeaker.textContent = l.who;
+  dlgLine.textContent = l.text;
+  speakingIs(l.who);
+  setCompanions(l.kabir, l.meera);
+  positionDialogue(l.who);
+  const more = dlgQueue.length || dlgDone;
+  dlgNext.style.display = more ? "inline" : "none";
+  speakLine(l.text, l.who, more ? showNextLine : null);
+  try{ beep(l.who==="Kabir"?430:560, 0.06, "sine", 0.06); }catch(e){}
+}
+dlgBox.addEventListener("click", showNextLine);
+window.addEventListener("resize", ()=>{
+  if(!dlgBox.classList.contains("hide") && dlgSpeaker.textContent) positionDialogue(dlgSpeaker.textContent);
+  redrawWires();
+});
+
+/* ============ Action button ============ */
+function setAction(label, cb){
+  actionbar.innerHTML = "";
+  clearChoices();
+  const b = document.createElement("button");
+  b.className = "btn"; b.textContent = label;
+  b.addEventListener("click", ()=>{ snd.click(); cb(); });
+  actionbar.appendChild(b);
+}
+function clearAction(){ actionbar.innerHTML = ""; }
+function setChoices(prompt, options, onPick){
+  clearAction();
+  choicesEl.innerHTML = "";
+  const title = document.createElement("div");
+  title.className = "choice-title";
+  title.textContent = prompt;
+  choicesEl.appendChild(title);
+  options.forEach(opt=>{
+    const b = document.createElement("button");
+    b.className = "choice-btn";
+    b.textContent = opt.label;
+    b.addEventListener("click", ()=>{
+      snd.click();
+      clearChoices();
+      onPick(opt);
+    });
+    choicesEl.appendChild(b);
+  });
+  choicesEl.classList.add("show");
+}
+function clearChoices(){
+  choicesEl.classList.remove("show");
+  choicesEl.innerHTML = "";
+}
+function showConcept(term, text, ms=17000){
+  hideHeadline();
+  conceptEl.classList.remove("fadeout");
+  conceptEl.innerHTML = `<span class="term">${term}</span><span>${text}</span>`;
+  conceptEl.classList.add("show");
+  clearTimeout(showConcept.timer);
+  clearTimeout(showConcept.fadeTimer);
+  // let it linger 15–20s, then fade out gently
+  showConcept.timer = setTimeout(()=>{
+    conceptEl.classList.add("fadeout");
+    showConcept.fadeTimer = setTimeout(()=>conceptEl.classList.remove("show","fadeout"), 520);
+  }, ms);
+}
+function hideConcept(){
+  clearTimeout(showConcept.timer);
+  clearTimeout(showConcept.fadeTimer);
+  conceptEl.classList.remove("show","fadeout");
+}
+const headlineEl = $("#headline");
+function showHeadline(text){
+  headlineEl.textContent = text;
+  headlineEl.classList.add("show");
+}
+function hideHeadline(){ headlineEl.classList.remove("show"); }
+
+/* ============ Confetti (gentle constellation reward) ============ */
+function confetti(){
+  const colors=["#ffd85c","#ffe879","#ffb84d","#fff3c0","#ffffff"];
+  const stars=["✦","✧","⭐","·"];
+  for(let i=0;i<42;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=(2+i*2.3)+"vw";
+    if(i%3===0){
+      c.textContent = stars[i%stars.length];
+      c.style.background="transparent";c.style.width="auto";c.style.height="auto";
+      c.style.color=colors[i%colors.length];
+      c.style.fontSize=(12+(i%4)*5)+"px";
+      c.style.textShadow="0 0 8px rgba(255,216,92,.8)";
+    } else {
+      c.style.background=colors[i%colors.length];
+      c.style.boxShadow="0 0 6px rgba(255,216,92,.7)";
+    }
+    c.style.animationDuration=(2.4+(i%5)*0.45)+"s";
+    c.style.animationDelay=((i%6)*0.12)+"s";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),4600);
+  }
+}
+
+/* =====================================================================
+   THE WORKBENCH — free-build circuit
+   Terminals live in a 640×420 viewBox; wires are child-drawn connections.
+   ===================================================================== */
+const VBW = 640, VBH = 420;
+const SVGNS = "http://www.w3.org/2000/svg";
+/* Each terminal is anchored to a spot ON its component's image (dx/dy are % of the
+   square component box, measured off the artwork's real terminals). Their viewBox
+   coordinates are read live from the rendered dot, so they stay correct at any size. */
+const TERMS = {
+  bp:{comp:"battery", dx:39.7, dy:19.0, pol:"pos"},   // battery + metal snap (leaves printed + sign visible below)
+  bn:{comp:"battery", dx:57.0, dy:19.0, pol:"neg"},   // battery − metal snap (leaves printed − sign visible below)
+  l1:{comp:"bulb",    dx:8.0, dy:50.0},               // LED terminal just off the left edge, keeping the face + signs clear
+  l2:{comp:"bulb",    dx:92.0, dy:50.0},              // LED terminal just off the right edge
+  s1:{comp:"switch",  dx:47.3, dy:83.0},              // switch left pin
+  s2:{comp:"switch",  dx:58.7, dy:83.0},              // switch right pin
+};
+const MAX_WIRES = 3;
+let wires = [];            // {a, b, pts, g, base, curp, hit}
+let switchOn = false;
+let switchVisible = false; // the switch only appears once it is introduced (Stage 5)
+let board = null, boardSvg = null, wireLayer = null, tempPath = null;
+let cur = { lit:false, switchInLoop:false };
+let dragging = null;       // {from, pts, moved, startPt}
+let selectedTerm = null;
+
+function buildBench(){
+  wires = [];
+  switchOn = false;
+  dragging = null;
+  selectedTerm = null;
+  cur = { lit:false, switchInLoop:false };
+  if(tempPath && tempPath.parentNode) tempPath.parentNode.removeChild(tempPath);
+  tempPath = null;
+  stageEl.innerHTML = "";
+  const panel = document.createElement("div");
+  panel.className = "bench-panel";
+  board = document.createElement("div");
+  board.id = "board";
+  board.className = "mode-light";
+  board.innerHTML = `
+    <svg viewBox="0 0 ${VBW} ${VBH}" preserveAspectRatio="none">
+      <g id="wire-layer"></g>
+    </svg>
+
+    <div class="comp" id="bulb" style="left:75%;top:42%;width:20%;">
+      <div class="ledglow"></div>
+      <img class="cimg" src="${IMG.bulb}" alt="bulb">
+    </div>
+
+    <div class="comp" id="battery" style="left:25%;top:42%;width:26%;">
+      <img class="cimg" src="${IMG.battery}" alt="battery">
+    </div>
+
+    <div class="comp" id="switch" style="left:50%;top:82%;width:16%;">
+      <img class="cimg" src="${IMG.switch}" alt="switch">
+      <div class="switch-badge">OFF</div>
+    </div>
+
+    <div id="wirepile">
+      <img src="${IMG.wire}" alt="loose wires">
+      <span class="count">× ${MAX_WIRES}</span>
+    </div>`;
+  panel.appendChild(board);
+  stageEl.appendChild(panel);
+
+  boardSvg = board.querySelector("svg");
+  wireLayer = board.querySelector("#wire-layer");
+
+  // terminal dots sit inside their component, right on the artwork's terminals
+  Object.keys(TERMS).forEach(id=>{
+    const t = TERMS[id];
+    const comp = board.querySelector("#"+t.comp);
+    const dot = document.createElement("div");
+    dot.className = "tdot pulse" + (t.pol ? " "+t.pol : "");
+    dot.dataset.term = id;
+    dot.style.left = t.dx + "%";
+    dot.style.top  = t.dy + "%";
+    dot.addEventListener("pointerdown", e=>{ e.preventDefault(); e.stopPropagation(); ac(); startWireFrom(id, e); });
+    comp.appendChild(dot);
+    t.dot = dot;
+  });
+
+  setSwitchVisible(switchVisible);   // switch stays hidden until it is introduced
+
+  board.addEventListener("pointerdown", onBoardDown);
+  board.querySelector("#switch").addEventListener("click", onSwitchTap);
+  board.querySelector("#wirepile").addEventListener("pointerdown", ()=>{
+    wigglePile(); snd.pop(); noteInteraction();
+  });
+}
+function setSwitchVisible(v){
+  switchVisible = v;
+  if(!board) return;
+  const sw = board.querySelector("#switch");
+  if(sw) sw.style.display = v ? "" : "none";
+  ["s1","s2"].forEach(id=>{ if(TERMS[id].dot) TERMS[id].dot.style.display = v ? "" : "none"; });
+}
+function revealSwitch(){
+  if(switchVisible) return;
+  setSwitchVisible(true);
+  const sw = board && board.querySelector("#switch");
+  if(sw){ sw.style.animation = "benchIn .5s ease-out"; }
+  refreshCircuit();
+}
+function wigglePile(){
+  const p = board && board.querySelector("#wirepile");
+  if(!p) return;
+  p.classList.remove("wiggle"); void p.offsetWidth; p.classList.add("wiggle");
+}
+
+/* ---- coordinate helpers ---- */
+function toVB(pt){
+  const r = boardSvg.getBoundingClientRect();
+  return { x:(pt.clientX-r.left)*VBW/r.width, y:(pt.clientY-r.top)*VBH/r.height };
+}
+/* live viewBox centre of a terminal, read from its rendered dot */
+function termCenterVB(id){
+  const dot = TERMS[id].dot;
+  const r = dot.getBoundingClientRect();
+  return toVB({ clientX:r.left + r.width/2, clientY:r.top + r.height/2 });
+}
+/* nearest terminal to a viewBox point, honouring switch visibility + filters */
+function nearestTerm(vb, thresh, opts){
+  opts = opts || {};
+  let best = null, bestD = thresh;
+  Object.keys(TERMS).forEach(id=>{
+    if(!switchVisible && TERMS[id].comp==="switch") return;
+    if(opts.freeOnly && occupiedBy(id)) return;
+    if(opts.excludeComp && TERMS[id].comp===opts.excludeComp) return;
+    const c = termCenterVB(id);
+    const d = Math.hypot(vb.x-c.x, vb.y-c.y);
+    if(d < bestD){ best = id; bestD = d; }
+  });
+  return best;
+}
+function pathFromPoints(pts){
+  return "M " + pts.map(p=>`${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" L ");
+}
+/* tidy right-angle fallback used only when a wire is made by tapping (no drawn path) */
+function autoRoute(A, B){
+  const dx = B.x-A.x, dy = B.y-A.y;
+  if(Math.abs(dx) < 18 || Math.abs(dy) < 18) return `M ${A.x} ${A.y} L ${B.x} ${B.y}`;
+  if(Math.abs(dx) >= Math.abs(dy)){
+    const mx = Math.round((A.x+B.x)/2);
+    return `M ${A.x} ${A.y} L ${mx} ${A.y} L ${mx} ${B.y} L ${B.x} ${B.y}`;
+  }
+  const my = Math.round((A.y+B.y)/2);
+  return `M ${A.x} ${A.y} L ${A.x} ${my} L ${B.x} ${my} L ${B.x} ${B.y}`;
+}
+/* a wire's path: the child's own drawn line if they bent one, else a neat auto-route */
+function wirePathD(w){
+  const A = termCenterVB(w.a), B = termCenterVB(w.b);
+  if(w.pts && w.pts.length) return pathFromPoints([A, ...w.pts, B]);
+  return autoRoute(A, B);
+}
+
+/* ---- wire bookkeeping ---- */
+function occupiedBy(termId){ return wires.find(w=>w.a===termId || w.b===termId) || null; }
+function updatePile(){
+  const pile = board.querySelector("#wirepile");
+  const left = MAX_WIRES - wires.length;
+  pile.querySelector(".count").textContent = "× " + left;
+  pile.classList.toggle("empty", left<=0);
+}
+function mkPath(cls, d){
+  const p = document.createElementNS(SVGNS,"path");
+  p.setAttribute("class", cls); p.setAttribute("d", d);
+  return p;
+}
+function addWire(a, b, pts){
+  const g = document.createElementNS(SVGNS,"g");
+  const w = { a, b, pts:(pts && pts.length ? pts.slice() : []), g };
+  const d = wirePathD(w);
+  const base = mkPath("wbase", d), curp = mkPath("wcur", d), hit = mkPath("whit", d);
+  g.appendChild(base); g.appendChild(curp); g.appendChild(hit);
+  wireLayer.appendChild(g);
+  w.base = base; w.curp = curp; w.hit = hit;
+  hit.addEventListener("pointerdown", e=>{
+    if(dragging) return;
+    e.preventDefault(); e.stopPropagation();
+    removeWire(w); snd.pop(); noteInteraction();
+    refreshCircuit();
+  });
+  wires.push(w);
+  updatePile();
+}
+function redrawWire(w){
+  const d = wirePathD(w);
+  w.base.setAttribute("d", d); w.curp.setAttribute("d", d); w.hit.setAttribute("d", d);
+}
+function redrawWires(){ if(board) wires.forEach(redrawWire); }
+function clearWireHints(){ wires.forEach(w=>{ if(w.base) w.base.classList.remove("hintwire"); }); }
+/* nudge for "stop the glow": glow one wire so the child sees a wire is the thing to pull */
+function hintRemoveWire(){
+  clearWireHints();
+  const w = wires.find(x=>TERMS[x.a].comp==="battery" || TERMS[x.b].comp==="battery") || wires[0];
+  if(w && w.base) w.base.classList.add("hintwire");
+}
+function removeWire(w){
+  const i = wires.indexOf(w);
+  if(i>=0) wires.splice(i,1);
+  if(w.g && w.g.parentNode) w.g.parentNode.removeChild(w.g);
+  updatePile();
+}
+function clearAllWires(){
+  wires.slice().forEach(removeWire);
+  setSelected(null);
+  markCandidates(null, false);
+}
+
+/* ---- draw a wire: press a terminal, bend the line any way, release on another ---- */
+function setSelected(id){
+  if(selectedTerm && TERMS[selectedTerm].dot) TERMS[selectedTerm].dot.classList.remove("sel");
+  selectedTerm = id;
+  if(id && TERMS[id].dot) TERMS[id].dot.classList.add("sel");
+}
+function markCandidates(fromId, on){
+  Object.keys(TERMS).forEach(id=>{
+    const dot = TERMS[id].dot; if(!dot) return;
+    if(!switchVisible && TERMS[id].comp==="switch"){ dot.classList.remove("cand"); return; }
+    const ok = on && fromId && id!==fromId && !occupiedBy(id) && TERMS[id].comp!==TERMS[fromId].comp;
+    dot.classList.toggle("cand", !!ok);
+  });
+}
+/* near-miss fallback: a press close to (but not on) a free terminal still starts a wire */
+function onBoardDown(e){
+  if(dragging) return;
+  const vb = toVB(e);
+  const id = nearestTerm(vb, 15, {});
+  if(id && !occupiedBy(id)){ e.preventDefault(); ac(); startWireFrom(id, e); }
+}
+function startWireFrom(id, e){
+  noteInteraction();
+  const existing = occupiedBy(id);
+  if(existing){
+    // grab this wire's end off the terminal and redraw it freehand from the other end
+    setSelected(null);
+    const other = (existing.a===id) ? existing.b : existing.a;
+    removeWire(existing);
+    refreshCircuit();
+    dragging = { from:other, pts:[], moved:true, startPt:toVB(e) };
+  } else {
+    if(wires.length >= MAX_WIRES && !selectedTerm){ wigglePile(); snd.bounce(); return; }
+    // tap-tap accessibility: a terminal was already selected → join the pair
+    if(selectedTerm && selectedTerm!==id){
+      tryConnect(selectedTerm, id, []);
+      setSelected(null); markCandidates(null, false);
+      return;
+    }
+    if(selectedTerm===id){ setSelected(null); markCandidates(null, false); return; }
+    dragging = { from:id, pts:[], moved:false, startPt:toVB(e) };
+  }
+  markCandidates(dragging.from, true);
+  tempPath = mkPath("wtemp", pathFromPoints([termCenterVB(dragging.from), toVB(e)]));
+  wireLayer.appendChild(tempPath);
+  window.addEventListener("pointermove", onDragMove);
+  window.addEventListener("pointerup", onDragEnd);
+  window.addEventListener("pointercancel", onDragEnd);
+}
+function onDragMove(e){
+  if(!dragging) return;
+  const p = toVB(e);
+  if(Math.hypot(p.x-dragging.startPt.x, p.y-dragging.startPt.y) > 8) dragging.moved = true;
+  if(dragging.moved){
+    const last = dragging.pts[dragging.pts.length-1];
+    if(!last || Math.hypot(p.x-last.x, p.y-last.y) > 7) dragging.pts.push(p);   // record the bend
+  }
+  if(tempPath) tempPath.setAttribute("d", pathFromPoints([termCenterVB(dragging.from), ...dragging.pts, p]));
+}
+function onDragEnd(e){
+  window.removeEventListener("pointermove", onDragMove);
+  window.removeEventListener("pointerup", onDragEnd);
+  window.removeEventListener("pointercancel", onDragEnd);
+  if(tempPath && tempPath.parentNode) tempPath.parentNode.removeChild(tempPath);
+  tempPath = null;
+  if(!dragging) return;
+  const d = dragging; dragging = null;
+  markCandidates(d.from, false);
+  if(!d.moved){
+    // a simple tap → select it, then tap another terminal to connect
+    setSelected(d.from);
+    markCandidates(d.from, true);
+    return;
+  }
+  const target = nearestTerm(toVB(e), 22, { freeOnly:true, excludeComp:TERMS[d.from].comp });
+  if(target){ tryConnect(d.from, target, d.pts); }
+  else { snd.pop(); refreshCircuit(); }   // released in space → the wire goes back to the pile
+}
+function tryConnect(a, b, pts){
+  if(TERMS[a].comp === TERMS[b].comp){ snd.bounce(); return; }   // same piece: no loop there
+  if(occupiedBy(a) || occupiedBy(b)){ snd.bounce(); return; }
+  if(wires.length >= MAX_WIRES){ snd.bounce(); return; }
+  addWire(a, b, pts);
+  snd.connect();
+  refreshCircuit();
+}
+
+/* ---- switch ---- */
+function onSwitchTap(){
+  if(stage < 1) return;
+  noteInteraction();
+  switchOn = !switchOn;
+  const sEl = board.querySelector("#switch");
+  sEl.classList.toggle("on", switchOn);
+  sEl.querySelector(".switch-badge").textContent = switchOn ? "ON" : "OFF";
+  sEl.querySelector(".cimg").setAttribute("src", switchOn ? IMG.switchOn : IMG.switch);
+  if(switchOn) snd.click(); else snd.off();
+  refreshCircuit();
+  onSwitchFlipped();
+}
+
+/* ---- circuit evaluation: is there a closed path through the bulb? ---- */
+function evalCircuit(){
+  const edges = wires.map(w=>({a:w.a, b:w.b, kind:"wire"}));
+  edges.push({a:"l1", b:"l2", kind:"bulb"});
+  if(switchOn) edges.push({a:"s1", b:"s2", kind:"switch"});
+  let lit=false, switchInLoop=false;
+  const used = new Set();
+  (function walk(node, hasBulb, hasSwitch){
+    if(node==="bn"){
+      if(hasBulb){ lit = true; if(hasSwitch) switchInLoop = true; }
+      return;
+    }
+    for(let i=0;i<edges.length;i++){
+      if(used.has(i)) continue;
+      const e = edges[i];
+      const nxt = e.a===node ? e.b : (e.b===node ? e.a : null);
+      if(!nxt) continue;
+      used.add(i);
+      walk(nxt, hasBulb||e.kind==="bulb", hasSwitch||e.kind==="switch");
+      used.delete(i);
+    }
+  })("bp", false, false);
+  const switchWasOn = switchOn;
+  switchOn = true;
+  const edgesWithSwitch = wires.map(w=>({a:w.a, b:w.b, kind:"wire"}));
+  edgesWithSwitch.push({a:"l1", b:"l2", kind:"bulb"}, {a:"s1", b:"s2", kind:"switch"});
+  let switchWouldComplete = false;
+  const usedWithSwitch = new Set();
+  (function walkSwitch(node, hasBulb, hasSwitch){
+    if(node==="bn"){
+      if(hasBulb && hasSwitch) switchWouldComplete = true;
+      return;
+    }
+    for(let i=0;i<edgesWithSwitch.length;i++){
+      if(usedWithSwitch.has(i)) continue;
+      const e = edgesWithSwitch[i];
+      const nxt = e.a===node ? e.b : (e.b===node ? e.a : null);
+      if(!nxt) continue;
+      usedWithSwitch.add(i);
+      walkSwitch(nxt, hasBulb||e.kind==="bulb", hasSwitch||e.kind==="switch");
+      usedWithSwitch.delete(i);
+    }
+  })("bp", false, false);
+  switchOn = switchWasOn;
+  return { lit, switchInLoop, switchWouldComplete };
+}
+function refreshCircuit(){
+  const prev = cur;
+  cur = evalCircuit();
+  board.classList.toggle("live", cur.lit);
+  const bulbEl = board.querySelector("#bulb");
+  bulbEl.classList.toggle("lit", cur.lit);
+  // terminal dots: quiet once occupied, invite while free (during build stages)
+  const inviting = (stage>=1 && stage<=6);
+  Object.keys(TERMS).forEach(id=>{
+    const dot = TERMS[id].dot; if(!dot) return;
+    if(!switchVisible && TERMS[id].comp==="switch"){ dot.classList.remove("busy","pulse","cand","sel"); return; }
+    const busy = !!occupiedBy(id);
+    dot.classList.toggle("busy", busy);
+    dot.classList.toggle("pulse", !busy && inviting);
+  });
+  if(cur.lit && !prev.lit) onGlow();
+  if(!cur.lit && prev.lit) onDark();
+  afterCircuitRefresh();
+}
+function setFlowMode(mode){
+  board.classList.remove("mode-light","mode-faint","mode-stream");
+  board.classList.add("mode-"+mode);
+}
+
+/* =====================================================================
+   STAGE MACHINE — build → notice → question → name → apply
+   ===================================================================== */
+let stage = 0;
+let chapterIdx = 0;        // which top-level step Back/Next navigate between
+let currentReplayReady = false;
+let pathQuestionAnswered = false;
+let switchDoorSeen = false;
+let switchDoorDone = false;
+let switchIncludeNudged = false;
+let recipeDone = false;
+let recipeNudged = false;
+let s4sub = 0;               // 0 naming lines · 1 needs switch in loop · 2 flip off · 3 flip back on
+let firstGlowDone = false;
+/* Declared for a set of earlier stage helpers that a later block overrides; kept
+   so those (unused) definitions stay strict-mode safe. */
+let s2broke = false, s2nudged = false, s5nudged = false;
+
+/* ---- least-help-first idle nudges (stage 1 only) ---- */
+const NUDGES = [
+  {who:"Kabir", text:"The bulb may need two touches, not one.", kabir:"kabirThink"},
+  {who:"Meera", text:"The light needs a way in… and a way back.", meera:"meeraThink"},
+  {who:"Kabir", text:"Try touching both sides of the battery.", kabir:"kabirThink"},
+];
+let nudgeIdx = 0, nudgeTimer = null;
+function armNudge(){
+  clearTimeout(nudgeTimer);
+  if(stage!==1 || cur.lit || nudgeIdx>=NUDGES.length) return;
+  nudgeTimer = setTimeout(()=>{
+    if(stage!==1 || cur.lit) return;
+    setDialogue([NUDGES[nudgeIdx]]);
+    nudgeIdx++;
+    armNudge();
+  }, 15000);
+}
+function noteInteraction(){
+  if(stage===1) armNudge();                    // any touch resets the idle clock
+  if(stage===2 && !s2broke && !s2nudged) armS2Nudge();
+}
+let s2NudgeTimer = null;
+function armS2Nudge(){
+  clearTimeout(s2NudgeTimer);
+  s2NudgeTimer = setTimeout(()=>{
+    if(stage===2 && !s2broke && !s2nudged){
+      s2nudged = true;
+      setDialogue([{who:"Meera", text:"What happens if you break the path?", meera:"meeraThink"}]);
+    }
+  }, 14000);
+}
+
+/* ---- circuit event hooks ---- */
+function onGlow(){
+  if(!firstGlowDone){
+    firstGlowDone = true;
+    const bulbEl = board.querySelector("#bulb");
+    bulbEl.classList.add("firstglow");
+    setTimeout(()=>bulbEl.classList.remove("firstglow"), 900);
+  }
+  if(stage===1){
+    clearTimeout(nudgeTimer);
+    snd.success();                                            // small celebratory blip
+    stage = 2; s2broke = false; s2nudged = false;
+    setCompanions("kabirHappy","meeraHappy");
+    setDialogue([
+      {who:"Kabir", text:"It only glows when the path goes all the way round.", kabir:"kabirHappy"},
+    ], armS2Nudge);
+  }
+  else if(stage===2 && s2broke){
+    clearTimeout(s2NudgeTimer);
+    snd.success();
+    stage = 3;
+    setFlowMode("faint");                                     // faint dots drift along the loop
+    setCompanions("kabirThink","meeraThink");
+    setDialogue([
+      {who:"Meera", text:"But what is this invisible thing flowing round?", meera:"meeraThink"},
+      {who:"Kabir", text:"Something is moving inside the wire… and coming out as light.", kabir:"kabirThink"},
+    ], ()=>{
+      setAction("Continue ▶", startStage4);                   // the beat pauses on the question
+    });
+  }
+  else if(stage===4 && s4sub===1 && cur.switchInLoop){
+    s4sub = 2;
+    armSwitchBeat();
+  }
+  else if(stage===4 && s4sub===3 && switchOn && cur.lit){
+    completeSwitchBeat();
+  }
+  else if(stage===5){
+    if(cur.switchInLoop){
+      finishActivity();
+    } else if(!s5nudged){
+      s5nudged = true;               // glows, but the switch isn't part of the loop yet
+      setDialogue([
+        {who:"Meera", text:"A lovely glow! Can you make the switch part of the loop too?", meera:"meeraThink"},
+      ]);
+    }
+  }
+}
+function onDark(){
+  if(stage===2 && !s2broke){
+    s2broke = true;
+    clearTimeout(s2NudgeTimer);
+  }
+}
+function onSwitchFlipped(){
+  if(stage!==4) return;
+  if(s4sub===2 && !switchOn){
+    s4sub = 3;                                                // stream stopped on cue
+    board.querySelector("#switch").classList.add("glowtap");
+  }
+  else if(s4sub===3 && switchOn && cur.lit){
+    completeSwitchBeat();
+  }
+}
+function completeSwitchBeat(){
+  if(s4sub===4) return;
+  s4sub = 4;
+  board.querySelector("#switch").classList.remove("glowtap");
+  snd.success();
+  setDialogue([
+    {who:"Kabir", text:"And the switch opens and closes the path — it starts and stops the current.", kabir:"kabirHappy"},
+  ], startStage5);
+}
+
+/* ---- STAGE 1 · Free Build ---- */
+function startStage1(){
+  stage = 1; nudgeIdx = 0; firstGlowDone = false;
+  buildBench();
+  refreshCircuit();
+  setCompanions("kabirHappy","meeraIdea");
+  setDialogue([
+    {who:"Meera", text:"Can you make the bulb glow?", meera:"meeraIdea"},
+  ]);
+  armNudge();
+}
+
+/* ---- STAGE 4 · Name — current, circuit, switch ---- */
+function startStage4(){
+  clearAction();
+  if(stage!==3) return;
+  stage = 4; s4sub = 0;
+  setFlowMode("stream");                                      // dots brighten into a clear stream
+  setCompanions("kabirHappy","meeraIdea");
+  setDialogue([
+    {who:"Meera", text:"That invisible thing is current — it flows round and makes the bulb glow.", meera:"meeraIdea"},
+    {who:"Kabir", text:"The full loop it flows around is a circuit.", kabir:"kabirHappy"},
+  ], ()=>{
+    if(cur.lit && cur.switchInLoop){
+      s4sub = 2;
+      armSwitchBeat();
+    } else {
+      s4sub = 1;                                              // earn it: switch must join the loop first
+      setDialogue([
+        {who:"Meera", text:"Can you bring the switch into the loop too?", meera:"meeraThink"},
+      ]);
+    }
+  });
+}
+function armSwitchBeat(){
+  board.querySelector("#switch").classList.add("glowtap");
+  setDialogue([
+    {who:"Meera", text:"Try the switch!", meera:"meeraHappy"},
+  ]);
+}
+
+/* ---- STAGE 5 · Apply — build it yourself, glow on purpose ---- */
+function startStage5(){
+  stage = 5;
+  s5nudged = false;
+  clearAllWires();
+  if(switchOn) onSwitchReset();
+  setFlowMode("stream");
+  refreshCircuit();
+  setCompanions("kabirHappy","meeraIdea");
+  setDialogue([
+    {who:"Meera", text:"Now make it glow on your own — and switch it on!", meera:"meeraIdea"},
+  ]);
+}
+function onSwitchReset(){
+  switchOn = false;
+  const sEl = board.querySelector("#switch");
+  sEl.classList.remove("on","glowtap");
+  sEl.querySelector(".switch-badge").textContent = "OFF";
+  sEl.querySelector(".cimg").setAttribute("src", IMG.switch);
+}
+
+/* ---- Finish · closing beat: the glow ties back to the stars ---- */
+function finishActivity(){
+  if(stage!==5) return;
+  stage = 6;
+  snd.bigwin();
+  confetti();
+  board.classList.add("board-greenpulse");
+  setCompanions("kabirCelebrate","meeraCelebrate");
+  setDialogue([
+    {who:"Meera", text:"You did it! Current flows in — and it glows. Just like a star gives light!", meera:"meeraCelebrate"},
+  ], ()=>{
+    setAction("Finish ⭐", showCertificate);
+  });
+}
+function showCertificate(){
+  clearAction();
+  dlgBox.classList.add("hide");
+  stopVoice();
+  confetti();
+  $("#certificate").classList.add("show");
+}
+$("#cert-done").addEventListener("click", ()=>{
+  snd.click();
+  // embedded in the constellation game (iframe) → hand back; else restart standalone.
+  if(window.self !== window.top){ window.parent.postMessage("ls-restart","*"); }
+  else { window.location.reload(); }
+});
+
+/* ============ Active seven-stage learning flow ============ */
+function celebrateFirstGlow(){
+  if(firstGlowDone || !board) return;
+  firstGlowDone = true;
+  const bulbEl = board.querySelector("#bulb");
+  bulbEl.classList.add("firstglow");
+  setTimeout(()=>bulbEl.classList.remove("firstglow"), 900);
+}
+function resetBenchForBuild(mode="light"){
+  clearAction();
+  clearChoices();
+  hideConcept();
+  clearWireHints();
+  clearAllWires();
+  if(switchOn) onSwitchReset();
+  setFlowMode(mode);
+  refreshCircuit();
+}
+function noteInteraction(){
+  if(stage===1) armNudge();
+}
+function onGlow(){
+  celebrateFirstGlow();
+  if(stage===1){
+    clearTimeout(nudgeTimer);
+    snd.success();
+    startStage2();
+  } else if(stage===2 && currentReplayReady){
+    currentReplayReady = false;
+    snd.success();
+    setDialogue([
+      {who:"Kabir", text:"Can you see it travel again?", kabir:"kabirHappy"},
+    ], startStage3);
+  } else if(stage===4){
+    snd.success();
+    startStage4Concept();
+  } else if(stage===5 && cur.switchInLoop){
+    completeSwitchDoor();
+  } else if(stage===5 && !cur.switchInLoop && !switchIncludeNudged){
+    switchIncludeNudged = true;
+    setDialogue([
+      {who:"Meera", text:"Nice glow. Now make the path go through the switch too.", meera:"meeraThink"},
+    ]);
+  } else if(stage===6 && cur.switchInLoop){
+    completeRecipe();
+  } else if(stage===6 && !cur.switchInLoop && !recipeNudged){
+    recipeNudged = true;
+    setDialogue([
+      {who:"Kabir", text:"Good start. The full recipe also needs the switch.", kabir:"kabirThink"},
+    ]);
+  }
+}
+function onDark(){
+  if(stage===3 && !pathQuestionAnswered){
+    askBrokenPathQuestion();
+  }
+}
+function onSwitchFlipped(){
+  if(stage===5 && cur.switchInLoop) completeSwitchDoor();
+  if(stage===6 && cur.switchInLoop) completeRecipe();
+}
+function afterCircuitRefresh(){
+  if(stage===5 && cur.switchWouldComplete && !switchOn && !switchDoorSeen){
+    switchDoorSeen = true;
+    board.querySelector("#switch").classList.add("glowtap");
+    setDialogue([
+      {who:"Meera", text:"The switch is OFF. The little door is open, so the glow stops.", meera:"meeraThink"},
+      {who:"Kabir", text:"Tap the switch to close the door.", kabir:"kabirHappy"},
+    ]);
+  } else if(stage===6 && cur.switchWouldComplete && !switchOn && !recipeNudged){
+    recipeNudged = true;
+    board.querySelector("#switch").classList.add("glowtap");
+    setDialogue([
+      {who:"Meera", text:"Almost. Tap the switch ON to start the glow.", meera:"meeraHappy"},
+    ]);
+  }
+}
+function startStage1(){
+  stage = 1;
+  setChapter(0);
+  nudgeIdx = 0;
+  NUDGES[1].text = "Can you give it a way to go in and come back?";
+  firstGlowDone = false;
+  currentReplayReady = false;
+  pathQuestionAnswered = false;
+  switchDoorSeen = false;
+  switchDoorDone = false;
+  switchIncludeNudged = false;
+  recipeDone = false;
+  recipeNudged = false;
+  switchVisible = false;                 // the switch is not on the bench yet
+  skyCallbackEl.classList.remove("show");
+  buildBench();
+  setFlowMode("light");
+  refreshCircuit();
+  showHeadline("Connect the LED and the battery to light the bulb");
+  setCompanions("kabirHappy","meeraIdea");
+  setDialogue([
+    {who:"Meera", text:"Can you make this tiny bulb glow?", meera:"meeraIdea"},
+  ]);
+  armNudge();
+}
+function armNudge(){
+  clearTimeout(nudgeTimer);
+  if(stage!==1 || cur.lit || nudgeIdx>=NUDGES.length) return;
+  nudgeTimer = setTimeout(()=>{
+    if(stage!==1 || cur.lit) return;
+    setDialogue([NUDGES[nudgeIdx]]);
+    nudgeIdx++;
+    armNudge();
+  }, 14000);
+}
+function startStage2(){
+  stage = 2;
+  setChapter(1);
+  hideHeadline();
+  setFlowMode("faint");
+  setCompanions("kabirThink","meeraIdea");
+  setDialogue([
+    {who:"Meera", text:"Wait... something is travelling!", meera:"meeraIdea"},
+    {who:"Kabir", text:"It goes around... and the bulb shows it as light.", kabir:"kabirThink"},
+  ], askTravellingThingQuestion);
+}
+function askTravellingThingQuestion(){
+  setChoices("What should we call the travelling thing?", [
+    {label:"Glow traveller"},
+    {label:"Light runner"},
+    {label:"Battery sparkle"},
+  ], ()=>{
+    setDialogue([
+      {who:"Kabir", text:"Yes! It is like a travelling glow thing.", kabir:"kabirHappy"},
+      {who:"Meera", text:"Scientists call this travelling thing current.", meera:"meeraIdea"},
+    ], ()=>{
+      showConcept("Current =", "the travelling thing that moves through the wire.");
+      setAction("Make current travel again", ()=>{
+        currentReplayReady = true;
+        resetBenchForBuild("stream");
+        setDialogue([
+          {who:"Kabir", text:"Can you make the current travel again?", kabir:"kabirHappy"},
+        ]);
+      });
+    });
+  });
+}
+function startStage3(){
+  stage = 3;
+  setChapter(2);
+  pathQuestionAnswered = false;
+  hideConcept();
+  setFlowMode("stream");
+  setCompanions("kabirHappy","meeraThink");
+  setDialogue([
+    {who:"Meera", text:"Can you stop the glow without removing the bulb?", meera:"meeraThink"},
+  ], ()=>{ if(stage===3) hintRemoveWire(); });   // glow a wire so the child sees to pull it
+}
+function askBrokenPathQuestion(){
+  pathQuestionAnswered = true;
+  clearWireHints();
+  setFlowMode("faint");
+  setCompanions("kabirThink","meeraThink");
+  setDialogue([
+    {who:"Kabir", text:"The current stopped!", kabir:"kabirThink"},
+    {who:"Meera", text:"Why did it stop?", meera:"meeraThink"},
+  ], ()=>{
+    setChoices("What happened to the path?", [
+      {label:"The path broke", correct:true},
+      {label:"The bulb got sleepy"},
+      {label:"The battery disappeared"},
+    ], opt=>{
+      if(!opt.correct){
+        snd.bounce();
+        pathQuestionAnswered = false;
+        setDialogue([
+          {who:"Meera", text:"Look at the gap in the path.", meera:"meeraThink"},
+        ], askBrokenPathQuestion);
+        return;
+      }
+      setDialogue([
+        {who:"Kabir", text:"Yes. The current needs a full path.", kabir:"kabirHappy"},
+      ], startStage4);
+    });
+  });
+}
+function startStage4(){
+  stage = 4;
+  setChapter(3);
+  setFlowMode("stream");
+  setCompanions("kabirHappy","meeraIdea");
+  setDialogue([
+    {who:"Meera", text:"Can you fix the path and bring the glow back?", meera:"meeraIdea"},
+  ]);
+}
+function startStage4Concept(){
+  stage = 40;
+  setDialogue([
+    {who:"Kabir", text:"You repaired the path!", kabir:"kabirHappy"},
+    {who:"Meera", text:"Now the current can travel all the way around.", meera:"meeraIdea"},
+    {who:"Kabir", text:"A full, unbroken path has a science name.", kabir:"kabirHappy"},
+    {who:"Meera", text:"It is called a circuit.", meera:"meeraIdea"},
+  ], ()=>{
+    showConcept("Circuit =", "a complete path for current.");
+    setDialogue([
+      {who:"Kabir", text:"Like Orion only looks complete when we join the stars.", kabir:"kabirHappy"},
+      {who:"Meera", text:"Our glow only works when the path is complete.", meera:"meeraIdea"},
+    ], startStage5);
+  });
+}
+function startStage5(){
+  stage = 5;
+  setChapter(4);
+  switchDoorSeen = false;
+  switchDoorDone = false;
+  switchIncludeNudged = false;
+  resetBenchForBuild("stream");
+  revealSwitch();                        // the switch appears now that it is introduced
+  board.querySelector("#switch").classList.add("glowtap");
+  setCompanions("kabirThink","meeraIdea");
+  setDialogue([
+    {who:"Kabir", text:"Can we stop and start the glow without pulling the wire every time?", kabir:"kabirThink"},
+    {who:"Meera", text:"A new part just appeared — this switch might help.", meera:"meeraIdea"},
+    {who:"Meera", text:"Build the path through the switch, then tap it ON.", meera:"meeraHappy"},
+  ]);
+}
+function completeSwitchDoor(){
+  if(switchDoorDone) return;
+  switchDoorDone = true;
+  stage = 50;
+  board.querySelector("#switch").classList.remove("glowtap");
+  snd.success();
+  setDialogue([
+    {who:"Meera", text:"The switch is like a tiny door in the path.", meera:"meeraIdea"},
+    {who:"Kabir", text:"Open door: current stops. Closed door: current travels.", kabir:"kabirHappy"},
+  ], ()=>{
+    showConcept("Switch =", "opens and closes the circuit.");
+    setAction("Build the full recipe", startStage6);
+  });
+}
+function startStage6(){
+  stage = 6;
+  setChapter(5);
+  recipeDone = false;
+  recipeNudged = false;
+  resetBenchForBuild("stream");
+  setCompanions("kabirHappy","meeraIdea");
+  setDialogue([
+    {who:"Meera", text:"Now make the full glow recipe.", meera:"meeraIdea"},
+    {who:"Kabir", text:"It needs a source, a path, and a way to start and stop.", kabir:"kabirHappy"},
+  ]);
+}
+function completeRecipe(){
+  if(recipeDone) return;
+  recipeDone = true;
+  stage = 60;
+  snd.bigwin();
+  confetti();
+  board.querySelector("#switch").classList.remove("glowtap");
+  board.classList.add("board-greenpulse");
+  setCompanions("kabirCelebrate","meeraCelebrate");
+  setDialogue([
+    {who:"Kabir", text:"Current is travelling!", kabir:"kabirCelebrate"},
+    {who:"Meera", text:"The circuit is complete!", meera:"meeraCelebrate"},
+    {who:"Kabir", text:"And the bulb makes the current seeable as light!", kabir:"kabirCelebrate"},
+  ], startStage7);
+}
+function startStage7(){
+  stage = 7;
+  setChapter(6);
+  hideConcept();
+  clearAction();
+  skyCallbackEl.classList.add("show");
+  setCompanions("kabirHappy","meeraHappy");
+  setDialogue([
+    {who:"Meera", text:"We first knew Orion's name.", meera:"meeraHappy"},
+    {who:"Kabir", text:"Now we know one glow recipe too.", kabir:"kabirHappy"},
+    {who:"Meera", text:"Our bulb needed a source, a complete path, and current.", meera:"meeraIdea"},
+    {who:"Kabir", text:"A real star must have its own glow recipe.", kabir:"kabirThink"},
+    {who:"Meera", text:"But what powers a real star?", meera:"meeraThink"},
+    {who:"Kabir", text:"That sounds like our next mystery.", kabir:"kabirHappy"},
+  ], ()=>{
+    setAction("Finish", showCertificate);
+  });
+}
+
+/* ============ Back / Undo / Next navigation ============ */
+const CHAPTERS = [startStage1, startStage2, startStage3, startStage4, startStage5, startStage6, startStage7];
+function setChapter(k){ chapterIdx = k; updateNav(); }
+function updateNav(){
+  const back = $("#nav-back"), next = $("#nav-next"), undo = $("#nav-undo");
+  if(back) back.disabled = chapterIdx <= 0;
+  if(next) next.disabled = chapterIdx >= CHAPTERS.length-1;
+  if(undo) undo.disabled = !(board && wires.length);
+}
+function goChapter(i){
+  i = Math.max(0, Math.min(CHAPTERS.length-1, i));
+  stopVoice(); clearDlgTimer(); clearAction(); clearChoices(); hideConcept(); clearWireHints();
+  $("#certificate").classList.remove("show");
+  CHAPTERS[i]();
+}
+$("#nav-next").addEventListener("click", ()=>{ snd.click(); goChapter(chapterIdx+1); });
+$("#nav-undo").addEventListener("click", ()=>{
+  if(!wires.length) return;
+  snd.pop();
+  removeWire(wires[wires.length-1]);   // pull back the most recent wire
+  clearWireHints();
+  refreshCircuit();
+  updateNav();
+});
+
+/* keep the Undo button's enabled state in step with the wire count */
+const _updatePile = updatePile;
+updatePile = function(){ _updatePile(); updateNav(); };
+
+/* ============ Entry gate & boot ============ */
+/* Build the night sky for the opening screen, matching the Constellation Explorer
+   home scene: tiny twinkling stars, a few big glowing stars, fireflies, and the
+   odd shooting star. No moon. */
+(function makeEntrySky(){
+  const wrap = $("#estars");
+  if(!wrap) return;
+  const reduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  // hundreds of tiny background stars
+  for(let i=0;i<170;i++){
+    const d = document.createElement("div"); d.className = "eb-star";
+    const sz = (1 + Math.random()*1.8);
+    d.style.width = d.style.height = sz.toFixed(2)+"px";
+    d.style.left = (Math.random()*100).toFixed(2)+"%";
+    d.style.top  = (Math.random()*100).toFixed(2)+"%";
+    d.style.setProperty("--o",(0.25+Math.random()*0.6).toFixed(2));
+    d.style.animationDuration = (2.4+Math.random()*4).toFixed(2)+"s";
+    d.style.animationDelay = (Math.random()*5).toFixed(2)+"s";
+    wrap.appendChild(d);
+  }
+  // a handful of larger foreground stars
+  [[15,24],[80,17],[30,62],[70,52],[50,11],[89,40],[11,48]].forEach((p,idx)=>{
+    const b = document.createElement("div"); b.className = "eb-bigstar";
+    b.style.left = p[0]+"%"; b.style.top = p[1]+"%";
+    b.style.animationDelay = (idx*0.7).toFixed(2)+"s";
+    const core = document.createElement("div"); core.className = "bs-core"; b.appendChild(core);
+    wrap.appendChild(b);
+  });
+  if(reduce) return;
+  // firefly sparkles
+  for(let i=0;i<12;i++){
+    const f = document.createElement("div"); f.className = "eb-fly";
+    f.style.left = (Math.random()*100).toFixed(1)+"%";
+    f.style.top  = (40+Math.random()*55).toFixed(1)+"%";
+    f.style.setProperty("--dx",(Math.random()*60-30).toFixed(0)+"px");
+    f.style.setProperty("--dy",(-20-Math.random()*60).toFixed(0)+"px");
+    f.style.setProperty("--d",(6+Math.random()*8).toFixed(1)+"s");
+    f.style.animationDelay = (Math.random()*6).toFixed(1)+"s";
+    wrap.appendChild(f);
+  }
+  // occasional shooting star while the opening screen is showing
+  (function scheduleShoot(){
+    setTimeout(()=>{
+      const entry = $("#entry");
+      if(entry && !entry.classList.contains("gone")){
+        const s = document.createElement("div"); s.className = "eb-shoot";
+        s.style.left = (Math.random()*40).toFixed(0)+"%";
+        s.style.top  = (Math.random()*30).toFixed(0)+"%";
+        s.addEventListener("animationend", ()=>s.remove());
+        wrap.appendChild(s);
+        scheduleShoot();
+      }
+    }, 9000 + Math.random()*8000);
+  })();
+})();
+let started = false;
+function startActivity(){
+  if(started) return;
+  started = true;
+  ac();
+  loadVoices();
+  const entry = $("#entry");
+  entry.classList.add("gone");
+  setTimeout(()=>{ entry.style.display="none"; }, 650);
+  startStage1();
+}
+$("#entry-btn").addEventListener("click", ()=>{ snd.click(); startActivity(); });
+
+/* Iframe contract with the constellation game (index.html): report ls-ready on
+   load and begin on ls-start — the parent's Continue click supplies the gesture. */
+if(window.self !== window.top){
+  window.addEventListener("message", e=>{
+    if(e.data==="ls-start") startActivity();
+  });
+  window.addEventListener("load", ()=>{
+    try{ window.parent.postMessage("ls-ready","*"); }catch(e){}
+  });
+}
+</script>
+</body>
+</html>
