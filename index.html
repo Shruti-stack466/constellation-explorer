@@ -1243,6 +1243,23 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   color:#FFF4DC;opacity:.9;
   text-shadow:0 2px 8px rgba(0,0,0,.55);
 }
+/* Glow-Box Mystery styled launch gate — mirrors the activity's own entry screen */
+.gbg-title{margin:0;font-family:'Fredoka','Baloo 2','Nunito',var(--font);font-weight:700;
+  color:#fff3c8;font-size:clamp(30px,6vw,58px);letter-spacing:.5px;line-height:1.06;text-align:center;
+  text-shadow:0 0 18px rgba(255,216,110,.55);}
+.gbg-sub{margin:0;color:#d9d2f5;font-family:'Nunito',var(--font);font-weight:700;
+  font-size:clamp(15px,2.3vw,22px);line-height:1.5;max-width:min(84vw,620px);text-align:center;
+  text-shadow:0 2px 8px rgba(0,0,0,.45);}
+.gbg-btn{min-height:56px;background:linear-gradient(180deg,#ffe879 0%,#ffd85c 100%);
+  color:#4c3478;font-family:'Fredoka','Baloo 2',var(--font);font-weight:700;font-size:clamp(16px,2vw,24px);
+  border:2px solid #ffbd35;border-radius:999px;padding:14px 46px;cursor:pointer;
+  box-shadow:0 6px 0 rgba(190,120,34,.35);transition:transform .14s, box-shadow .14s;
+  animation:gbgGlow 1.4s ease-in-out infinite;}
+.gbg-btn:hover{transform:translateY(-2px);}
+.gbg-btn:active{transform:translateY(3px);box-shadow:0 3px 0 rgba(190,120,34,.35);}
+.gbg-btn:focus-visible{outline:3px solid #fff;outline-offset:3px;}
+@keyframes gbgGlow{0%,100%{box-shadow:0 6px 0 rgba(190,120,34,.35)}
+  50%{box-shadow:0 0 26px rgba(255,216,110,.95),0 6px 0 rgba(190,120,34,.35)}}
 </style>
 
 <div id="app">
@@ -3624,23 +3641,46 @@ SCENES.reward=()=>{
 };
 function showLightSourceGate(){
   screen.innerHTML="";
+  const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const s=document.createElement("div"); s.className="scene";
-  s.style.cssText="position:relative;background:var(--indigo-900);display:flex;align-items:center;justify-content:center;overflow:hidden";
-  // Persistent night-sky star background. The shared .sky-bg class sits at z-index:-1,
-  // which renders BEHIND the scene's solid indigo fill — so the stars only flashed by
-  // during the transition, then vanished. Pin it at z-index:0 (above the fill, below the
-  // button) so the star field stays visible the whole time the child is on this screen,
-  // until they tap Continue.
-  const sky=document.createElement("div"); sky.className="sky-bg";
-  sky.style.cssText="position:absolute;inset:0;z-index:0;overflow:hidden";
-  twinkles(sky,140);
+  s.style.cssText="position:relative;background:#0a0e26;display:flex;align-items:center;justify-content:center;overflow:hidden";
+
+  // Glow-Box Mystery night sky (same rich star field as the activity's own entry screen,
+  // built from the shared home-scene layers) — deliberately NO moon.
+  const sky=document.createElement("div"); sky.className="home-sky"; sky.style.zIndex="0";
+  sky.innerHTML='<div class="home-nebula n1"></div><div class="home-nebula n2"></div>';
+  const starLayer=document.createElement("div"); starLayer.className="home-starlayer"; sky.appendChild(starLayer);
+  buildHomeStars(starLayer,200,{min:1,max:2.4});
+  const bigLayer=document.createElement("div"); bigLayer.className="home-biglayer"; sky.appendChild(bigLayer);
+  buildBigStars(bigLayer);
+  const flyLayer=document.createElement("div"); flyLayer.className="home-flylayer"; sky.appendChild(flyLayer);
+  if(!reduceMotion) buildFireflies(flyLayer,14);
+  const shootLayer=document.createElement("div"); shootLayer.className="home-shootlayer"; sky.appendChild(shootLayer);
   s.appendChild(sky);
-  const c=document.createElement("div"); c.className="center"; c.style.zIndex="1";
-  c.style.gap="26px"; c.style.paddingBottom="9vh";   // lift the title group up; give the button breathing room
-  c.innerHTML='<h1 class="gate-title">Spark the Stars</h1>'+
-              '<p class="gate-sub">Build the glow. Power the projector. Reveal the stars.</p>';
-  c.appendChild(mkBtn("Continue ➜","pulse",openLightSource));
+
+  // foreground: Glow-Box title / tagline / Check the Bulb button
+  const c=document.createElement("div");
+  c.style.cssText="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:0 22px;text-align:center";
+  c.innerHTML='<h1 class="gbg-title">★ The Glow-Box Mystery</h1>'+
+              '<p class="gbg-sub">Something makes the park bulb glow… can you find out what?</p>';
+  const btn=document.createElement("button"); btn.type="button"; btn.className="gbg-btn"; btn.textContent="🔦 Check the Bulb";
+  btn.addEventListener("click", openLightSource);   // real click keeps the iframe's audio/video autoplay unlocked
+  c.appendChild(btn);
   s.appendChild(c); screen.appendChild(s);
+
+  // occasional shooting star while the gate is on screen
+  if(!reduceMotion){
+    (function shoot(){
+      setTimeout(()=>{
+        if(!shootLayer.isConnected) return;
+        const sh=document.createElement("div"); sh.className="home-shoot";
+        sh.style.left=(Math.random()*40).toFixed(0)+"%"; sh.style.top=(Math.random()*30).toFixed(0)+"%";
+        sh.addEventListener("animationend",()=>sh.remove());
+        shootLayer.appendChild(sh); shoot();
+      }, 9000+Math.random()*8000);
+    })();
+  }
+
   preloadLightSource();     // Activity 2 loads invisibly BEHIND the gate while the child reads it
 }
 /* Embed Activity 2 (The Glow-Box Mystery) as a full-screen iframe so there's no page reload
