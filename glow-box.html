@@ -180,6 +180,8 @@
     box-shadow:0 1px 4px rgba(120,80,20,.5);cursor:crosshair;touch-action:none;z-index:9;
     transition:background .25s, border-color .25s, transform .15s;}
   .tdot::after{content:"";position:absolute;inset:-13px;border-radius:50%;}  /* fat invisible touch pad */
+  /* the switch's pin dots are smaller, so they don't crowd its little legs */
+  #switch .tdot{width:clamp(11px,1.3vw,16px);height:clamp(11px,1.3vw,16px);border-width:2px;}
   .tdot.pos{border-color:#e23b3b;}
   .tdot.neg{border-color:#2f6bd8;}
   .tdot.pulse{animation:termPulse 1.5s ease-in-out infinite;}
