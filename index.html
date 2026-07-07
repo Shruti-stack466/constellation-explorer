@@ -746,22 +746,25 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 
 /* nebula / cloud glow layers (slow drift) — deep violet, crimson-magenta, reddish
    pink and cool cyan clouds, matching the Glow-Box entry screen */
+/* the glow sits off-centre in each cloud, so the slow full rotation reads as a swirl */
 .home-nebula{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;pointer-events:none}
 .home-nebula.n1{width:64vw;height:64vw;left:-12vw;top:-14vw;
-  background:radial-gradient(circle,rgba(98,66,238,.62),transparent 66%);animation:homeNeb 28s ease-in-out infinite}
+  background:radial-gradient(circle at 38% 42%,rgba(98,66,238,.62),transparent 66%);animation:homeNeb 46s linear infinite}
 .home-nebula.n2{width:60vw;height:60vw;right:-14vw;bottom:-18vw;
-  background:radial-gradient(circle,rgba(208,44,152,.58),transparent 66%);animation:homeNeb 34s ease-in-out infinite reverse}
+  background:radial-gradient(circle at 60% 38%,rgba(208,44,152,.58),transparent 66%);animation:homeNeb 54s linear infinite reverse}
 .home-nebula.n3{width:52vw;height:52vw;right:-10vw;top:-12vw;
-  background:radial-gradient(circle,rgba(238,70,122,.5),transparent 64%);animation:homeNeb 31s ease-in-out 3s infinite}
+  background:radial-gradient(circle at 42% 58%,rgba(238,70,122,.5),transparent 64%);animation:homeNeb 50s linear 3s infinite}
 .home-nebula.n4{width:46vw;height:46vw;left:-8vw;bottom:-14vw;
-  background:radial-gradient(circle,rgba(255,110,180,.32),transparent 64%);animation:homeNeb 37s ease-in-out 6s infinite reverse}
+  background:radial-gradient(circle at 58% 44%,rgba(255,110,180,.32),transparent 64%);animation:homeNeb 58s linear 6s infinite reverse}
 .home-nebula.n5{width:40vw;height:40vw;left:30vw;top:30vh;
-  background:radial-gradient(circle,rgba(76,50,182,.42),transparent 66%);animation:homeNeb 40s ease-in-out 9s infinite}
+  background:radial-gradient(circle at 40% 40%,rgba(76,50,182,.42),transparent 66%);animation:homeNeb 62s linear 9s infinite}
 .home-nebula.n6{width:38vw;height:38vw;left:6vw;top:4vh;
-  background:radial-gradient(circle,rgba(72,206,235,.34),transparent 64%);animation:homeNeb 33s ease-in-out 4s infinite reverse}
+  background:radial-gradient(circle at 56% 42%,rgba(72,206,235,.34),transparent 64%);animation:homeNeb 52s linear 4s infinite reverse}
 .home-nebula.n7{width:34vw;height:34vw;right:8vw;bottom:6vh;
-  background:radial-gradient(circle,rgba(60,190,220,.28),transparent 64%);animation:homeNeb 39s ease-in-out 11s infinite}
-@keyframes homeNeb{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(3%,-3%) scale(1.08)}}
+  background:radial-gradient(circle at 44% 56%,rgba(60,190,220,.28),transparent 64%);animation:homeNeb 60s linear 11s infinite}
+@keyframes homeNeb{0%{transform:translate(0,0) rotate(0deg) scale(1)}
+  50%{transform:translate(3%,-3%) rotate(180deg) scale(1.08)}
+  100%{transform:translate(0,0) rotate(360deg) scale(1)}}
 /* milky-way galaxy band: wide hazy ribbon + brighter cyan-tinted core */
 .home-dustband{position:absolute;left:-20%;right:-20%;top:16%;height:60%;transform:rotate(-14deg);
   filter:blur(44px);opacity:.6;pointer-events:none;
@@ -771,6 +774,11 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   filter:blur(26px);opacity:.5;pointer-events:none;
   background:linear-gradient(110deg,transparent 0%,rgba(150,225,255,.10) 30%,
     rgba(190,240,255,.16) 50%,rgba(150,225,255,.10) 70%,transparent 100%)}
+/* a second, fainter galaxy arm crossing the other way */
+.home-dustband3{position:absolute;left:-20%;right:-20%;top:8%;height:46%;transform:rotate(17deg);
+  filter:blur(40px);opacity:.4;pointer-events:none;
+  background:linear-gradient(70deg,transparent 0%,rgba(190,160,255,.09) 30%,
+    rgba(230,140,235,.14) 50%,rgba(190,160,255,.09) 70%,transparent 100%)}
 
 /* hundreds of tiny background stars */
 .home-starlayer,.home-biglayer,.home-flylayer,.home-shootlayer{position:absolute;inset:0;pointer-events:none}
@@ -2151,12 +2159,23 @@ function buildGalaxyDust(layer){
     if(y<-2||y>102) continue;
     homeDustSpeck(layer, x, y, 0.6+Math.random()*1.4, 0.3+Math.random()*0.65);
   }
+  // a second, fainter galaxy arm of dust crossing the other diagonal
+  for(let i=0;i<220;i++){
+    const t=Math.random();
+    const spread=(Math.random()+Math.random()+Math.random())/3-0.5;
+    const x=-6+t*112, y=22+t*30+spread*26;
+    if(y<-2||y>102) continue;
+    homeDustSpeck(layer, x, y, 0.6+Math.random()*1.3, 0.26+Math.random()*0.55);
+  }
   const POCKETS=[
     {cx:7,  cy:7,  rx:17, ry:13, n:85},    // upper-left corner
     {cx:93, cy:7,  rx:17, ry:13, n:85},    // upper-right corner
     {cx:9,  cy:93, rx:19, ry:12, n:85},    // lower-left corner
     {cx:91, cy:93, rx:19, ry:12, n:85},    // lower-right corner
     {cx:50, cy:97, rx:36, ry:9,  n:110},   // all along the bottom edge
+    {cx:50, cy:4,  rx:32, ry:8,  n:90},    // along the top edge
+    {cx:28, cy:44, rx:16, ry:14, n:70},    // mid-left field
+    {cx:74, cy:58, rx:16, ry:14, n:70},    // mid-right field
   ];
   POCKETS.forEach(p=>{
     for(let i=0;i<p.n;i++){
@@ -2230,15 +2249,13 @@ SCENES.start=()=>{
 
   /* --- night sky background (no moon — nebulas, milky-way bands and star dust) --- */
   const sky=document.createElement("div"); sky.className="home-sky";
-  sky.innerHTML='<div class="home-dustband"></div><div class="home-dustband2"></div>'+
+  sky.innerHTML='<div class="home-dustband"></div><div class="home-dustband2"></div><div class="home-dustband3"></div>'+
     '<div class="home-nebula n1"></div><div class="home-nebula n2"></div><div class="home-nebula n3"></div>'+
     '<div class="home-nebula n4"></div><div class="home-nebula n5"></div><div class="home-nebula n6"></div>'+
     '<div class="home-nebula n7"></div>';
   const starLayer=document.createElement("div"); starLayer.className="home-starlayer"; sky.appendChild(starLayer);
-  buildHomeStars(starLayer,420,{min:.8,max:2.6});
+  buildHomeStars(starLayer,620,{min:.8,max:2.6});
   buildGalaxyDust(starLayer);
-  const bigLayer=document.createElement("div"); bigLayer.className="home-biglayer"; sky.appendChild(bigLayer);
-  const bigStars=buildBigStars(bigLayer);
   const flyLayer=document.createElement("div"); flyLayer.className="home-flylayer"; sky.appendChild(flyLayer);
   if(!reduceMotion) buildFireflies(flyLayer,14);
   const shootLayer=document.createElement("div"); shootLayer.className="home-shootlayer"; sky.appendChild(shootLayer);
@@ -2294,20 +2311,8 @@ SCENES.start=()=>{
     setTimeout(()=>show("story"),1000);                              // ~900–1000ms cinematic, then the park
   };
 
-  /* --- light magical interactions (disabled under reduced motion) --- */
+  /* --- occasional shooting star (the big mouse-reactive stars were removed) --- */
   if(!reduceMotion){
-    let raf=0,mx=-1,my=-1;
-    sky.addEventListener("mousemove",(e)=>{
-      const r=sky.getBoundingClientRect(); mx=e.clientX-r.left; my=e.clientY-r.top;
-      if(!raf) raf=requestAnimationFrame(()=>{ raf=0;
-        bigStars.forEach((b)=>{
-          const bx=b.offsetLeft, by=b.offsetTop;            // width:0 element → left/top is the star centre
-          const g=Math.max(1, 2.6-Math.hypot(mx-bx,my-by)/170);
-          b.style.setProperty("--g",g.toFixed(2));
-        });
-      });
-    });
-    sky.addEventListener("mouseleave",()=>bigStars.forEach((b)=>b.style.setProperty("--g","1")));
     scheduleShoot(shootLayer);
   }
 };
@@ -3844,15 +3849,13 @@ function showLightSourceGate(){
   // Glow-Box Mystery night sky (same rich star field as the activity's own entry screen,
   // built from the shared home-scene layers) — deliberately NO moon.
   const sky=document.createElement("div"); sky.className="home-sky"; sky.style.zIndex="0";
-  sky.innerHTML='<div class="home-dustband"></div><div class="home-dustband2"></div>'+
+  sky.innerHTML='<div class="home-dustband"></div><div class="home-dustband2"></div><div class="home-dustband3"></div>'+
     '<div class="home-nebula n1"></div><div class="home-nebula n2"></div><div class="home-nebula n3"></div>'+
     '<div class="home-nebula n4"></div><div class="home-nebula n5"></div><div class="home-nebula n6"></div>'+
     '<div class="home-nebula n7"></div>';
   const starLayer=document.createElement("div"); starLayer.className="home-starlayer"; sky.appendChild(starLayer);
-  buildHomeStars(starLayer,420,{min:.8,max:2.6});
+  buildHomeStars(starLayer,620,{min:.8,max:2.6});
   buildGalaxyDust(starLayer);
-  const bigLayer=document.createElement("div"); bigLayer.className="home-biglayer"; sky.appendChild(bigLayer);
-  buildBigStars(bigLayer);
   const flyLayer=document.createElement("div"); flyLayer.className="home-flylayer"; sky.appendChild(flyLayer);
   if(!reduceMotion) buildFireflies(flyLayer,14);
   const shootLayer=document.createElement("div"); shootLayer.className="home-shootlayer"; sky.appendChild(shootLayer);
