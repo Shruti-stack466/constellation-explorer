@@ -5,7 +5,7 @@
      falls back to rounded system fonts offline, so nothing breaks either way. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 
 <style>
 /* ============================================================
@@ -179,8 +179,11 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   filter:drop-shadow(0 0 3px var(--gold-deep))}
 .starnode.sel .starshape,.starnode.used .starshape,.starnode:hover .starshape{fill:var(--gold);stroke:#fff6cf;
   filter:drop-shadow(0 0 1.6px var(--gold))}
-.starhit{cursor:pointer;fill:transparent}
-.starhit:focus-visible{outline:3px solid var(--gold);outline-offset:1px;border-radius:50%}
+.starhit{cursor:pointer;fill:transparent;outline:none}
+.starhit:focus-visible{outline:1px solid rgba(255,255,255,.85);outline-offset:2px;border-radius:4px}
+/* selected star: a small square outline with a thin border (no scale-up, no thick ring) */
+.starnode .selbox{display:none;fill:none;stroke:rgba(255,255,255,.9);stroke-width:.28;pointer-events:none}
+.starnode.sel .selbox{display:block}
 .starnode.hint .starshape{animation:starpulse 1.05s ease-in-out infinite;
   transform-box:fill-box;transform-origin:center}
 @keyframes starpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.55)}}
@@ -462,7 +465,7 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 /* ---------- Unified discover screen ---------- */
 .discover-stage{position:relative;overflow:hidden}
 .discover-coach{position:absolute;left:2.5vw;bottom:0;z-index:6;display:flex;flex-direction:column;align-items:flex-start;gap:0;pointer-events:none;max-width:42vw}
-.discover-coach .dc-fig{height:min(47vh,432px);width:auto;flex:0 0 auto;filter:drop-shadow(0 8px 20px rgba(0,0,0,.55))}
+.discover-coach .dc-fig{height:min(62vh,572px);width:auto;flex:0 0 auto;filter:drop-shadow(0 8px 20px rgba(0,0,0,.55))}
 /* Meera's dialogue — soft warm-glass speech bubble, nudged close to her */
 .discover-coach .dc-say{position:relative;z-index:2;margin-left:24px;margin-bottom:-1.6vh;max-width:min(20vw,206px);
   background:linear-gradient(180deg,rgba(251,248,255,.96),rgba(235,227,252,.93));color:#241f3d;
@@ -522,12 +525,15 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   backdrop-filter:blur(16px) saturate(1.05);-webkit-backdrop-filter:blur(16px) saturate(1.05);
   box-shadow:0 10px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.09);transition:transform .15s,box-shadow .2s;animation:huntFieldIn .6s ease .2s both}
 .discover-sound:hover{transform:scale(1.06)}
-.discover-skip{position:absolute;top:14px;right:70px;z-index:7;padding:10px 16px;border-radius:16px;cursor:pointer;
-  font:inherit;font-weight:800;font-size:14px;color:#e7ecf5;
-  background:linear-gradient(180deg,rgba(15,23,42,.7),rgba(30,41,59,.5));border:1px solid rgba(125,211,252,.2);
-  backdrop-filter:blur(16px) saturate(1.05);-webkit-backdrop-filter:blur(16px) saturate(1.05);
-  box-shadow:0 10px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.09);transition:transform .15s;animation:huntFieldIn .6s ease .2s both}
-.discover-skip:hover{transform:scale(1.05)}
+/* Skip — SAME design, format and size as the Next / Finish button (violet glass, gold border) */
+.discover-skip{position:absolute;top:14px;right:70px;z-index:7;cursor:pointer;
+  font-family:var(--font);font-weight:800;font-size:19px;padding:14px 30px;min-height:52px;border-radius:var(--pill);
+  color:#ffe9bd;background:linear-gradient(180deg,rgba(72,42,116,.92),rgba(46,25,74,.92));
+  border:1px solid rgba(255,234,185,.58);
+  box-shadow:0 8px 22px rgba(0,0,0,.36),0 0 14px rgba(255,233,180,.30),inset 0 1px 0 rgba(255,255,255,.12);
+  transition:transform .15s,box-shadow .2s;animation:huntFieldIn .6s ease .2s both}
+.discover-skip:hover{transform:translateY(-2px);
+  box-shadow:0 10px 26px rgba(0,0,0,.42),0 0 20px rgba(255,233,180,.46),inset 0 1px 0 rgba(255,255,255,.16)}
 .videocap{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);z-index:7;
   max-width:80vw;text-align:center;pointer-events:none;opacity:0;transition:opacity .15s;
   color:#fff;font-size:clamp(15px,2vw,24px);line-height:1.35;font-weight:600;
@@ -546,7 +552,7 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
    corner. The image has transparent padding, so negative margins pull her body into
    the corner / down to the ground; .discover-stage overflow:hidden clips the rest. */
 .discover-coach.cass-coach{left:2.5vw;bottom:0}
-.discover-coach.cass-coach .dc-fig{height:min(52vh,482px);margin-left:-9.5vw;margin-bottom:-2vh}
+.discover-coach.cass-coach .dc-fig{height:min(68vh,638px);margin-left:-9.5vw;margin-bottom:-2vh}
 /* night-sky stars gently twinkle */
 @keyframes twinkle{0%,100%{opacity:1}50%{opacity:.38}}
 .tracefield .starnode .starshape{animation:twinkle 3.2s ease-in-out infinite}
@@ -626,6 +632,45 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 .choice-card .cc-text{font-size:11.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:rgba(232,224,255,.85);white-space:nowrap}
 .choice-card .cc-check{display:none}
 .choice-card.sel{background:rgba(255,212,94,.16)}
+/* "sep" variant: same glass look as the dock tabs, but each option is its OWN
+   floating card (shape-guess + reason questions), not one joined tray */
+.choice-tray.sep{background:transparent;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;
+  padding:0;gap:12px;flex-wrap:wrap;justify-content:center;max-width:min(94vw,760px)}
+.choice-tray.sep .choice-card{height:auto;min-height:58px;padding:10px 20px;border-radius:16px;
+  background:linear-gradient(180deg,rgba(30,17,56,.78),rgba(48,26,76,.58));border:1px solid rgba(255,234,185,.42);
+  backdrop-filter:blur(10px) saturate(1.05);-webkit-backdrop-filter:blur(10px) saturate(1.05);
+  box-shadow:0 16px 40px rgba(0,0,0,.36),0 0 13px rgba(255,233,180,.26),0 0 26px rgba(168,85,247,.20),inset 0 1px 0 rgba(255,255,255,.13)}
+.choice-tray.sep .choice-card:hover{background:linear-gradient(180deg,rgba(255,212,94,.18),rgba(48,26,76,.66))}
+.choice-tray.sep .choice-card .cc-text{white-space:normal;text-transform:none;font-size:13.5px;line-height:1.3;max-width:210px}
+/* Hint tab pulses after the first wrong attempt */
+.discover-dock .seg.attn{background:rgba(255,212,94,.14);animation:segPulse 1.4s ease-in-out infinite}
+@keyframes segPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,212,94,.55)}50%{box-shadow:0 0 16px 5px rgba(255,212,94,.45)}}
+/* Hint taken: the stars that belong to the pattern turn DARK BLUE and shine
+   steadily (twinkle off, full brightness) until traced gold */
+.tracefield .starnode.traceblue:not(.used) .starshape{fill:#1e4fd6;stroke:#6ea3ff;
+  animation:none !important;opacity:1;
+  filter:drop-shadow(0 0 3px #2f6bff) drop-shadow(0 0 9px rgba(47,107,255,.95))}
+/* Hint mode: the NEXT line to connect glows blue (re-targets to the selected star) */
+.tracefield .hintpath{stroke:#4f8bff;stroke-width:1.5;stroke-linecap:round;
+  animation:hintPathGlow 1.2s ease-in-out infinite}
+@keyframes hintPathGlow{
+  0%,100%{opacity:.65;filter:drop-shadow(0 0 2px #2f6bff) drop-shadow(0 0 6px rgba(47,107,255,.7))}
+  50%{opacity:1;filter:drop-shadow(0 0 4px #6ea3ff) drop-shadow(0 0 12px rgba(47,107,255,1))}}
+/* reason check: wrong answer vibrates with a red glow; the right one glows green */
+.choice-tray.sep .choice-card.wrong{animation:choiceShake .5s ease;border-color:rgba(255,110,110,.9);
+  background:linear-gradient(180deg,rgba(120,30,40,.80),rgba(70,20,32,.62));
+  box-shadow:0 0 16px 4px rgba(255,80,80,.55),inset 0 1px 0 rgba(255,255,255,.10)}
+@keyframes choiceShake{0%,100%{transform:translateX(0)}15%{transform:translateX(-7px)}30%{transform:translateX(7px)}
+  45%{transform:translateX(-5px)}60%{transform:translateX(5px)}75%{transform:translateX(-3px)}90%{transform:translateX(3px)}}
+.choice-tray.sep .choice-card.right{border-color:rgba(131,232,178,.95);
+  background:linear-gradient(180deg,rgba(30,96,64,.82),rgba(20,64,44,.66));
+  box-shadow:0 0 18px 5px rgba(131,232,178,.55),inset 0 1px 0 rgba(255,255,255,.12)}
+/* 12s of inactivity: the constellation's starting star pulses with a blue glow */
+.tracefield .starnode.startglow .starshape{fill:#9fd4ff;stroke:#e6f4ff;
+  animation:blueStartPulse 1.2s ease-in-out infinite !important;transform-box:fill-box;transform-origin:center}
+@keyframes blueStartPulse{
+  0%,100%{transform:scale(1);opacity:1;filter:drop-shadow(0 0 3px #4fa8ff) drop-shadow(0 0 8px rgba(80,160,255,.8))}
+  50%{transform:scale(1.6);opacity:1;filter:drop-shadow(0 0 6px #8cc6ff) drop-shadow(0 0 16px rgba(80,160,255,1))}}
 
 /* ---------- desktop fit: keep every page inside one screen ----------
    On a desktop the whole app is locked to the viewport height so that
@@ -684,12 +729,13 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
    ============================================================ */
 .home-scene{position:relative;flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
 
-/* ---- deep navy→indigo sky + atmosphere ---- */
+/* ---- deep space sky: magenta / violet glow over dark indigo (poster style) ---- */
 .home-sky{position:absolute;inset:0;overflow:hidden;z-index:0;
   background:
-    radial-gradient(140% 100% at 50% -25%, #1b2360 0%, transparent 55%),
-    radial-gradient(120% 90% at 85% 115%, #251a55 0%, transparent 55%),
-    linear-gradient(180deg,#0c1234 0%,#0a0e26 55%,#0a0920 100%)}
+    radial-gradient(90% 70% at 78% 20%, rgba(198,62,172,.35), transparent 55%),
+    radial-gradient(80% 65% at 12% 68%, rgba(126,62,205,.32), transparent 60%),
+    radial-gradient(70% 55% at 42% 40%, rgba(20,12,44,.7), transparent 70%),
+    linear-gradient(160deg,#120a2e 0%,#170c38 45%,#0a0722 100%)}
 .home-sky,.home-content{transition:transform 1s cubic-bezier(.3,.7,.2,1)}
 
 /* soft moon glow, top-right corner */
@@ -698,13 +744,33 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   background:radial-gradient(circle at 38% 36%,#fff9ea 0%,#ffe7a6 16%,rgba(255,221,150,.34) 44%,transparent 72%);
   filter:blur(1px)}
 
-/* nebula / cloud glow layers (slow drift) */
-.home-nebula{position:absolute;border-radius:50%;filter:blur(60px);opacity:.5;pointer-events:none}
+/* nebula / cloud glow layers (slow drift) — deep violet, crimson-magenta, reddish
+   pink and cool cyan clouds, matching the Glow-Box entry screen */
+.home-nebula{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;pointer-events:none}
 .home-nebula.n1{width:64vw;height:64vw;left:-12vw;top:-14vw;
-  background:radial-gradient(circle,rgba(86,108,220,.6),transparent 66%);animation:homeNeb 28s ease-in-out infinite}
+  background:radial-gradient(circle,rgba(98,66,238,.62),transparent 66%);animation:homeNeb 28s ease-in-out infinite}
 .home-nebula.n2{width:60vw;height:60vw;right:-14vw;bottom:-18vw;
-  background:radial-gradient(circle,rgba(150,90,210,.55),transparent 66%);animation:homeNeb 34s ease-in-out infinite reverse}
+  background:radial-gradient(circle,rgba(208,44,152,.58),transparent 66%);animation:homeNeb 34s ease-in-out infinite reverse}
+.home-nebula.n3{width:52vw;height:52vw;right:-10vw;top:-12vw;
+  background:radial-gradient(circle,rgba(238,70,122,.5),transparent 64%);animation:homeNeb 31s ease-in-out 3s infinite}
+.home-nebula.n4{width:46vw;height:46vw;left:-8vw;bottom:-14vw;
+  background:radial-gradient(circle,rgba(255,110,180,.32),transparent 64%);animation:homeNeb 37s ease-in-out 6s infinite reverse}
+.home-nebula.n5{width:40vw;height:40vw;left:30vw;top:30vh;
+  background:radial-gradient(circle,rgba(76,50,182,.42),transparent 66%);animation:homeNeb 40s ease-in-out 9s infinite}
+.home-nebula.n6{width:38vw;height:38vw;left:6vw;top:4vh;
+  background:radial-gradient(circle,rgba(72,206,235,.34),transparent 64%);animation:homeNeb 33s ease-in-out 4s infinite reverse}
+.home-nebula.n7{width:34vw;height:34vw;right:8vw;bottom:6vh;
+  background:radial-gradient(circle,rgba(60,190,220,.28),transparent 64%);animation:homeNeb 39s ease-in-out 11s infinite}
 @keyframes homeNeb{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(3%,-3%) scale(1.08)}}
+/* milky-way galaxy band: wide hazy ribbon + brighter cyan-tinted core */
+.home-dustband{position:absolute;left:-20%;right:-20%;top:16%;height:60%;transform:rotate(-14deg);
+  filter:blur(44px);opacity:.6;pointer-events:none;
+  background:linear-gradient(110deg,transparent 0%,rgba(214,150,255,.11) 26%,
+    rgba(244,130,222,.18) 50%,rgba(214,150,255,.11) 74%,transparent 100%)}
+.home-dustband2{position:absolute;left:-20%;right:-20%;top:34%;height:22%;transform:rotate(-14deg);
+  filter:blur(26px);opacity:.5;pointer-events:none;
+  background:linear-gradient(110deg,transparent 0%,rgba(150,225,255,.10) 30%,
+    rgba(190,240,255,.16) 50%,rgba(150,225,255,.10) 70%,transparent 100%)}
 
 /* hundreds of tiny background stars */
 .home-starlayer,.home-biglayer,.home-flylayer,.home-shootlayer{position:absolute;inset:0;pointer-events:none}
@@ -746,19 +812,21 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   align-items:center;justify-content:center;gap:clamp(10px,2.4vh,28px);
   padding:clamp(18px,5vh,46px) 20px;text-align:center;min-height:0}
 
-/* premium title: stars settle first, then it fades/scales in with a gold shimmer */
+/* title: heavy squared sci-fi logotype (Star-Wars-poster style), plain white.
+   It flies in from deep space — tiny, blurred, far away — and lands on screen. */
 .home-title-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
-.home-title{margin:0;font-family:var(--font);font-weight:900;line-height:1.04;letter-spacing:.5px;
-  font-size:clamp(32px,7.6vw,80px);
-  background:linear-gradient(100deg,#ffe9a8 0%,#ffffff 28%,#ffd45e 50%,#ffffff 72%,#ffe9a8 100%);
-  background-size:230% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
-  filter:drop-shadow(0 2px 16px rgba(255,212,94,.4));
-  opacity:0;transform:scale(.86) translateY(10px);
-  animation:homeTitleIn 1s cubic-bezier(.2,.8,.2,1) .6s forwards, homeShimmer 7s linear 1.7s infinite}
-@keyframes homeTitleIn{to{opacity:1;transform:none}}
-@keyframes homeShimmer{0%{background-position:0% center}100%{background-position:230% center}}
-.home-tag{margin:0;color:var(--muted);font-size:clamp(14px,2.4vw,21px);font-weight:700;
-  opacity:0;animation:homeFadeUp .9s ease 1.05s forwards}
+.home-title{margin:0;font-family:'Orbitron',var(--font);font-weight:900;line-height:1.08;
+  color:#ffffff;text-transform:uppercase;letter-spacing:.12em;
+  font-size:clamp(26px,5.6vw,64px);
+  text-shadow:0 0 26px rgba(222,120,255,.5),0 2px 8px rgba(0,0,0,.65);
+  animation:fromSpace 1.6s cubic-bezier(.2,.8,.25,1) .2s both}
+.home-tag{margin:0;color:#d9d2f5;font-size:clamp(14px,2.4vw,21px);font-weight:700;
+  animation:fromSpace 1.5s cubic-bezier(.2,.8,.25,1) .9s both}
+@keyframes fromSpace{
+  0%{opacity:0;transform:scale(.06);filter:blur(8px)}
+  60%{opacity:1;filter:blur(0)}
+  82%{transform:scale(1.05)}
+  100%{opacity:1;transform:scale(1);filter:blur(0)}}
 @keyframes homeFadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 /* characters — alive, not static stickers */
@@ -775,29 +843,23 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 @keyframes homeMeeraIdle{0%{transform:translateY(0) scaleY(1)}
   50%{transform:translateY(-6px) scaleY(1.015)}100%{transform:translateY(0)}}
 
-/* ---- the Start button: strongest focus on the screen ---- */
+/* ---- the Start button: appears once the title has landed, with a soft glow ---- */
 .home-start{position:relative;font-family:var(--font);font-weight:900;cursor:pointer;
   font-size:clamp(20px,2.8vw,28px);color:#3a2600;border:none;border-radius:var(--pill);
   padding:clamp(15px,2.2vh,22px) clamp(38px,6vw,64px);min-height:60px;
   background:linear-gradient(180deg,#ffe680 0%,#ffd45e 46%,#f4b740 100%);
   opacity:0;transform:translateY(16px);
-  animation:homeStartIn .8s cubic-bezier(.2,.9,.2,1) 1.45s forwards,
-            homeStartBreathe 2.8s ease-in-out 2.4s infinite;
+  animation:homeStartIn .6s cubic-bezier(.2,.9,.2,1) 2.5s forwards,
+            homeStartBreathe 2.8s ease-in-out 3.2s infinite;
   transition:transform .18s ease,box-shadow .25s ease,filter .2s ease}
 @keyframes homeStartIn{to{opacity:1;transform:none}}
 @keyframes homeStartBreathe{
-  0%,100%{transform:scale(1);box-shadow:0 10px 28px rgba(244,183,64,.5),0 0 22px 4px rgba(255,212,94,.3),inset 0 2px 6px rgba(255,255,255,.55)}
-  50%{transform:scale(1.035);box-shadow:0 14px 40px rgba(244,183,64,.6),0 0 44px 10px rgba(255,212,94,.5),inset 0 2px 6px rgba(255,255,255,.55)}}
+  0%,100%{transform:scale(1);box-shadow:0 8px 20px rgba(244,183,64,.35),0 0 8px 2px rgba(255,212,94,.16),inset 0 2px 6px rgba(255,255,255,.55)}
+  50%{transform:scale(1.03);box-shadow:0 10px 24px rgba(244,183,64,.4),0 0 14px 3px rgba(255,212,94,.26),inset 0 2px 6px rgba(255,255,255,.55)}}
 .home-start:hover,.home-start:focus-visible{animation-play-state:paused;transform:translateY(-3px) scale(1.05);filter:brightness(1.05);
-  box-shadow:0 18px 46px rgba(244,183,64,.7),0 0 60px 14px rgba(255,212,94,.6),inset 0 2px 6px rgba(255,255,255,.6)}
+  box-shadow:0 12px 28px rgba(244,183,64,.45),0 0 20px 5px rgba(255,212,94,.3),inset 0 2px 6px rgba(255,255,255,.6)}
 .home-start:focus-visible{outline:3px solid #fff;outline-offset:4px}
 .home-start:active{transform:translateY(0) scale(.98)}
-/* tiny hover sparkles */
-.home-start::before,.home-start::after{content:"✨";position:absolute;font-size:16px;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .4s ease}
-.home-start::before{top:-10px;left:14px}
-.home-start::after{bottom:-8px;right:16px}
-.home-start:hover::before{opacity:.95;transform:translateY(-4px) rotate(-12deg)}
-.home-start:hover::after{opacity:.95;transform:translateY(4px) rotate(12deg)}
 /* click: compress then bounce */
 .home-start.clicked{animation:homeStartClick .5s ease}
 @keyframes homeStartClick{0%{transform:scale(1)}25%{transform:scale(.92)}55%{transform:scale(1.08)}100%{transform:scale(1)}}
@@ -1553,6 +1615,7 @@ function createStarField(host, stars, opts){
 
   let edges=[];          // [[a,b]...]
   let pending=null;
+  let locked=false;      // when true, taps on stars are ignored (attempt submitted — must Clear first)
   const nodes=[];
 
   function starPoints(R){
@@ -1579,6 +1642,14 @@ function createStarField(host, stars, opts){
     poly.setAttribute("class","starshape");
     g.appendChild(poly);
     if(!deco){
+      // small square selection box (thin border), shown only while this star is selected
+      const box=document.createElementNS(NS,"rect");
+      const half=R*1.5+0.6;
+      box.setAttribute("x",(-half).toFixed(2)); box.setAttribute("y",(-half).toFixed(2));
+      box.setAttribute("width",(half*2).toFixed(2)); box.setAttribute("height",(half*2).toFixed(2));
+      box.setAttribute("rx",(half*0.18).toFixed(2));
+      box.setAttribute("class","selbox");
+      g.appendChild(box);
       // generous transparent hit area (easy tap + keyboard focus)
       const hit=document.createElementNS(NS,"circle");
       hit.setAttribute("cx",0); hit.setAttribute("cy",0); hit.setAttribute("r",Math.max(4,R+2.2));
@@ -1601,7 +1672,7 @@ function createStarField(host, stars, opts){
   function setPending(i){
     resetSel();
     pending=i;
-    if(i!==null){ const n=nodes[i]; n.g.setAttribute("transform",n.baseT+" scale(1.18)"); n.g.classList.add("sel"); }
+    if(i!==null){ nodes[i].g.classList.add("sel"); }   // square selbox shows it — no scale-up
   }
   function clearPending(){ resetSel(); pending=null; }
   function markUsed(){
@@ -1609,11 +1680,13 @@ function createStarField(host, stars, opts){
     nodes.forEach((n,i)=>{ n.g.classList.toggle("used", used.has(i)); });
   }
   function select(i){
-    if(pending===null){ setPending(i); playStarSelect(); return; }
-    if(pending===i){ clearPending(); return; }
+    if(locked) return;
+    if(pending===null){ setPending(i); playStarSelect(); if(opts.onSelect) opts.onSelect(i); return; }
+    if(pending===i){ clearPending(); if(opts.onSelect) opts.onSelect(null); return; }
     addEdge(pending,i);
     setPending(i);   // chain: keep drawing from the last star
     playStarSelect();
+    if(opts.onSelect) opts.onSelect(i);
   }
   function drawEdge(a,b,cls){
     const l=document.createElementNS(NS,"line");
@@ -1660,7 +1733,17 @@ function createStarField(host, stars, opts){
       gHint.innerHTML="";
       (edgePairs||[]).forEach(([a,b])=>{ gHint.appendChild(drawEdge(a,b,"ghost")); });
     },
-    clearGuide(){ gHint.innerHTML=""; }
+    clearGuide(){ gHint.innerHTML=""; },
+    // draw a connection programmatically (used by the auto-reveal after 2 wrong attempts)
+    connect(a,b){ addEdge(a,b); },
+    // glowing blue "connect this next" path (hint mode) — one at a time, over the dotted guide
+    hintPath(a,b){ gHint.querySelectorAll(".hintpath").forEach(el=>el.remove()); gHint.appendChild(drawEdge(a,b,"hintpath")); },
+    clearHintPath(){ gHint.querySelectorAll(".hintpath").forEach(el=>el.remove()); },
+    // freeze/unfreeze star taps (drawing). Undo/Clear/connect still work while locked.
+    lock(v){ locked=!!v; if(locked) clearPending(); },
+    // persistent class marks on star nodes (blue hint stars, idle start-star glow)
+    mark(indices,cls){ (indices||[]).forEach(i=>{ if(nodes[i]) nodes[i].g.classList.add(cls); }); },
+    unmark(cls){ nodes.forEach(n=>n.g.classList.remove(cls)); }
   };
 }
 
@@ -2033,19 +2116,52 @@ const HOME_KABIR_SRC = "Visuals/kabir standing.png";   // opening-screen Kabir (
 let homeShootTimer=null, homeAttnTimer=null;
 
 /* hundreds of tiny background stars, varied size + opacity + twinkle timing */
+const HOME_DUST_TINTS=["#ffffff","#ffffff","#cfe9ff","#ffd9ec","#e7dbff"];
+function homeDustSpeck(layer,x,y,sz,o){
+  const d=document.createElement("div"); d.className="home-star";
+  d.style.width=d.style.height=sz.toFixed(2)+"px";
+  d.style.left=x.toFixed(2)+"%";
+  d.style.top=y.toFixed(2)+"%";
+  d.style.background=HOME_DUST_TINTS[Math.floor(Math.random()*HOME_DUST_TINTS.length)];
+  d.style.setProperty("--o",o.toFixed(2));
+  d.style.animationDuration=(2.4+Math.random()*4).toFixed(2)+"s";
+  d.style.animationDelay=(Math.random()*5).toFixed(2)+"s";
+  layer.appendChild(d);
+}
 function buildHomeStars(layer,n,opts){
   opts=opts||{};
   for(let i=0;i<n;i++){
-    const d=document.createElement("div"); d.className="home-star";
-    const sz=((opts.min||1)+Math.random()*((opts.max||2.4)-(opts.min||1)));
-    d.style.width=d.style.height=sz.toFixed(2)+"px";
-    d.style.left=(Math.random()*100).toFixed(2)+"%";
-    d.style.top=(Math.random()*100).toFixed(2)+"%";
-    d.style.setProperty("--o",(0.25+Math.random()*0.6).toFixed(2));
-    d.style.animationDuration=(2.4+Math.random()*4).toFixed(2)+"s";
-    d.style.animationDelay=(Math.random()*5).toFixed(2)+"s";
-    layer.appendChild(d);
+    homeDustSpeck(layer, Math.random()*100, Math.random()*100,
+      (opts.min||1)+Math.random()*((opts.max||2.4)-(opts.min||1)),
+      0.25+Math.random()*0.6);
   }
+}
+/* milky-way galaxy dust: a dense diagonal stream + hazy pockets in the upper
+   corners and along the bottom — same treatment as the Glow-Box entry sky */
+function buildGalaxyDust(layer){
+  for(let i=0;i<300;i++){
+    const t=Math.random();                                       // position along the band
+    const spread=(Math.random()+Math.random()+Math.random())/3-0.5;   // bell-ish across it
+    const x=-6+t*112, y=60-t*26+spread*30;
+    if(y<-2||y>102) continue;
+    homeDustSpeck(layer, x, y, 0.6+Math.random()*1.4, 0.3+Math.random()*0.65);
+  }
+  const POCKETS=[
+    {cx:7,  cy:7,  rx:17, ry:13, n:85},    // upper-left corner
+    {cx:93, cy:7,  rx:17, ry:13, n:85},    // upper-right corner
+    {cx:9,  cy:93, rx:19, ry:12, n:85},    // lower-left corner
+    {cx:91, cy:93, rx:19, ry:12, n:85},    // lower-right corner
+    {cx:50, cy:97, rx:36, ry:9,  n:110},   // all along the bottom edge
+  ];
+  POCKETS.forEach(p=>{
+    for(let i=0;i<p.n;i++){
+      const g1=(Math.random()+Math.random()+Math.random())/3-0.5;
+      const g2=(Math.random()+Math.random()+Math.random())/3-0.5;
+      const x=p.cx+g1*2*p.rx, y=p.cy+g2*2*p.ry;
+      if(x<-2||x>102||y<-2||y>102) continue;
+      homeDustSpeck(layer, x, y, 0.6+Math.random()*1.3, 0.28+Math.random()*0.6);
+    }
+  });
 }
 /* a handful of larger foreground stars with soft glow (mouse-reactive) */
 function buildBigStars(layer){
@@ -2107,11 +2223,15 @@ SCENES.start=()=>{
 
   const scene=document.createElement("div"); scene.className="scene home-scene";
 
-  /* --- night sky background --- */
+  /* --- night sky background (no moon — nebulas, milky-way bands and star dust) --- */
   const sky=document.createElement("div"); sky.className="home-sky";
-  sky.innerHTML='<div class="home-moon"></div><div class="home-nebula n1"></div><div class="home-nebula n2"></div>';
+  sky.innerHTML='<div class="home-dustband"></div><div class="home-dustband2"></div>'+
+    '<div class="home-nebula n1"></div><div class="home-nebula n2"></div><div class="home-nebula n3"></div>'+
+    '<div class="home-nebula n4"></div><div class="home-nebula n5"></div><div class="home-nebula n6"></div>'+
+    '<div class="home-nebula n7"></div>';
   const starLayer=document.createElement("div"); starLayer.className="home-starlayer"; sky.appendChild(starLayer);
-  buildHomeStars(starLayer,220,{min:1,max:2.6});
+  buildHomeStars(starLayer,420,{min:.8,max:2.6});
+  buildGalaxyDust(starLayer);
   const bigLayer=document.createElement("div"); bigLayer.className="home-biglayer"; sky.appendChild(bigLayer);
   const bigStars=buildBigStars(bigLayer);
   const flyLayer=document.createElement("div"); flyLayer.className="home-flylayer"; sky.appendChild(flyLayer);
@@ -2125,15 +2245,6 @@ SCENES.start=()=>{
   tWrap.innerHTML='<h1 class="home-title">Constellation Explorers</h1>'+
                   '<p class="home-tag">Discover the pictures hidden in the night sky</p>';
   content.appendChild(tWrap);
-
-  const chars=document.createElement("div"); chars.className="home-chars";
-  const kabir=document.createElement("img"); kabir.className="home-char kabir"; kabir.alt="Kabir";
-  kabir.src=encodeURI(HOME_KABIR_SRC);                       // no-bag Kabir if provided…
-  kabir.onerror=()=>{ if(typeof IMG!=="undefined"&&IMG.kabir){ kabir.onerror=null; kabir.src=IMG.kabir; } }; // …else the existing Kabir
-  const meera=document.createElement("img"); meera.className="home-char meera"; meera.alt="Meera";
-  if(typeof IMG!=="undefined"&&IMG.meera) meera.src=IMG.meera;
-  chars.appendChild(kabir); chars.appendChild(meera);
-  content.appendChild(chars);
 
   const btn=document.createElement("button"); btn.className="home-start"; btn.textContent="Let's Explore!";
   content.appendChild(btn);
@@ -3045,10 +3156,22 @@ SCENES.discover=()=>{
   // level; we only pick out the constellation this level asks the child to trace.
   const lf=(()=>{ const sf=buildSharedField(aspect); const m=sf.map[c.id];
     return {stars:sf.stars, edges:m.edges, constIdx:m.constIdx, brightIdx:m.brightIdx}; })();
-  let solved=false, cuesUsed=0, failCount=0, attemptScored=false;
+  let solved=false, cuesUsed=0, failCount=0, attemptScored=false, autoSolving=false, hintOn=false, drawLocked=false;
   const targetCount=c.edges.length;
   const SHAPE_TOL=(c.tol!=null)?c.tol:0.22;
   function isMatch(){ return shapesMatch(c.stars,c.edges, lf.stars,field.edges(), SHAPE_TOL); }
+
+  // tap-to-answer options for the "what does it look like?" and "why?" questions —
+  // each set stays close to what the traced figure actually looks like
+  const GUESS_OPTS={
+    cassiopeia:{ shapes:["A letter W","A crown","An upside-down M"],
+                 reasons:["The lines zig-zag up and down","It has pointy tips like a crown","It looks like an M flipped over"] },
+    orion:{ shapes:["A hunter","An hourglass","A big butterfly"],
+            reasons:["It has a head, arms and legs","The middle is narrow and the ends are wide","The two sides look like open wings"] },
+    scorpius:{ shapes:["A scorpion","A fish hook","The letter J"],
+               reasons:["The long tail curls like a stinger","The line bends round like a hook","The bottom curve looks like a J"] }
+  };
+  const gOpts=GUESS_OPTS[c.id]||{shapes:["A shape","A picture","A pattern"],reasons:["The lines make that shape","The stars sit that way","It just looks like it to me"]};
 
   // golden dot that travels along each freshly-drawn line (same as Activity 1)
   const NS="http://www.w3.org/2000/svg";
@@ -3070,28 +3193,77 @@ SCENES.discover=()=>{
     const n=field.edges().length;
     if(n===dPrev+1){ const e=field.edges()[n-1]; travelParticle(e[0],e[1]); }   // golden dot on the new line
     dPrev=n;
+    if(autoSolving) return;                                    // Meera is drawing the answer herself
+    armIdle();
+    if(hintOn) glowNextPath(null);                             // re-aim the glowing "connect this next" path
     if(isMatch()){ win(); return; }
-    if(n===0){ attemptScored=false; setSay(FIND); return; }
+    if(n===0){ attemptScored=false; drawLocked=false; field.lock(false); setSay(FIND); return; }
     if(n>=targetCount){
-      // a complete figure that doesn't match — Meera says try again (once per attempt)
+      // a complete figure that doesn't match — the attempt is submitted: freeze drawing
+      // (no more lines until the child clears it) and Meera says try again (once per attempt)
       if(!attemptScored){ attemptScored=true; failCount++; Sfx.retry();
-        setSay(failCount>=2 ? "That's not quite it. Tap the 💡 bulb for a clue, then try again!"
-                            : "Hmm, that doesn't match. Tap Clear and try again!",
-               failCount>=2 ? A_BULB : A_CLEAR);
+        drawLocked=true; field.lock(true);
+        if(failCount>=2){ autoReveal(); return; }              // 2 wrong attempts → Meera shows the pattern
+        cueBtn.classList.add("attn");                          // 1 wrong attempt → the Hint tab pulses
+        setSay("Hmm, that doesn't match. Tap Clear and try again!", A_CLEAR);
       }
-    } else { attemptScored=false; setSay("Keep connecting to match the picture!"); }
-  }});
+    } else if(drawLocked){ setSay("Tap Clear to remove your lines, then try again!"); }
+    else { attemptScored=false; setSay("Keep connecting to match the picture!"); }
+  }, onSelect:(i)=>{ if(hintOn&&!solved&&!autoSolving) glowNextPath(i); }});
+
+  // hint mode: glow the path the child should connect NEXT, in blue. When a star is
+  // selected (sel), aim the glow from that star to its un-drawn pattern partner.
+  function glowNextPath(sel){
+    if(!hintOn||solved||autoSolving) return;
+    field.clearHintPath();
+    const have=new Set(field.keys());
+    const undrawn=lf.edges.filter(([a,b])=>!have.has(Math.min(a,b)+"-"+Math.max(a,b)));
+    if(!undrawn.length) return;
+    let e=undrawn[0];
+    if(sel!=null){ const m=undrawn.find(([a,b])=>a===sel||b===sel); if(m) e=m; }
+    field.hintPath(e[0],e[1]);
+  }
+
+  // ---- 12s inactivity nudge: the pattern's starting star pulses blue ----
+  const startStar=lf.edges.length?lf.edges[0][0]:null;
+  let idleTimer=null;
+  function armIdle(){
+    clearTimeout(idleTimer); field.unmark("startglow");
+    if(solved||autoSolving||startStar===null) return;
+    idleTimer=setTimeout(()=>{ if(!solved&&!autoSolving&&state.currentScene==="discover") field.mark([startStar],"startglow"); },12000);
+  }
+  s.addEventListener("pointerdown",armIdle,true);
+  armIdle();
+
+  // ---- after 2 wrong attempts: draw the constellation for the child, then ask the questions ----
+  function autoReveal(){
+    if(solved||autoSolving) return;
+    autoSolving=true;
+    clearTimeout(idleTimer); field.unmark("startglow"); field.clearHintPath();
+    cueBtn.classList.remove("attn"); cueBtn.disabled=true;
+    setSay("Good try! Watch — here is the pattern.");
+    setTimeout(()=>{
+      if(solved||state.currentScene!=="discover") return;
+      field.clear();
+      lf.edges.forEach((e,i)=>setTimeout(()=>{ if(!solved&&state.currentScene==="discover") field.connect(e[0],e[1]); },i*420));
+      setTimeout(()=>{ if(!solved&&state.currentScene==="discover") win(true); }, lf.edges.length*420+400);
+    },900);
+  }
   setTimeout(()=>{ if(state.currentScene==="discover" && fieldBox.isConnected){ fieldBox.classList.add("amb"); addSkyAtmosphere(fieldBox); } },0);   // build atmosphere + wisps after first paint (avoids entry lag)
 
-  // segmented control: Back | Reset | Hint
-  dock.appendChild(segBtn("↶","Back",()=>{ if(!solved) field.undo(); }));
+  // segmented control: Back | Clear | Hint
+  dock.appendChild(segBtn("↶","Back",()=>{ if(!solved&&!autoSolving) field.undo(); }));
   dock.appendChild(segDiv());
-  dock.appendChild(segBtn("⟲","Reset",()=>{ if(!solved){ field.clear(); setSay(FIND); } }));
+  dock.appendChild(segBtn("⟲","Clear",()=>{ if(!solved&&!autoSolving){ field.clear(); setSay(FIND); } }));
   dock.appendChild(segDiv());
-  // Hint = dotted outline of the WHOLE constellation; stays until the child finishes tracing
+  // Hint = dotted outline of the WHOLE constellation + its stars turn blue; stays until traced
   const cueBtn=segBtn("💡","Hint",()=>{
-    if(solved) return;
+    if(solved||autoSolving) return;
+    cueBtn.classList.remove("attn");
+    hintOn=true;
     field.guide(lf.edges);
+    field.mark(lf.constIdx,"traceblue");                       // show WHICH stars to trace, in blue
+    glowNextPath(null);                                        // and glow the path to connect next
     setSay("Follow the dotted lines to connect.", A_HINT);
   });
   dock.appendChild(cueBtn);
@@ -3188,37 +3360,25 @@ SCENES.discover=()=>{
 
   function esc(t){ return (t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-  function win(){
-    solved=true; Sfx.win();
+  function win(auto){
+    solved=true; Sfx.win(); field.lock(true);                  // pattern done — no more drawing
+    clearTimeout(idleTimer); field.unmark("startglow"); field.unmark("traceblue");
     if(!state.huntLevelsComplete.includes(c.id)) state.huntLevelsComplete.push(c.id);
     Rewards.earn(4); renderProgress();
-    cueBtn.disabled=true;
+    cueBtn.disabled=true; cueBtn.classList.remove("attn");
     field.clearGuide();                                        // remove the dotted clue outline
     if(field.svg) field.svg.classList.add("trace-win");        // re-trace the line + gentle pulse
-    dock.style.display="none";                                 // controls done — make room for the thought card
+    dock.style.display="none";                                 // controls done — make room for the choices
     setStep("imagine");
-    setSay("You found it! What do you think this looks like?", A_FOUND);
+    if(auto) setSay("Here is the pattern! What do you think this looks like?");
+    else setSay("You found it! What do you think this looks like?", A_FOUND);
     askGuess();
   }
 
-  // a centred "thought card" for the child to name the pattern they made
+  // the child names the pattern by tapping one of three shape ideas
+  // (remember WHICH one, so the reason step can check the matching reason)
   function askGuess(){
-    const box=document.createElement("div"); box.className="guess-box";
-    box.innerHTML='<div class="gb-label"><span class="gb-star" aria-hidden="true">✨</span>I imagine it looks like…</div>'+
-      '<div class="gb-row"><input type="text" class="guess-input" placeholder="Type what you see…" maxlength="40" autocomplete="off" spellcheck="false">'+
-      '<button type="button" class="btn small guess-go">Share idea ✨</button></div>';
-    s.appendChild(box);
-    const input=box.querySelector(".guess-input"), go=box.querySelector(".guess-go");
-    go.disabled=true;                                          // only active once the child types
-    input.addEventListener("input",()=>{ go.disabled=!input.value.trim(); });
-    setTimeout(()=>{ try{ input.focus(); }catch(e){} }, 60);
-    function submit(){
-      const ans=(input.value||"").trim(); if(!ans) return;
-      box.remove();
-      afterGuess(ans);
-    }
-    go.onclick=submit;
-    input.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); submit(); } });
+    choicePrompt(gOpts.shapes.map((t,i)=>({label:t, pick:()=>afterGuess(t,i)})), true);
   }
 
   // show a Meera line, then advance to the next. With a clip playing we advance the instant it
@@ -3259,8 +3419,9 @@ SCENES.discover=()=>{
   }
 
   // a centred row of tappable choice buttons inside the glass card
-  function choicePrompt(options){
-    const tray=document.createElement("div"); tray.className="choice-tray"; let picked=false;
+  // sep=true → each option floats as its OWN card (same look, not one joined tray)
+  function choicePrompt(options,sep){
+    const tray=document.createElement("div"); tray.className="choice-tray"+(sep?" sep":""); let picked=false;
     options.forEach(o=>{
       const card=document.createElement("button"); card.type="button"; card.className="choice-card";
       card.innerHTML=(o.icon||"")+'<span class="cc-text">'+o.label+'</span><span class="cc-check" aria-hidden="true">✓</span>';
@@ -3271,11 +3432,40 @@ SCENES.discover=()=>{
     s.appendChild(tray);
   }
 
-  // After the child names the shape, Meera asks WHY; once she finishes, a reason box appears.
-  function afterGuess(ans){
+  // After the child names the shape, Meera asks WHY; once she finishes, three reason choices
+  // appear — only the reason that matches the chosen shape is accepted (wrong → red shake).
+  function afterGuess(ans,idx){
     setStep("explain");
     const q="Interesting! Why do you think it looks like that?";
-    sayThen(q, guard(()=>textPrompt("I think it's because…","Type your reason here…",80,reason=>afterReason(ans,reason))), A_INTEREST);
+    sayThen(q, guard(()=>reasonPrompt(gOpts.reasons, idx, reason=>afterReason(ans,reason))), A_INTEREST);
+  }
+
+  // like choicePrompt(sep), but with a CORRECT answer: the matching reason glows green and
+  // moves on; a wrong one vibrates with a red glow and the child tries again
+  function reasonPrompt(labels, correctIdx, onPick){
+    const tray=document.createElement("div"); tray.className="choice-tray sep"; let done=false, warned=false;
+    // shuffle the display order so the right reason never sits in a predictable spot
+    const order=labels.map((_,i)=>i);
+    for(let i=order.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=order[i]; order[i]=order[j]; order[j]=t; }
+    order.forEach(i=>{ const t=labels[i];
+      const card=document.createElement("button"); card.type="button"; card.className="choice-card";
+      card.innerHTML='<span class="cc-text">'+t+'</span>';
+      card.onclick=()=>{
+        if(done) return;
+        if(i===correctIdx){
+          done=true; card.classList.add("right");
+          setTimeout(()=>{ tray.remove(); onPick(t); },700);
+        } else {
+          Sfx.retry();
+          card.classList.remove("wrong"); void card.offsetWidth;   // restart the shake animation
+          card.classList.add("wrong");
+          setTimeout(()=>card.classList.remove("wrong"),700);
+          if(!warned){ warned=true; setSay("Hmm, does that reason match your shape? Try another!"); }
+        }
+      };
+      tray.appendChild(card);
+    });
+    s.appendChild(tray);
   }
 
   // Meera acknowledges the reason, then asks whether everyone would imagine the same shape
@@ -3373,6 +3563,7 @@ function buildSharedField(aspect){
       const y=my+(1-2*my)*(rows<2?0.5:r/(rows-1));
       const px=x+(((i*37)%5)-2)*0.009*aspect, py=y+(((i*53)%5)-2)*0.010;
       if(py<0.085 && (px<0.18*aspect || px>0.82*aspect)) continue;        // keep top corners clear (Undo/Clear & tools)
+      if(px<0.27*aspect) continue;                                        // keep Meera's whole column (above + below her) free of tappable stars
       let ok=true;
       for(let k=0;k<stars.length;k++){ if(Math.hypot(stars[k].x-px,stars[k].y-py)<minD){ ok=false; break; } }
       if(ok) stars.push({x:px,y:py});

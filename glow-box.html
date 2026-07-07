@@ -6,7 +6,7 @@
 <title>The Glow-Box Mystery</title>
 <style>
   /* Soft magical Star-Lab type system — loads from the web, falls back to system-ui offline */
-  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&family=Orbitron:wght@700;900&display=swap');
 
   :root{
     /* ---- Star-Lab pastel palette (same as light-source) ---- */
@@ -92,11 +92,11 @@
   /* ---------- Floating dialogue bubble (near the speaker) ---------- */
   #dialogue{
     position:absolute;z-index:30;cursor:pointer;
-    width:min(20vw,270px);
+    width:min(15.5vw,205px);
     background:var(--panel);
     border:2px solid #d8ccff;
-    border-radius:22px;
-    padding:12px 22px 12px 14px;
+    border-radius:16px;
+    padding:8px 18px 8px 11px;
     box-shadow:var(--shadow-card);
     transition:opacity .25s;
     left:1.5vw;bottom:46vh;
@@ -110,11 +110,11 @@
   #dialogue.anchor-right::after{left:auto;right:26px;}
   #dialogue.anchor-center::after{left:50%;transform:translateX(-50%);}
   #dialogue .speaker{display:inline-flex;background:var(--accent-violet);color:#fff;
-    border-radius:999px;padding:3px 12px;font-family:var(--font-body);font-weight:900;
-    font-size:clamp(11px,1vw,14px);margin-bottom:6px;letter-spacing:.3px;}
+    border-radius:999px;padding:2px 9px;font-family:var(--font-body);font-weight:900;
+    font-size:clamp(9px,.85vw,12px);margin-bottom:4px;letter-spacing:.3px;}
   #dialogue .line{color:var(--text-primary);font-family:var(--font-body);font-weight:700;
-    font-size:clamp(13px,1.25vw,17px);line-height:1.3;min-height:1.3em;}
-  #dialogue .next{position:absolute;right:12px;bottom:8px;color:var(--accent-violet);font-size:17px;animation:bob 1s infinite;}
+    font-size:clamp(11px,1vw,14px);line-height:1.24;min-height:1.24em;}
+  #dialogue .next{position:absolute;right:10px;bottom:6px;color:var(--accent-violet);font-size:14px;animation:bob 1s infinite;}
   @keyframes bob{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
   #dialogue.hide{opacity:0;pointer-events:none;}
 
@@ -138,14 +138,14 @@
     position:absolute;left:50%;top:46%;z-index:5;
     transform:translate(-50%,-50%);
     width:min(62vw,1020px);
-    height:min(70vh,720px);
+    height:min(58vh,600px);
     display:flex;align-items:center;justify-content:center;
   }
   .bench-panel{
     position:relative;width:100%;height:100%;padding:2.4% 3%;
     background:
-      radial-gradient(circle at center, rgba(255,248,190,.7), transparent 62%),
-      #fff9dc;
+      radial-gradient(circle at center, rgba(255,252,244,.85), transparent 64%),
+      #fffaf0;
     border:2px solid var(--launchpad-border);
     border-radius:32px;
     box-shadow:0 0 30px rgba(255,216,77,.28);
@@ -252,22 +252,45 @@
   #entry{position:absolute;inset:0;z-index:70;display:flex;flex-direction:column;
     align-items:center;justify-content:center;gap:26px;
     background:
-      radial-gradient(140% 100% at 50% -25%, #1b2360 0%, transparent 55%),
-      radial-gradient(120% 90% at 85% 115%, #251a55 0%, transparent 55%),
-      linear-gradient(180deg,#0c1234 0%,#0a0e26 55%,#0a0920 100%);
+      radial-gradient(90% 70% at 78% 20%, rgba(198,62,172,.35), transparent 55%),
+      radial-gradient(80% 65% at 12% 68%, rgba(126,62,205,.32), transparent 60%),
+      radial-gradient(70% 55% at 42% 40%, rgba(20,12,44,.7), transparent 70%),
+      linear-gradient(160deg,#120a2e 0%,#170c38 45%,#0a0722 100%);
     transition:opacity .6s;}
   #entry.gone{opacity:0;pointer-events:none;}
   #entry .eb-sky{position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none;}
   #entry .eb-content{position:relative;z-index:2;display:flex;flex-direction:column;
     align-items:center;justify-content:center;gap:26px;padding:0 22px;text-align:center;}
   #entry .estars{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
-  /* drifting nebula / cloud glow layers */
-  #entry .eb-nebula{position:absolute;border-radius:50%;filter:blur(60px);opacity:.5;pointer-events:none;}
+  /* drifting nebula / cloud glow layers — deep violet, crimson-magenta, reddish pink
+     and cool cyan space clouds, like the poster */
+  #entry .eb-nebula{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;pointer-events:none;}
   #entry .eb-nebula.n1{width:64vw;height:64vw;left:-12vw;top:-14vw;
-    background:radial-gradient(circle,rgba(86,108,220,.6),transparent 66%);animation:ebNeb 28s ease-in-out infinite;}
+    background:radial-gradient(circle,rgba(98,66,238,.62),transparent 66%);animation:ebNeb 28s ease-in-out infinite;}
   #entry .eb-nebula.n2{width:60vw;height:60vw;right:-14vw;bottom:-18vw;
-    background:radial-gradient(circle,rgba(150,90,210,.55),transparent 66%);animation:ebNeb 34s ease-in-out infinite reverse;}
+    background:radial-gradient(circle,rgba(208,44,152,.58),transparent 66%);animation:ebNeb 34s ease-in-out infinite reverse;}
+  #entry .eb-nebula.n3{width:52vw;height:52vw;right:-10vw;top:-12vw;
+    background:radial-gradient(circle,rgba(238,70,122,.5),transparent 64%);animation:ebNeb 31s ease-in-out 3s infinite;}
+  #entry .eb-nebula.n4{width:46vw;height:46vw;left:-8vw;bottom:-14vw;
+    background:radial-gradient(circle,rgba(255,110,180,.32),transparent 64%);animation:ebNeb 37s ease-in-out 6s infinite reverse;}
+  #entry .eb-nebula.n5{width:40vw;height:40vw;left:30vw;top:30vh;
+    background:radial-gradient(circle,rgba(76,50,182,.42),transparent 66%);animation:ebNeb 40s ease-in-out 9s infinite;}
+  /* cyan accents drifting among the warm clouds */
+  #entry .eb-nebula.n6{width:38vw;height:38vw;left:6vw;top:4vh;
+    background:radial-gradient(circle,rgba(72,206,235,.34),transparent 64%);animation:ebNeb 33s ease-in-out 4s infinite reverse;}
+  #entry .eb-nebula.n7{width:34vw;height:34vw;right:8vw;bottom:6vh;
+    background:radial-gradient(circle,rgba(60,190,220,.28),transparent 64%);animation:ebNeb 39s ease-in-out 11s infinite;}
   @keyframes ebNeb{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(3%,-3%) scale(1.08)}}
+  /* milky-way galaxy band: a wide hazy diagonal ribbon + a brighter cyan-tinted core;
+     makeEntrySky() sprinkles hundreds of dust specks along the same line */
+  #entry .eb-dust{position:absolute;left:-20%;right:-20%;top:16%;height:60%;transform:rotate(-14deg);
+    filter:blur(44px);opacity:.6;pointer-events:none;
+    background:linear-gradient(110deg,transparent 0%,rgba(214,150,255,.11) 26%,
+      rgba(244,130,222,.18) 50%,rgba(214,150,255,.11) 74%,transparent 100%);}
+  #entry .eb-dust2{position:absolute;left:-20%;right:-20%;top:34%;height:22%;transform:rotate(-14deg);
+    filter:blur(26px);opacity:.5;pointer-events:none;
+    background:linear-gradient(110deg,transparent 0%,rgba(150,225,255,.10) 30%,
+      rgba(190,240,255,.16) 50%,rgba(150,225,255,.10) 70%,transparent 100%);}
   /* hundreds of tiny twinkling background stars */
   #entry .eb-star{position:absolute;border-radius:50%;background:#fff;opacity:var(--o,.6);
     box-shadow:0 0 3px rgba(255,255,255,.45);animation:ebTwinkle 3s ease-in-out infinite;}
@@ -296,12 +319,25 @@
     transform:translateY(-50%);background:#fff;box-shadow:0 0 8px 2px #fff;}
   @keyframes ebShoot{0%{opacity:0;transform:translate(0,0) rotate(20deg) scaleX(.3)}
     12%{opacity:1}100%{opacity:0;transform:translate(58vw,24vh) rotate(20deg) scaleX(1)}}
-  #entry h1{font-family:var(--font-heading);color:#fff3c8;font-size:clamp(26px,4vw,48px);
-    text-shadow:0 0 18px rgba(255,216,110,.55);letter-spacing:.5px;z-index:1;text-align:center;}
-  #entry p{color:#d9d2f5;font-weight:700;font-size:clamp(14px,1.6vw,19px);z-index:1;max-width:70vw;text-align:center;}
-  #entry .btn{z-index:1;animation:entryGlow 1.4s ease-in-out infinite;}
+  /* heading: heavy squared sci-fi logotype (Star-Wars-poster style), plain white.
+     It flies in from deep space — tiny, blurred and far away, growing onto the screen. */
+  #entry h1{font-family:'Orbitron',var(--font-heading);font-weight:900;color:#ffffff;
+    font-size:clamp(26px,4.6vw,58px);text-transform:uppercase;letter-spacing:.12em;
+    text-shadow:0 0 26px rgba(222,120,255,.5),0 2px 8px rgba(0,0,0,.65);
+    z-index:1;text-align:center;
+    animation:fromSpace 1.6s cubic-bezier(.2,.8,.25,1) .2s both;}
+  #entry p{color:#d9d2f5;font-weight:700;font-size:clamp(14px,1.6vw,19px);z-index:1;max-width:70vw;text-align:center;
+    animation:fromSpace 1.5s cubic-bezier(.2,.8,.25,1) .9s both;}
+  @keyframes fromSpace{
+    0%{opacity:0;transform:scale(.06);filter:blur(8px)}
+    60%{opacity:1;filter:blur(0)}
+    82%{transform:scale(1.05)}
+    100%{opacity:1;transform:scale(1);filter:blur(0)}}
+  /* the button waits for the text to land, then fades up — with a much softer glow */
+  #entry .btn{z-index:1;
+    animation:btnIn .5s ease-out 2.5s both, entryGlow 1.8s ease-in-out 3s infinite;}
   @keyframes entryGlow{0%,100%{box-shadow:var(--shadow-button)}
-    50%{box-shadow:0 0 26px rgba(255,216,110,.95),0 6px 0 rgba(190,120,34,.35)}}
+    50%{box-shadow:0 0 12px rgba(255,216,110,.4),0 6px 0 rgba(190,120,34,.35)}}
 
   /* ---------- Certificate finale ---------- */
   #certificate{position:absolute;inset:0;z-index:65;display:none;align-items:center;justify-content:center;
@@ -325,7 +361,7 @@
 
   /* ---------- Learning prompts ---------- */
   #choices{
-    position:absolute;left:50%;bottom:4.5vh;transform:translateX(-50%);
+    position:absolute;left:50%;bottom:10vh;transform:translateX(-50%);
     z-index:42;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
     width:min(86vw,760px);pointer-events:none;
   }
@@ -354,29 +390,59 @@
     font-size:clamp(15px,2vw,25px);line-height:1.15;
   }
   #headline.show{display:flex;animation:cardPop .3s ease-out;}
-  /* Concept reveal: pops up big in the centre of the screen, then fades away */
+  /* Concept reveal: a short, WIDE strip sitting on top of the bench panel —
+     it runs horizontally so it never covers the circuit built below it */
   #concept-card{
-    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    z-index:60;display:none;flex-direction:column;align-items:center;gap:8px;
-    max-width:min(78vw,600px);padding:26px 40px;border-radius:30px;
+    position:absolute;top:8.5vh;left:50%;transform:translateX(-50%);
+    z-index:60;display:none;flex-direction:row;align-items:center;justify-content:center;
+    flex-wrap:wrap;column-gap:9px;row-gap:2px;
+    width:max-content;max-width:min(72vw,780px);padding:10px 26px;border-radius:14px;
     background:
       radial-gradient(circle at center, rgba(255,248,190,.85), transparent 72%),
       #fff9dc;
-    border:3px solid var(--launchpad-border);
-    box-shadow:0 0 46px rgba(255,216,77,.55), var(--shadow-soft);
+    border:2px solid var(--launchpad-border);
+    box-shadow:0 0 22px rgba(255,216,77,.45), var(--shadow-soft);
     color:var(--text-primary);font-weight:800;text-align:center;
-    font-size:clamp(17px,2.3vw,30px);line-height:1.3;pointer-events:none;
+    font-size:clamp(12px,1.35vw,17px);line-height:1.3;pointer-events:none;
   }
-  #concept-card.show{display:flex;animation:cardPopCenter .42s cubic-bezier(.2,1.3,.4,1);}
+  #concept-card.show{display:flex;animation:cardPopSide .42s cubic-bezier(.2,1.3,.4,1);}
   #concept-card.fadeout{animation:cardFade .5s ease-in forwards;}
-  #concept-card .term{font-family:var(--font-heading);color:var(--accent-violet-dark);font-size:1.15em;}
-  @keyframes cardPopCenter{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}
-    65%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-  @keyframes cardFade{from{opacity:1}to{opacity:0;transform:translate(-50%,-50%) scale(.92)}}
+  #concept-card .term{font-family:var(--font-heading);color:var(--accent-violet-dark);font-size:1.12em;}
+  @keyframes cardPopSide{0%{opacity:0;transform:translateX(-50%) scale(.5)}
+    65%{opacity:1;transform:translateX(-50%) scale(1.06)}100%{opacity:1;transform:translateX(-50%) scale(1)}}
+  @keyframes cardFade{from{opacity:1}to{opacity:0;transform:translateX(-50%) scale(.94)}}
   /* wire the child should try pulling — glows to draw the eye */
   .wbase.hintwire{animation:hintWire 1s ease-in-out infinite;}
   @keyframes hintWire{0%,100%{stroke:#c2bcd8;filter:drop-shadow(0 0 3px rgba(255,150,60,.4))}
     50%{stroke:#ff7a7a;filter:drop-shadow(0 0 15px rgba(255,120,120,.95))}}
+  /* dotted "connect here" guide wires (auto-help after two wrong tries with the switch).
+     Red dashes join + to + · blue dashes carry the return path through the switch to −,
+     matching the red/blue rings on the terminals themselves. */
+  .wghost{fill:none;stroke:rgba(120,95,225,.85);stroke-width:4.5;stroke-linecap:round;
+    stroke-linejoin:round;stroke-dasharray:9 8;pointer-events:none;
+    animation:ghostBlink 1.6s ease-in-out infinite;}
+  .wghost.pos{stroke:#e23b3b;}
+  .wghost.neg{stroke:#2f6bd8;}
+  @keyframes ghostBlink{0%,100%{opacity:.55}50%{opacity:1}}
+  /* component name labels shown under the images in the first build */
+  .comp-label{position:absolute;top:100%;left:50%;transform:translate(-50%,-14px);display:none;
+    background:#ffffff;border:2px solid #d8ccff;border-radius:999px;padding:3px 14px;
+    font-family:var(--font-heading);font-weight:700;color:#4a2f8c;
+    font-size:clamp(11px,1.2vw,15px);letter-spacing:.5px;white-space:nowrap;
+    box-shadow:var(--shadow-card);z-index:3;pointer-events:none;}
+  #board.show-labels .comp-label{display:block;}
+  /* the bench panel glows green when the circuit is joined correctly, red when wrong */
+  .bench-panel.panel-good{border-color:var(--success-green);
+    box-shadow:0 0 34px rgba(98,213,139,.65);}
+  .bench-panel.panel-bad{border-color:var(--error-coral);
+    box-shadow:0 0 34px rgba(255,122,122,.6);}
+  /* answer options: a wrong pick shakes with a red glow; the right one glows green */
+  .choice-btn.bad{animation:choiceShake .5s ease;border-color:#ff7a7a;background:#ffe9e9;
+    box-shadow:0 0 16px rgba(255,110,110,.8);}
+  @keyframes choiceShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}
+    40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+  .choice-btn.good{border-color:#62d58b;background:#e4f9ec;
+    box-shadow:0 0 16px rgba(98,213,139,.85);}
   /* Back / Undo / Next controls */
   #navbar{position:absolute;top:16px;left:20px;z-index:46;display:flex;gap:8px;}
   .navbtn{min-height:42px;padding:8px 16px;border-radius:999px;background:#ffffff;border:2px solid #d8ccff;
@@ -402,16 +468,16 @@
   #sky-callback circle{fill:#fff8d8;filter:drop-shadow(0 0 8px #ffd85c);}
 
   @media (max-width: 820px) and (orientation: portrait){
-    #stage{top:39%;width:min(94vw,680px);height:min(52vh,470px);}
+    #stage{top:39%;width:min(94vw,680px);height:min(46.8vh,423px);}
     .bench-panel{border-radius:24px;}
     #board{inset:4% 3% 5% 3%;}
     #kabir,#meera{height:min(35vh,320px);}
     #kabir{left:-19vw;bottom:-7vh;}
     #meera{right:-18vw;bottom:-6vh;}
-    #dialogue{width:min(82vw,360px);max-width:calc(100vw - 28px);border-radius:18px;}
+    #dialogue{width:min(70vw,300px);max-width:calc(100vw - 28px);border-radius:14px;}
     #actionbar{bottom:max(14px,env(safe-area-inset-bottom));}
     #choices{bottom:max(14px,env(safe-area-inset-bottom));}
-    #concept-card{max-width:86vw;padding:20px 22px;font-size:clamp(16px,4.6vw,24px);}
+    #concept-card{max-width:92vw;padding:9px 16px;font-size:clamp(13px,3.4vw,16px);}
     #headline{top:max(10px,env(safe-area-inset-top));font-size:clamp(14px,3.8vw,19px);padding:9px 16px;}
     #navbar{top:auto;bottom:max(12px,env(safe-area-inset-bottom));left:8px;gap:6px;}
     .navbtn{min-height:38px;padding:6px 12px;font-size:14px;}
@@ -425,15 +491,15 @@
   }
 
   @media (max-height: 560px) and (orientation: landscape){
-    #stage{top:46%;width:min(66vw,820px);height:min(68vh,430px);}
+    #stage{top:46%;width:min(66vw,820px);height:min(61.2vh,387px);}
     .bench-panel{border-radius:24px;}
     #kabir,#meera{height:min(54vh,360px);}
     #kabir{left:-12vw;bottom:-14vh;}
     #meera{right:-12vw;bottom:-11vh;}
-    #dialogue{width:min(30vw,260px);border-radius:18px;}
+    #dialogue{width:min(24vw,210px);border-radius:14px;}
     #actionbar{bottom:10px;}
     #choices{bottom:10px;width:min(68vw,660px);}
-    #concept-card{max-width:min(64vw,520px);padding:18px 26px;font-size:clamp(16px,2.6vw,26px);}
+    #concept-card{max-width:min(74vw,640px);padding:8px 18px;font-size:clamp(12px,1.8vw,16px);}
     #navbar{top:10px;left:12px;gap:6px;}
     .navbtn{min-height:38px;padding:6px 12px;font-size:13px;}
     .btn{min-height:46px;padding:9px 24px;font-size:clamp(15px,2.2vw,19px);}
@@ -494,7 +560,7 @@
     <div class="cert-card">
       <div class="big">⭐</div>
       <h2>Glow-Box Detective!</h2>
-      <div class="sub">You discovered how a bulb glows — just like a star gives light.</div>
+      <div class="sub">You discovered how an LED glows — just like a star gives light.</div>
       <div class="word-chips"><span>⚡ Current</span><span>🔁 Circuit</span><span>🔘 Switch</span></div>
       <button class="btn" id="cert-done">Finish ⭐</button>
     </div>
@@ -502,14 +568,21 @@
 
   <div id="entry">
     <div class="eb-sky" id="eb-sky">
+      <div class="eb-dust"></div>
+      <div class="eb-dust2"></div>
       <div class="eb-nebula n1"></div>
       <div class="eb-nebula n2"></div>
+      <div class="eb-nebula n3"></div>
+      <div class="eb-nebula n4"></div>
+      <div class="eb-nebula n5"></div>
+      <div class="eb-nebula n6"></div>
+      <div class="eb-nebula n7"></div>
       <div class="estars" id="estars"></div>
     </div>
     <div class="eb-content">
-      <h1>★ The Glow-Box Mystery</h1>
+      <h1>The Glow-Box Mystery</h1>
       <p>Something makes the park bulb glow… can you find out what?</p>
-      <button class="btn" id="entry-btn">🔦 Check the Bulb</button>
+      <button class="btn" id="entry-btn">Let's go</button>
     </div>
   </div>
 </div>
@@ -595,13 +668,14 @@ function positionDialogue(who){
     dlgBox.style.transform = "translateX(-50%)";
     return;
   }
+  // the bubble floats just above the speaker's head (tail points down at them)
   if(who === "Meera"){
     dlgBox.classList.add("anchor-right");
-    dlgBox.style.right = "11vw"; dlgBox.style.left = "auto";
-    dlgBox.style.bottom = "6vh";
+    dlgBox.style.right = "3vw"; dlgBox.style.left = "auto";
+    dlgBox.style.bottom = "57vh";
   } else {
-    dlgBox.style.left = "11vw"; dlgBox.style.right = "auto";
-    dlgBox.style.bottom = "6vh";
+    dlgBox.style.left = "3vw"; dlgBox.style.right = "auto";
+    dlgBox.style.bottom = "52vh";
   }
 }
 function setDialogue(lines, onDone){
@@ -609,6 +683,15 @@ function setDialogue(lines, onDone){
   dlgBox.classList.remove("hide");
   showNextLine();
 }
+/* The current build step's guiding prompt. Stored so that when the child undoes a
+   wire the coach can step back to it, instead of leaving a stale forward line
+   (e.g. a "Careful!" polarity hint) on screen once the offending wire is gone. */
+let lastGuide = null;
+function guideDialogue(lines, onDone){
+  lastGuide = lines.map(l=>Object.assign({}, l));
+  setDialogue(lines, onDone);
+}
+function clearGuide(){ lastGuide = null; }
 function showNextLine(){
   clearDlgTimer();
   if(dlgQueue.length === 0){
@@ -645,21 +728,34 @@ function setAction(label, cb){
   actionbar.appendChild(b);
 }
 function clearAction(){ actionbar.innerHTML = ""; }
-function setChoices(prompt, options, onPick){
+function setChoices(prompt, options, onPick, onWrong){
   clearAction();
   choicesEl.innerHTML = "";
   const title = document.createElement("div");
   title.className = "choice-title";
   title.textContent = prompt;
   choicesEl.appendChild(title);
+  // if any option is marked correct, wrong picks glow red and stay; the right one glows green
+  const validated = options.some(o=>o.correct);
+  let done = false;
   options.forEach(opt=>{
     const b = document.createElement("button");
     b.className = "choice-btn";
     b.textContent = opt.label;
     b.addEventListener("click", ()=>{
+      if(done) return;
       snd.click();
-      clearChoices();
-      onPick(opt);
+      if(validated && !opt.correct){
+        snd.bounce();
+        b.classList.remove("bad"); void b.offsetWidth;   // restart the shake
+        b.classList.add("bad");
+        setTimeout(()=>b.classList.remove("bad"), 700);
+        if(onWrong) onWrong(opt);
+        return;                                          // choices stay open — try again
+      }
+      done = true;
+      b.classList.add("good");
+      setTimeout(()=>{ clearChoices(); onPick(opt); }, validated ? 650 : 400);
     });
     choicesEl.appendChild(b);
   });
@@ -731,10 +827,10 @@ const SVGNS = "http://www.w3.org/2000/svg";
 const TERMS = {
   bp:{comp:"battery", dx:39.7, dy:19.0, pol:"pos"},   // battery + metal snap (leaves printed + sign visible below)
   bn:{comp:"battery", dx:57.0, dy:19.0, pol:"neg"},   // battery − metal snap (leaves printed − sign visible below)
-  l1:{comp:"bulb",    dx:8.0, dy:50.0},               // LED terminal just off the left edge, keeping the face + signs clear
-  l2:{comp:"bulb",    dx:92.0, dy:50.0},              // LED terminal just off the right edge
-  s1:{comp:"switch",  dx:47.3, dy:83.0},              // switch left pin
-  s2:{comp:"switch",  dx:58.7, dy:83.0},              // switch right pin
+  l1:{comp:"bulb",    dx:18.0, dy:50.0, pol:"pos"},   // LED + terminal — just off the star's left edge (+ side)
+  l2:{comp:"bulb",    dx:82.0, dy:50.0, pol:"neg"},   // LED − terminal — just off the star's right edge (− side)
+  s1:{comp:"switch",  dx:47.3, dy:91.0},              // switch left pin — dot sits just below the leg so it stays visible
+  s2:{comp:"switch",  dx:58.7, dy:91.0},              // switch right pin — dot sits just below the leg so it stays visible
 };
 const MAX_WIRES = 3;
 let wires = [];            // {a, b, pts, g, base, curp, hit}
@@ -745,11 +841,16 @@ let cur = { lit:false, switchInLoop:false };
 let dragging = null;       // {from, pts, moved, startPt}
 let selectedTerm = null;
 
+let polarityHelpShown = false;      // a reversed loop has prompted the "check the signs" hint this build
+let polarityPraisedThisBuild = false; // the "+ meets +, − meets −" reinforcement has shown this build
 function buildBench(){
   wires = [];
+  ghostWires = [];              // the rebuilt board wipes any dotted guide wires with it
   switchOn = false;
   dragging = null;
   selectedTerm = null;
+  polarityHelpShown = false;
+  polarityPraisedThisBuild = false;
   cur = { lit:false, switchInLoop:false };
   if(tempPath && tempPath.parentNode) tempPath.parentNode.removeChild(tempPath);
   tempPath = null;
@@ -764,13 +865,15 @@ function buildBench(){
       <g id="wire-layer"></g>
     </svg>
 
-    <div class="comp" id="bulb" style="left:75%;top:42%;width:20%;">
+    <div class="comp" id="bulb" style="left:75%;top:42%;width:27%;">
       <div class="ledglow"></div>
-      <img class="cimg" src="${IMG.bulb}" alt="bulb">
+      <img class="cimg" src="${IMG.bulb}" alt="LED">
+      <div class="comp-label">LED</div>
     </div>
 
     <div class="comp" id="battery" style="left:25%;top:42%;width:26%;">
       <img class="cimg" src="${IMG.battery}" alt="battery">
+      <div class="comp-label">POWER SOURCE</div>
     </div>
 
     <div class="comp" id="switch" style="left:50%;top:82%;width:16%;">
@@ -910,7 +1013,38 @@ function redrawWire(w){
   const d = wirePathD(w);
   w.base.setAttribute("d", d); w.curp.setAttribute("d", d); w.hit.setAttribute("d", d);
 }
-function redrawWires(){ if(board) wires.forEach(redrawWire); }
+function redrawWires(){
+  if(!board) return;
+  wires.forEach(redrawWire);
+  ghostWires.forEach(g=>g.el.setAttribute("d", guideRouteD(g.a, g.b, g.kind)));
+}
+/* dotted "connect these" guide wires — automatic help after two wrong switch-stage tries */
+let ghostWires = [];
+/* tidy, readable routes for the guide: "over" arcs across the top of the bench;
+   "viaAx" drops/rises straight from the first terminal, then runs across to the second */
+function guideRouteD(a, b, kind){
+  const A = termCenterVB(a), B = termCenterVB(b);
+  if(kind==="over"){
+    const yTop = Math.max(12, Math.min(A.y, B.y) - 58);
+    return pathFromPoints([A, {x:A.x, y:yTop}, {x:B.x, y:yTop}, B]);
+  }
+  if(kind==="viaAx"){
+    return pathFromPoints([A, {x:A.x, y:B.y}, B]);
+  }
+  return autoRoute(A, B);
+}
+function clearGhostWires(){
+  ghostWires.forEach(g=>{ if(g.el && g.el.parentNode) g.el.parentNode.removeChild(g.el); });
+  ghostWires = [];
+}
+function showGuideWires(pairs){
+  clearGhostWires();
+  pairs.forEach(([a, b, cls, kind])=>{
+    const el = mkPath("wghost" + (cls ? " "+cls : ""), guideRouteD(a, b, kind));
+    wireLayer.appendChild(el);
+    ghostWires.push({a, b, el, kind});
+  });
+}
 function clearWireHints(){ wires.forEach(w=>{ if(w.base) w.base.classList.remove("hintwire"); }); }
 /* nudge for "stop the glow": glow one wire so the child sees a wire is the thing to pull */
 function hintRemoveWire(){
@@ -1009,12 +1143,15 @@ function onDragEnd(e){
   else { snd.pop(); refreshCircuit(); }   // released in space → the wire goes back to the pile
 }
 function tryConnect(a, b, pts){
-  if(TERMS[a].comp === TERMS[b].comp){ snd.bounce(); return; }   // same piece: no loop there
+  if(TERMS[a].comp === TERMS[b].comp){ snd.bounce(); nudgeOnMistake(); return; }   // same piece: no loop there
   if(occupiedBy(a) || occupiedBy(b)){ snd.bounce(); return; }
   if(wires.length >= MAX_WIRES){ snd.bounce(); return; }
   addWire(a, b, pts);
   snd.connect();
   refreshCircuit();
+  // both parts wired up but still dark (and not the polarity case, which has its own
+  // coaching line) → that's a mistake, so offer the next nudge
+  if(stage===1 && !cur.lit && !cur.wrongPolarity && wires.length>=2) nudgeOnMistake();
 }
 
 /* ---- switch ---- */
@@ -1036,11 +1173,17 @@ function evalCircuit(){
   const edges = wires.map(w=>({a:w.a, b:w.b, kind:"wire"}));
   edges.push({a:"l1", b:"l2", kind:"bulb"});
   if(switchOn) edges.push({a:"s1", b:"s2", kind:"switch"});
-  let lit=false, switchInLoop=false;
+  let lit=false, switchInLoop=false, closedLoop=false, wrongPolarity=false, badLoop=false;
   const used = new Set();
-  (function walk(node, hasBulb, hasSwitch){
+  // Walk from the battery + terminal. A loop only lights when we cross the bulb
+  // entering at its + terminal (l1) — i.e. battery + meets LED +, and − meets −.
+  (function walk(node, hasBulb, hasSwitch, polOK){
     if(node==="bn"){
-      if(hasBulb){ lit = true; if(hasSwitch) switchInLoop = true; }
+      if(hasBulb){
+        closedLoop = true;
+        if(polOK){ lit = true; if(hasSwitch) switchInLoop = true; }
+        else { wrongPolarity = true; }
+      } else { badLoop = true; }   // battery looped back without the LED — a wrong circuit
       return;
     }
     for(let i=0;i<edges.length;i++){
@@ -1048,20 +1191,22 @@ function evalCircuit(){
       const e = edges[i];
       const nxt = e.a===node ? e.b : (e.b===node ? e.a : null);
       if(!nxt) continue;
+      let np = polOK;
+      if(e.kind==="bulb") np = (node==="l1");   // entered the LED at its + terminal → correct polarity
       used.add(i);
-      walk(nxt, hasBulb||e.kind==="bulb", hasSwitch||e.kind==="switch");
+      walk(nxt, hasBulb||e.kind==="bulb", hasSwitch||e.kind==="switch", np);
       used.delete(i);
     }
-  })("bp", false, false);
+  })("bp", false, false, false);
   const switchWasOn = switchOn;
   switchOn = true;
   const edgesWithSwitch = wires.map(w=>({a:w.a, b:w.b, kind:"wire"}));
   edgesWithSwitch.push({a:"l1", b:"l2", kind:"bulb"}, {a:"s1", b:"s2", kind:"switch"});
   let switchWouldComplete = false;
   const usedWithSwitch = new Set();
-  (function walkSwitch(node, hasBulb, hasSwitch){
+  (function walkSwitch(node, hasBulb, hasSwitch, polOK){
     if(node==="bn"){
-      if(hasBulb && hasSwitch) switchWouldComplete = true;
+      if(hasBulb && hasSwitch && polOK) switchWouldComplete = true;
       return;
     }
     for(let i=0;i<edgesWithSwitch.length;i++){
@@ -1069,13 +1214,15 @@ function evalCircuit(){
       const e = edgesWithSwitch[i];
       const nxt = e.a===node ? e.b : (e.b===node ? e.a : null);
       if(!nxt) continue;
+      let np = polOK;
+      if(e.kind==="bulb") np = (node==="l1");
       usedWithSwitch.add(i);
-      walkSwitch(nxt, hasBulb||e.kind==="bulb", hasSwitch||e.kind==="switch");
+      walkSwitch(nxt, hasBulb||e.kind==="bulb", hasSwitch||e.kind==="switch", np);
       usedWithSwitch.delete(i);
     }
-  })("bp", false, false);
+  })("bp", false, false, false);
   switchOn = switchWasOn;
-  return { lit, switchInLoop, switchWouldComplete };
+  return { lit, switchInLoop, switchWouldComplete, closedLoop, wrongPolarity, badLoop };
 }
 function refreshCircuit(){
   const prev = cur;
@@ -1083,6 +1230,12 @@ function refreshCircuit(){
   board.classList.toggle("live", cur.lit);
   const bulbEl = board.querySelector("#bulb");
   bulbEl.classList.toggle("lit", cur.lit);
+  // the whole bench panel answers the build: green glow = joined correctly, red = wrong
+  const panel = board.parentNode;
+  if(panel && panel.classList.contains("bench-panel")){
+    panel.classList.toggle("panel-good", cur.lit);
+    panel.classList.toggle("panel-bad", !cur.lit && !!(cur.wrongPolarity || cur.badLoop));
+  }
   // terminal dots: quiet once occupied, invite while free (during build stages)
   const inviting = (stage>=1 && stage<=6);
   Object.keys(TERMS).forEach(id=>{
@@ -1092,9 +1245,43 @@ function refreshCircuit(){
     dot.classList.toggle("busy", busy);
     dot.classList.toggle("pulse", !busy && inviting);
   });
+  polarityFeedback(prev, cur);
   if(cur.lit && !prev.lit) onGlow();
   if(!cur.lit && prev.lit) onDark();
   afterCircuitRefresh();
+}
+/* Wrong-terminal coaching, applied everywhere the child wires the bench:
+   a fully closed loop that runs battery + into the LED − (and vice-versa) will
+   not glow — Kabir/Meera ask the child to check the signs and connect + to +.
+   A correct connection that lights the bulb earns a short reinforcement. */
+function polarityFeedback(prev, cur){
+  const nowWrong = cur.wrongPolarity && !cur.lit;
+  const wasWrong = prev.wrongPolarity && !prev.lit;
+  if(nowWrong && !wasWrong){
+    polarityHelpShown = true;
+    setDialogue([
+      {who:"Kabir", text:"Careful! Check the signs on the battery and the LED, then connect + to + and − to −.", kabir:"kabirThink"},
+    ]);
+    // in the switch stage a reversed loop also counts as a wrong try toward the auto-guide
+    if(stage===5){ s5wrong++; if(s5wrong>=2) showSwitchGuide(); }
+    // first build: after the child sees the red glow and hears the prompt, the wrong
+    // wires clear by themselves so they can try again fresh
+    if(stage===1){
+      setTimeout(()=>{
+        if(stage===1 && cur.wrongPolarity && !cur.lit){
+          clearAllWires();
+          refreshCircuit();
+        }
+      }, 2400);
+    }
+    return;
+  }
+  if(cur.lit && !prev.lit && polarityHelpShown && !polarityPraisedThisBuild){
+    polarityPraisedThisBuild = true;
+    // they fixed a reversed loop — reinforce why it glows now (concept card, so it
+    // sits alongside the stage dialogue instead of interrupting it)
+    showConcept("The LED glows when", "its + meets the battery's +, and − meets −.", 8000);
+  }
 }
 function setFlowMode(mode){
   board.classList.remove("mode-light","mode-faint","mode-stream");
@@ -1121,7 +1308,7 @@ let s2broke = false, s2nudged = false, s5nudged = false;
 
 /* ---- least-help-first idle nudges (stage 1 only) ---- */
 const NUDGES = [
-  {who:"Kabir", text:"The bulb may need two touches, not one.", kabir:"kabirThink"},
+  {who:"Kabir", text:"The LED may need two touches, not one.", kabir:"kabirThink"},
   {who:"Meera", text:"The light needs a way in… and a way back.", meera:"meeraThink"},
   {who:"Kabir", text:"Try touching both sides of the battery.", kabir:"kabirThink"},
 ];
@@ -1328,6 +1515,7 @@ function resetBenchForBuild(mode="light"){
   clearChoices();
   hideConcept();
   clearWireHints();
+  clearGhostWires();
   clearAllWires();
   if(switchOn) onSwitchReset();
   setFlowMode(mode);
@@ -1355,7 +1543,9 @@ function onGlow(){
     completeSwitchDoor();
   } else if(stage===5 && !cur.switchInLoop && !switchIncludeNudged){
     switchIncludeNudged = true;
-    setDialogue([
+    s5wrong++;
+    if(s5wrong>=2){ showSwitchGuide(); }
+    else setDialogue([
       {who:"Meera", text:"Nice glow. Now make the path go through the switch too.", meera:"meeraThink"},
     ]);
   } else if(stage===6 && cur.switchInLoop){
@@ -1376,7 +1566,47 @@ function onSwitchFlipped(){
   if(stage===5 && cur.switchInLoop) completeSwitchDoor();
   if(stage===6 && cur.switchInLoop) completeRecipe();
 }
+/* Switch stage coaching: if the child wires the switch to only ONE other part, Meera
+   names the part that's missing. After two wrong tries the dotted connections appear
+   and Kabir invites them to trace the joins. */
+let s5promptKey = null, s5wrong = 0, switchGuideShown = false;
+function showSwitchGuide(){
+  if(switchGuideShown || stage!==5) return;
+  switchGuideShown = true;
+  // battery + → LED + (red, arcing over the top) · LED − → switch → battery − (blue,
+  // clean L-shaped runs) — the dash colours match the + / − rings on the dots
+  showGuideWires([
+    ["bp","l1","pos","over"],
+    ["l2","s1","neg","viaAx"],
+    ["s2","bn","neg","viaAx"],
+  ]);
+  setDialogue([{who:"Kabir", text:"Let's connect them now.", kabir:"kabirHappy"}]);
+}
+function switchStageCoach(){
+  if(stage!==5) return;
+  if(cur.lit){ s5promptKey = null; return; }
+  // wait until BOTH of the switch's pins are wired — only then is the attempt complete
+  // enough to point out which part was left out
+  if(!(occupiedBy("s1") && occupiedBy("s2"))){ s5promptKey = null; return; }
+  const comps = new Set();
+  wires.forEach(w=>{ comps.add(TERMS[w.a].comp); comps.add(TERMS[w.b].comp); });
+  let key = null, text = null;
+  if(comps.has("switch") && comps.has("battery") && !comps.has("bulb")){
+    key = "needLED"; text = "Not working! Let's add the LED.";
+  } else if(comps.has("switch") && comps.has("bulb") && !comps.has("battery")){
+    key = "needBattery"; text = "Not working! Let's add the battery.";
+  }
+  if(key && key!==s5promptKey){
+    s5promptKey = key;
+    if(switchGuideShown) return;
+    s5wrong++;
+    if(s5wrong>=2){ showSwitchGuide(); return; }
+    setDialogue([{who:"Meera", text, meera:"meeraThink"}]);
+  }
+  if(!key) s5promptKey = null;
+}
 function afterCircuitRefresh(){
+  switchStageCoach();
   if(stage===5 && cur.switchWouldComplete && !switchOn && !switchDoorSeen){
     switchDoorSeen = true;
     board.querySelector("#switch").classList.add("glowtap");
@@ -1408,34 +1638,37 @@ function startStage1(){
   switchVisible = false;                 // the switch is not on the bench yet
   skyCallbackEl.classList.remove("show");
   buildBench();
+  board.classList.add("show-labels");     // name tags under the images for the first build
   setFlowMode("light");
   refreshCircuit();
-  showHeadline("Connect the LED and the battery to light the bulb");
+  showHeadline("Connect the power source and the LED to make it glow");
   setCompanions("kabirHappy","meeraIdea");
-  setDialogue([
-    {who:"Meera", text:"Can you make this tiny bulb glow?", meera:"meeraIdea"},
+  guideDialogue([
+    {who:"Meera", text:"Can you make this LED glow?", meera:"meeraIdea"},
   ]);
   armNudge();
 }
+/* Nudges are no longer on an idle timer — they only appear when the child makes a
+   mistake (a wrong join, or a finished connection that doesn't light the LED). */
 function armNudge(){
   clearTimeout(nudgeTimer);
+}
+function nudgeOnMistake(){
   if(stage!==1 || cur.lit || nudgeIdx>=NUDGES.length) return;
-  nudgeTimer = setTimeout(()=>{
-    if(stage!==1 || cur.lit) return;
-    setDialogue([NUDGES[nudgeIdx]]);
-    nudgeIdx++;
-    armNudge();
-  }, 14000);
+  setDialogue([NUDGES[nudgeIdx]]);
+  nudgeIdx++;
 }
 function startStage2(){
   stage = 2;
   setChapter(1);
   hideHeadline();
+  if(board) board.classList.remove("show-labels");   // the name tags belong to the first build only
   setFlowMode("faint");
   setCompanions("kabirThink","meeraIdea");
   setDialogue([
-    {who:"Meera", text:"Wait... something is travelling!", meera:"meeraIdea"},
-    {who:"Kabir", text:"It goes around... and the bulb shows it as light.", kabir:"kabirThink"},
+    {who:"Meera", text:"It glows! The LED only lights when + meets the battery's + and − meets −.", meera:"meeraIdea"},
+    {who:"Kabir", text:"Wait... something is travelling!", kabir:"kabirThink"},
+    {who:"Meera", text:"It goes around... and the LED shows it as light.", meera:"meeraIdea"},
   ], askTravellingThingQuestion);
 }
 function askTravellingThingQuestion(){
@@ -1448,11 +1681,12 @@ function askTravellingThingQuestion(){
       {who:"Kabir", text:"Yes! It is like a travelling glow thing.", kabir:"kabirHappy"},
       {who:"Meera", text:"Scientists call this travelling thing current.", meera:"meeraIdea"},
     ], ()=>{
+      markStageDone();
       showConcept("Current =", "the travelling thing that moves through the wire.");
       setAction("Make current travel again", ()=>{
         currentReplayReady = true;
         resetBenchForBuild("stream");
-        setDialogue([
+        guideDialogue([
           {who:"Kabir", text:"Can you make the current travel again?", kabir:"kabirHappy"},
         ]);
       });
@@ -1464,10 +1698,11 @@ function startStage3(){
   setChapter(2);
   pathQuestionAnswered = false;
   hideConcept();
+  clearGuide();                                  // undo here IS the goal (break the path) — don't re-prompt
   setFlowMode("stream");
   setCompanions("kabirHappy","meeraThink");
   setDialogue([
-    {who:"Meera", text:"Can you stop the glow without removing the bulb?", meera:"meeraThink"},
+    {who:"Meera", text:"Can you stop the glow without removing the LED?", meera:"meeraThink"},
   ], ()=>{ if(stage===3) hintRemoveWire(); });   // glow a wire so the child sees to pull it
 }
 function askBrokenPathQuestion(){
@@ -1481,20 +1716,16 @@ function askBrokenPathQuestion(){
   ], ()=>{
     setChoices("What happened to the path?", [
       {label:"The path broke", correct:true},
-      {label:"The bulb got sleepy"},
+      {label:"The LED got sleepy"},
       {label:"The battery disappeared"},
-    ], opt=>{
-      if(!opt.correct){
-        snd.bounce();
-        pathQuestionAnswered = false;
-        setDialogue([
-          {who:"Meera", text:"Look at the gap in the path.", meera:"meeraThink"},
-        ], askBrokenPathQuestion);
-        return;
-      }
+    ], ()=>{
       setDialogue([
         {who:"Kabir", text:"Yes. The current needs a full path.", kabir:"kabirHappy"},
       ], startStage4);
+    }, ()=>{
+      setDialogue([
+        {who:"Meera", text:"Look at the gap in the path.", meera:"meeraThink"},
+      ]);
     });
   });
 }
@@ -1503,12 +1734,14 @@ function startStage4(){
   setChapter(3);
   setFlowMode("stream");
   setCompanions("kabirHappy","meeraIdea");
-  setDialogue([
+  guideDialogue([
     {who:"Meera", text:"Can you fix the path and bring the glow back?", meera:"meeraIdea"},
   ]);
 }
 function startStage4Concept(){
   stage = 40;
+  markStageDone();
+  clearGuide();
   setDialogue([
     {who:"Kabir", text:"You repaired the path!", kabir:"kabirHappy"},
     {who:"Meera", text:"Now the current can travel all the way around.", meera:"meeraIdea"},
@@ -1528,6 +1761,7 @@ function startStage5(){
   switchDoorSeen = false;
   switchDoorDone = false;
   switchIncludeNudged = false;
+  s5promptKey = null; s5wrong = 0; switchGuideShown = false;
   resetBenchForBuild("stream");
   revealSwitch();                        // the switch appears now that it is introduced
   board.querySelector("#switch").classList.add("glowtap");
@@ -1537,11 +1771,15 @@ function startStage5(){
     {who:"Meera", text:"A new part just appeared — this switch might help.", meera:"meeraIdea"},
     {who:"Meera", text:"Build the path through the switch, then tap it ON.", meera:"meeraHappy"},
   ]);
+  lastGuide = [{who:"Meera", text:"Build the path through the switch, then tap it ON.", meera:"meeraHappy"}];
 }
 function completeSwitchDoor(){
   if(switchDoorDone) return;
   switchDoorDone = true;
   stage = 50;
+  markStageDone();
+  clearGuide();
+  clearGhostWires();
   board.querySelector("#switch").classList.remove("glowtap");
   snd.success();
   setDialogue([
@@ -1563,11 +1801,17 @@ function startStage6(){
     {who:"Meera", text:"Now make the full glow recipe.", meera:"meeraIdea"},
     {who:"Kabir", text:"It needs a source, a path, and a way to start and stop.", kabir:"kabirHappy"},
   ]);
+  lastGuide = [
+    {who:"Meera", text:"Now make the full glow recipe.", meera:"meeraIdea"},
+    {who:"Kabir", text:"It needs a source, a path, and a way to start and stop.", kabir:"kabirHappy"},
+  ];
 }
 function completeRecipe(){
   if(recipeDone) return;
   recipeDone = true;
   stage = 60;
+  markStageDone();
+  clearGuide();
   snd.bigwin();
   confetti();
   board.querySelector("#switch").classList.remove("glowtap");
@@ -1576,7 +1820,7 @@ function completeRecipe(){
   setDialogue([
     {who:"Kabir", text:"Current is travelling!", kabir:"kabirCelebrate"},
     {who:"Meera", text:"The circuit is complete!", meera:"meeraCelebrate"},
-    {who:"Kabir", text:"And the bulb makes the current seeable as light!", kabir:"kabirCelebrate"},
+    {who:"Kabir", text:"And the LED makes the current seeable as light!", kabir:"kabirCelebrate"},
   ], startStage7);
 }
 function startStage7(){
@@ -1589,7 +1833,7 @@ function startStage7(){
   setDialogue([
     {who:"Meera", text:"We first knew Orion's name.", meera:"meeraHappy"},
     {who:"Kabir", text:"Now we know one glow recipe too.", kabir:"kabirHappy"},
-    {who:"Meera", text:"Our bulb needed a source, a complete path, and current.", meera:"meeraIdea"},
+    {who:"Meera", text:"Our LED needed a source, a complete path, and current.", meera:"meeraIdea"},
     {who:"Kabir", text:"A real star must have its own glow recipe.", kabir:"kabirThink"},
     {who:"Meera", text:"But what powers a real star?", meera:"meeraThink"},
     {who:"Kabir", text:"That sounds like our next mystery.", kabir:"kabirHappy"},
@@ -1600,11 +1844,18 @@ function startStage7(){
 
 /* ============ Back / Undo / Next navigation ============ */
 const CHAPTERS = [startStage1, startStage2, startStage3, startStage4, startStage5, startStage6, startStage7];
-function setChapter(k){ chapterIdx = k; updateNav(); }
+/* The Next tab only appears once the current screen's steps are complete —
+   markStageDone() is called at each stage's completion beat. */
+let stageDone = false;
+function markStageDone(){ stageDone = true; updateNav(); }
+function setChapter(k){ chapterIdx = k; stageDone = false; updateNav(); }
 function updateNav(){
   const back = $("#nav-back"), next = $("#nav-next"), undo = $("#nav-undo");
   if(back) back.disabled = chapterIdx <= 0;
-  if(next) next.disabled = chapterIdx >= CHAPTERS.length-1;
+  if(next){
+    next.style.display = stageDone ? "" : "none";
+    next.disabled = chapterIdx >= CHAPTERS.length-1;
+  }
   if(undo) undo.disabled = !(board && wires.length);
 }
 function goChapter(i){
@@ -1617,10 +1868,19 @@ $("#nav-next").addEventListener("click", ()=>{ snd.click(); goChapter(chapterIdx
 $("#nav-undo").addEventListener("click", ()=>{
   if(!wires.length) return;
   snd.pop();
+  const wasLit = cur.lit;
   removeWire(wires[wires.length-1]);   // pull back the most recent wire
   clearWireHints();
-  refreshCircuit();
+  refreshCircuit();                    // may itself speak (e.g. onDark breaks the glow)
   updateNav();
+  // Step the coach back in time with the undo: if the refresh didn't already say
+  // something and we're not mid question/concept, re-show the current build prompt
+  // so a stale forward line (like the "Careful!" polarity hint) doesn't linger.
+  const busy = choicesEl.classList.contains("show") || conceptEl.classList.contains("show");
+  const spokeOnRefresh = wasLit && !cur.lit;   // onDark handled this transition
+  if(!cur.lit && !busy && !spokeOnRefresh && lastGuide){
+    setDialogue(lastGuide.map(l=>Object.assign({}, l)));
+  }
 });
 
 /* keep the Undo button's enabled state in step with the wire count */
@@ -1635,18 +1895,51 @@ updatePile = function(){ _updatePile(); updateNav(); };
   const wrap = $("#estars");
   if(!wrap) return;
   const reduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  // hundreds of tiny background stars
-  for(let i=0;i<170;i++){
+  // hundreds of tiny background stars — a dense field of star dust, faintly tinted
+  const DUST_TINTS = ["#ffffff","#ffffff","#cfe9ff","#ffd9ec","#e7dbff"];
+  function dustSpeck(x, y, sz, o){
     const d = document.createElement("div"); d.className = "eb-star";
-    const sz = (1 + Math.random()*1.8);
     d.style.width = d.style.height = sz.toFixed(2)+"px";
-    d.style.left = (Math.random()*100).toFixed(2)+"%";
-    d.style.top  = (Math.random()*100).toFixed(2)+"%";
-    d.style.setProperty("--o",(0.25+Math.random()*0.6).toFixed(2));
+    d.style.left = x.toFixed(2)+"%";
+    d.style.top  = y.toFixed(2)+"%";
+    d.style.background = DUST_TINTS[Math.floor(Math.random()*DUST_TINTS.length)];
+    d.style.setProperty("--o", o.toFixed(2));
     d.style.animationDuration = (2.4+Math.random()*4).toFixed(2)+"s";
     d.style.animationDelay = (Math.random()*5).toFixed(2)+"s";
     wrap.appendChild(d);
   }
+  for(let i=0;i<420;i++){
+    dustSpeck(Math.random()*100, Math.random()*100,
+              0.7 + Math.random()*1.9, 0.22 + Math.random()*0.6);
+  }
+  // the milky-way stream: a thick ribbon of extra-fine dust hugging the same
+  // diagonal as the hazy band (upper-right → lower-left, like the poster)
+  for(let i=0;i<300;i++){
+    const t = Math.random();                                   // position along the band
+    const spread = (Math.random()+Math.random()+Math.random())/3 - 0.5;  // bell-ish across it
+    const x = -6 + t*112;
+    const y = 60 - t*26 + spread*30;
+    if(y<-2 || y>102) continue;
+    dustSpeck(x, y, 0.6 + Math.random()*1.4, 0.3 + Math.random()*0.65);
+  }
+  // extra galaxy-dust pockets: dense clusters hugging the upper corners and the bottom
+  const POCKETS = [
+    {cx:7,  cy:7,  rx:17, ry:13, n:85},    // upper-left corner
+    {cx:93, cy:7,  rx:17, ry:13, n:85},    // upper-right corner
+    {cx:9,  cy:93, rx:19, ry:12, n:85},    // lower-left corner
+    {cx:91, cy:93, rx:19, ry:12, n:85},    // lower-right corner
+    {cx:50, cy:97, rx:36, ry:9,  n:110},   // all along the bottom edge
+  ];
+  POCKETS.forEach(p=>{
+    for(let i=0;i<p.n;i++){
+      const g1 = (Math.random()+Math.random()+Math.random())/3 - 0.5;   // bell-ish falloff
+      const g2 = (Math.random()+Math.random()+Math.random())/3 - 0.5;
+      const x = p.cx + g1*2*p.rx;
+      const y = p.cy + g2*2*p.ry;
+      if(x<-2 || x>102 || y<-2 || y>102) continue;
+      dustSpeck(x, y, 0.6 + Math.random()*1.3, 0.28 + Math.random()*0.6);
+    }
+  });
   // a handful of larger foreground stars
   [[15,24],[80,17],[30,62],[70,52],[50,11],[89,40],[11,48]].forEach((p,idx)=>{
     const b = document.createElement("div"); b.className = "eb-bigstar";
