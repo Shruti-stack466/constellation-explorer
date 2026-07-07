@@ -525,29 +525,24 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   backdrop-filter:blur(16px) saturate(1.05);-webkit-backdrop-filter:blur(16px) saturate(1.05);
   box-shadow:0 10px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.09);transition:transform .15s,box-shadow .2s;animation:huntFieldIn .6s ease .2s both}
 .discover-sound:hover{transform:scale(1.06)}
-/* Skip — SAME design, format and size as the Next / Finish button (violet glass, gold border) */
+/* Skip — SAME design, format and size as the Next / Finish button (golden yellow) */
 .discover-skip{position:absolute;top:14px;right:70px;z-index:7;cursor:pointer;
   font-family:var(--font);font-weight:800;font-size:19px;padding:14px 30px;min-height:52px;border-radius:var(--pill);
-  color:#ffe9bd;background:linear-gradient(180deg,rgba(72,42,116,.92),rgba(46,25,74,.92));
-  border:1px solid rgba(255,234,185,.58);
-  box-shadow:0 8px 22px rgba(0,0,0,.36),0 0 14px rgba(255,233,180,.30),inset 0 1px 0 rgba(255,255,255,.12);
+  color:#241a00;background:linear-gradient(180deg,var(--gold),var(--gold-deep));
+  border:none;box-shadow:0 6px 18px rgba(244,183,64,.35);
   transition:transform .15s,box-shadow .2s;animation:huntFieldIn .6s ease .2s both}
-.discover-skip:hover{transform:translateY(-2px);
-  box-shadow:0 10px 26px rgba(0,0,0,.42),0 0 20px rgba(255,233,180,.46),inset 0 1px 0 rgba(255,255,255,.16)}
+.discover-skip:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(244,183,64,.5)}
 .videocap{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);z-index:7;
   max-width:80vw;text-align:center;pointer-events:none;opacity:0;transition:opacity .15s;
   color:#fff;font-size:clamp(15px,2vw,24px);line-height:1.35;font-weight:600;
   text-shadow:0 2px 4px rgba(0,0,0,.9);background:rgba(0,0,0,.5);padding:6px 16px;border-radius:10px}
 .discover-sound:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .discover-sound.snd-off{filter:grayscale(.6) brightness(.9)}
-/* "Next / Finish" button — bottom-right corner */
+/* "Next / Finish" button — bottom-right corner, classic golden yellow */
 .discover-next{position:absolute;right:20px;bottom:20px;z-index:8}
-/* Next button — violet glass on-theme, with a thin white-gold glowing border */
-.discover-next .btn{background:linear-gradient(180deg,rgba(72,42,116,.92),rgba(46,25,74,.92));color:#ffe9bd;
-  border:1px solid rgba(255,234,185,.58);
-  box-shadow:0 8px 22px rgba(0,0,0,.36),0 0 14px rgba(255,233,180,.30),inset 0 1px 0 rgba(255,255,255,.12)}
-.discover-next .btn:hover{transform:translateY(-2px);
-  box-shadow:0 10px 26px rgba(0,0,0,.42),0 0 20px rgba(255,233,180,.46),inset 0 1px 0 rgba(255,255,255,.16)}
+.discover-next .btn{background:linear-gradient(180deg,var(--gold),var(--gold-deep));color:#241a00;
+  border:none;box-shadow:0 6px 18px rgba(244,183,64,.35)}
+.discover-next .btn:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(244,183,64,.5)}
 /* Cassiopeia: Meera stays the standard SIZE but is pushed flush into the bottom-left
    corner. The image has transparent padding, so negative margins pull her body into
    the corner / down to the ground; .discover-stage overflow:hidden clips the rest. */
