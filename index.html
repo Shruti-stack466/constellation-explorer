@@ -1305,23 +1305,28 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   color:#FFF4DC;opacity:.9;
   text-shadow:0 2px 8px rgba(0,0,0,.55);
 }
-/* Glow-Box Mystery styled launch gate — mirrors the activity's own entry screen */
-.gbg-title{margin:0;font-family:'Fredoka','Baloo 2','Nunito',var(--font);font-weight:700;
-  color:#fff3c8;font-size:clamp(30px,6vw,58px);letter-spacing:.5px;line-height:1.06;text-align:center;
-  text-shadow:0 0 18px rgba(255,216,110,.55);}
+/* Glow-Box Mystery styled launch gate — mirrors the activity's own entry screen:
+   Orbitron logotype flying in from space, then a soft-glow "Let's go" button */
+.gbg-title{margin:0;font-family:'Orbitron','Fredoka',var(--font);font-weight:900;
+  color:#ffffff;text-transform:uppercase;letter-spacing:.12em;
+  font-size:clamp(26px,4.6vw,58px);line-height:1.08;text-align:center;
+  text-shadow:0 0 26px rgba(222,120,255,.5),0 2px 8px rgba(0,0,0,.65);
+  animation:fromSpace 1.6s cubic-bezier(.2,.8,.25,1) .2s both;}
 .gbg-sub{margin:0;color:#d9d2f5;font-family:'Nunito',var(--font);font-weight:700;
   font-size:clamp(15px,2.3vw,22px);line-height:1.5;max-width:min(84vw,620px);text-align:center;
-  text-shadow:0 2px 8px rgba(0,0,0,.45);}
+  text-shadow:0 2px 8px rgba(0,0,0,.45);
+  animation:fromSpace 1.5s cubic-bezier(.2,.8,.25,1) .9s both;}
 .gbg-btn{min-height:56px;background:linear-gradient(180deg,#ffe879 0%,#ffd85c 100%);
   color:#4c3478;font-family:'Fredoka','Baloo 2',var(--font);font-weight:700;font-size:clamp(16px,2vw,24px);
   border:2px solid #ffbd35;border-radius:999px;padding:14px 46px;cursor:pointer;
   box-shadow:0 6px 0 rgba(190,120,34,.35);transition:transform .14s, box-shadow .14s;
-  animation:gbgGlow 1.4s ease-in-out infinite;}
+  animation:gbgIn .5s ease-out 2.5s both, gbgGlow 1.8s ease-in-out 3s infinite;}
 .gbg-btn:hover{transform:translateY(-2px);}
 .gbg-btn:active{transform:translateY(3px);box-shadow:0 3px 0 rgba(190,120,34,.35);}
 .gbg-btn:focus-visible{outline:3px solid #fff;outline-offset:3px;}
+@keyframes gbgIn{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
 @keyframes gbgGlow{0%,100%{box-shadow:0 6px 0 rgba(190,120,34,.35)}
-  50%{box-shadow:0 0 26px rgba(255,216,110,.95),0 6px 0 rgba(190,120,34,.35)}}
+  50%{box-shadow:0 0 12px rgba(255,216,110,.4),0 6px 0 rgba(190,120,34,.35)}}
 </style>
 
 <div id="app">
@@ -3839,9 +3844,13 @@ function showLightSourceGate(){
   // Glow-Box Mystery night sky (same rich star field as the activity's own entry screen,
   // built from the shared home-scene layers) — deliberately NO moon.
   const sky=document.createElement("div"); sky.className="home-sky"; sky.style.zIndex="0";
-  sky.innerHTML='<div class="home-nebula n1"></div><div class="home-nebula n2"></div>';
+  sky.innerHTML='<div class="home-dustband"></div><div class="home-dustband2"></div>'+
+    '<div class="home-nebula n1"></div><div class="home-nebula n2"></div><div class="home-nebula n3"></div>'+
+    '<div class="home-nebula n4"></div><div class="home-nebula n5"></div><div class="home-nebula n6"></div>'+
+    '<div class="home-nebula n7"></div>';
   const starLayer=document.createElement("div"); starLayer.className="home-starlayer"; sky.appendChild(starLayer);
-  buildHomeStars(starLayer,200,{min:1,max:2.4});
+  buildHomeStars(starLayer,420,{min:.8,max:2.6});
+  buildGalaxyDust(starLayer);
   const bigLayer=document.createElement("div"); bigLayer.className="home-biglayer"; sky.appendChild(bigLayer);
   buildBigStars(bigLayer);
   const flyLayer=document.createElement("div"); flyLayer.className="home-flylayer"; sky.appendChild(flyLayer);
@@ -3852,9 +3861,9 @@ function showLightSourceGate(){
   // foreground: Glow-Box title / tagline / Check the Bulb button
   const c=document.createElement("div");
   c.style.cssText="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:0 22px;text-align:center";
-  c.innerHTML='<h1 class="gbg-title">★ The Glow-Box Mystery</h1>'+
+  c.innerHTML='<h1 class="gbg-title">The Glow-Box Mystery</h1>'+
               '<p class="gbg-sub">Something makes the park bulb glow… can you find out what?</p>';
-  const btn=document.createElement("button"); btn.type="button"; btn.className="gbg-btn"; btn.textContent="🔦 Check the Bulb";
+  const btn=document.createElement("button"); btn.type="button"; btn.className="gbg-btn"; btn.textContent="Let's go";
   btn.addEventListener("click", openLightSource);   // real click keeps the iframe's audio/video autoplay unlocked
   c.appendChild(btn);
   s.appendChild(c); screen.appendChild(s);
