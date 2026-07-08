@@ -261,6 +261,10 @@
     transition:opacity .6s;}
   #entry.gone{opacity:0;pointer-events:none;}
   #entry .eb-sky{position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none;}
+  /* full-screen looping video background (over the gradient/nebula fallback, under content) */
+  #entry .eb-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;background:#050311;}
+  #entry .eb-vidtint{position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(180deg,rgba(5,3,17,.45) 0%,transparent 24%,transparent 52%,rgba(5,3,17,.60) 100%);}
   #entry .eb-content{position:relative;z-index:2;display:flex;flex-direction:column;
     align-items:center;justify-content:center;gap:26px;padding:0 22px;text-align:center;}
   #entry .estars{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
@@ -590,6 +594,8 @@
       <div class="eb-nebula n7"></div>
       <div class="estars" id="estars"></div>
     </div>
+    <video class="eb-video" id="eb-video" muted loop playsinline autoplay aria-hidden="true"></video>
+    <div class="eb-vidtint"></div>
     <div class="eb-content">
       <h1>The Glow-Box Mystery</h1>
       <p>Something makes the park bulb glow… can you find out what?</p>
@@ -1899,9 +1905,18 @@ const _updatePile = updatePile;
 updatePile = function(){ _updatePile(); updateNav(); };
 
 /* ============ Entry gate & boot ============ */
-/* Build the night sky for the opening screen, matching the Constellation Explorer
-   home scene: tiny twinkling stars, a few big glowing stars, fireflies, and the
-   odd shooting star. No moon. */
+/* Play the entry-scene video as the background. Under reduced-motion we drop the
+   clip and let the CSS nebula/dust sky behind it stand in. */
+(function makeEntryVideo(){
+  const v = document.getElementById("eb-video");
+  if(!v) return;
+  const reduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  if(reduce){ v.remove(); return; }
+  v.src = encodeURI("videos/the glow box mystery entry scene.mp4");
+  const p = v.play && v.play(); if(p && p.catch) p.catch(()=>{});   // ignore autoplay-block errors
+})();
+/* Build the night sky behind the video (also the full background under reduced-motion):
+   tiny twinkling star dust, milky-way bands, drifting nebulas. No moon. */
 (function makeEntrySky(){
   const wrap = $("#estars");
   if(!wrap) return;

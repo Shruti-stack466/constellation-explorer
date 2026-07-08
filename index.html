@@ -3897,6 +3897,21 @@ function showLightSourceGate(){
   const shootLayer=document.createElement("div"); shootLayer.className="home-shootlayer"; sky.appendChild(shootLayer);
   s.appendChild(sky);
 
+  // the entry-scene video plays over the fallback sky (skipped under reduced-motion)
+  if(!reduceMotion){
+    const vid=document.createElement("video");
+    vid.muted=true; vid.defaultMuted=true; vid.loop=true; vid.autoplay=true; vid.playsInline=true;
+    vid.setAttribute("muted",""); vid.setAttribute("playsinline",""); vid.setAttribute("autoplay","");
+    vid.setAttribute("aria-hidden","true");
+    vid.style.cssText="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;background:#050311";
+    vid.src=encodeURI("videos/the glow box mystery entry scene.mp4");
+    s.appendChild(vid);
+    const tint=document.createElement("div");
+    tint.style.cssText="position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(5,3,17,.45) 0%,transparent 24%,transparent 52%,rgba(5,3,17,.60) 100%)";
+    s.appendChild(tint);
+    const pl=vid.play&&vid.play(); if(pl&&pl.catch) pl.catch(()=>{});   // ignore autoplay-block errors
+  }
+
   // foreground: Glow-Box title / tagline / Check the Bulb button
   const c=document.createElement("div");
   c.style.cssText="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:0 22px;text-align:center";
