@@ -733,6 +733,14 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
     linear-gradient(160deg,#0d0722 0%,#110829 45%,#050311 100%)}
 .home-sky,.home-content{transition:transform 1s cubic-bezier(.3,.7,.2,1)}
 
+/* full-screen looping video background for the entry screen (sits over the
+   gradient sky fallback, under the title/tagline/button) */
+.home-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;
+  background:#050311;transition:transform 1s cubic-bezier(.3,.7,.2,1)}
+/* soft dark tint top & bottom so the white logo type and gold button stay readable */
+.home-vidtint{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(5,3,17,.45) 0%,transparent 24%,transparent 52%,rgba(5,3,17,.60) 100%)}
+
 /* soft moon glow, top-right corner */
 .home-moon{position:absolute;top:-70px;right:-46px;width:clamp(180px,26vw,300px);height:clamp(180px,26vw,300px);
   border-radius:50%;pointer-events:none;
@@ -889,7 +897,7 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 .home-flash{position:absolute;inset:0;z-index:30;pointer-events:none;opacity:0;
   background:radial-gradient(circle at 50% 58%,rgba(255,247,224,.95),rgba(255,221,150,.55) 36%,rgba(20,26,60,0) 76%);
   transition:opacity .8s ease}
-.home-scene.igniting .home-sky,.home-scene.igniting .home-content{transform:scale(1.12) translateY(-3%)}
+.home-scene.igniting .home-sky,.home-scene.igniting .home-video,.home-scene.igniting .home-content{transform:scale(1.12) translateY(-3%)}
 .home-scene.igniting .home-flash{opacity:1}
 .home-scene.igniting .home-star{opacity:1}
 .home-scene.igniting .home-bigstar{--g:2.6}
@@ -2242,19 +2250,20 @@ SCENES.start=()=>{
 
   const scene=document.createElement("div"); scene.className="scene home-scene";
 
-  /* --- night sky background (no moon — nebulas, milky-way bands and star dust) --- */
-  const sky=document.createElement("div"); sky.className="home-sky";
-  sky.innerHTML='<div class="home-dustband"></div><div class="home-dustband2"></div><div class="home-dustband3"></div>'+
-    '<div class="home-nebula n1"></div><div class="home-nebula n2"></div><div class="home-nebula n3"></div>'+
-    '<div class="home-nebula n4"></div><div class="home-nebula n5"></div><div class="home-nebula n6"></div>'+
-    '<div class="home-nebula n7"></div>';
-  const starLayer=document.createElement("div"); starLayer.className="home-starlayer"; sky.appendChild(starLayer);
-  buildHomeStars(starLayer,500,{min:.8,max:2.6});
-  buildGalaxyDust(starLayer);
-  const flyLayer=document.createElement("div"); flyLayer.className="home-flylayer"; sky.appendChild(flyLayer);
-  if(!reduceMotion) buildFireflies(flyLayer,14);
-  const shootLayer=document.createElement("div"); shootLayer.className="home-shootlayer"; sky.appendChild(shootLayer);
-  scene.appendChild(sky);
+  /* --- video background (the constellation sky clip). A plain deep-space gradient
+     sky sits behind it as a fallback if the clip can't load, and IS the background
+     under reduced-motion (where we don't autoplay video). --- */
+  const sky=document.createElement("div"); sky.className="home-sky"; scene.appendChild(sky);
+  if(!reduceMotion){
+    const vid=document.createElement("video"); vid.className="home-video";
+    vid.muted=true; vid.defaultMuted=true; vid.loop=true; vid.autoplay=true; vid.playsInline=true;
+    vid.setAttribute("muted",""); vid.setAttribute("playsinline",""); vid.setAttribute("autoplay","");
+    vid.setAttribute("aria-hidden","true");
+    vid.src=encodeURI("videos/entry screen constellations.mp4");
+    scene.appendChild(vid);
+    const vidtint=document.createElement("div"); vidtint.className="home-vidtint"; scene.appendChild(vidtint);
+    const pl=vid.play&&vid.play(); if(pl&&pl.catch) pl.catch(()=>{});   // ignore autoplay-block errors
+  }
 
   /* --- foreground content --- */
   const content=document.createElement("div"); content.className="home-content";
@@ -2306,10 +2315,7 @@ SCENES.start=()=>{
     setTimeout(()=>show("story"),1000);                              // ~900–1000ms cinematic, then the park
   };
 
-  /* --- occasional shooting star (the big mouse-reactive stars were removed) --- */
-  if(!reduceMotion){
-    scheduleShoot(shootLayer);
-  }
+  /* the video clip carries all the sky motion now — no CSS shooting stars needed */
 };
 
 /* ---------- THE 7-SCENE PICTURE STORY ---------- */
