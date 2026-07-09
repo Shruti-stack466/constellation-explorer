@@ -6,40 +6,41 @@
 <title>The Glow-Box Mystery</title>
 <style>
   /* Soft magical Star-Lab type system — loads from the web, falls back to system-ui offline */
-  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&family=Orbitron:wght@400;500;600;700;800&family=Exo+2:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
   :root{
-    /* ---- Star-Lab pastel palette (same as light-source) ---- */
-    --bg-lavender:#eee8ff;
-    --bg-dusk-blue:#ddebff;
-    --bg-cream:#fff7df;
-    --panel-cream:#fff4d8;
-    --panel-border:#ffe19a;
+    /* ---- Cosmic HUD palette (matches the Glow-Box entry screen) ---- */
+    --bg-deep:#030711;
+    --panel-navy:#08142B;
+    --neon-blue:#7DB7FF;
+    --soft-violet:#9D8CFF;
+    --cta-violet:#372D7D;
+    --current-yellow:#FFD75A;
+    --led-warm:#FFA72A;
 
-    --launchpad-yellow:#fff1b8;
-    --launchpad-border:#ffd86b;
-    --launchpad-glow:rgba(255,216,77,.45);
+    --launchpad-border:rgba(125,183,255,.65);
 
-    --accent-violet:#8b6fe8;
-    --accent-violet-dark:#5d49c9;
+    --accent-violet:#9D8CFF;
+    --accent-violet-dark:#B9AEFF;
     --accent-orange:#ff9f43;
-    --accent-yellow:#ffd85c;
+    --accent-yellow:#FFD75A;
 
     --success-green:#62d58b;
     --success-glow:rgba(98,213,139,.35);
     --error-coral:#ff7a7a;
 
-    --text-primary:#2f285f;
-    --text-secondary:#5f5a7a;
+    --text-primary:#F4F6FF;
+    --text-secondary:#B9C4E8;
 
-    --shadow-soft:0 10px 28px rgba(93,73,201,.12);
-    --shadow-card:0 8px 18px rgba(93,73,201,.14);
-    --shadow-button:0 6px 0 rgba(190,120,34,.35);
+    --shadow-soft:0 10px 28px rgba(2,6,18,.55);
+    --shadow-card:0 8px 18px rgba(2,6,18,.5);
+    --shadow-button:0 0 18px rgba(125,183,255,.4);
 
-    --font-heading:'Fredoka','Baloo 2',system-ui,sans-serif;
+    --font-heading:'Rajdhani','Fredoka',system-ui,sans-serif;
+    --font-ui:'Orbitron','Rajdhani',system-ui,sans-serif;
     --font-body:'Nunito','Poppins',system-ui,sans-serif;
 
-    --panel:#ffffff;
+    --panel:#0B1834;
     --glow-green:#62d58b;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -47,31 +48,36 @@
   #game{
     position:fixed;inset:0;
     background:
-      radial-gradient(circle at 18% 16%, rgba(255,243,199,.85), transparent 30%),
-      radial-gradient(circle at 86% 12%, rgba(221,240,255,.95), transparent 32%),
-      linear-gradient(135deg,#eee8ff 0%,#ddebff 52%,#fff4d8 100%);
+      radial-gradient(circle at 22% 16%, rgba(84,60,180,.30), transparent 42%),
+      radial-gradient(circle at 82% 10%, rgba(45,90,200,.26), transparent 40%),
+      radial-gradient(circle at 72% 86%, rgba(120,70,210,.20), transparent 44%),
+      radial-gradient(circle at 10% 80%, rgba(40,110,220,.16), transparent 40%),
+      linear-gradient(180deg,#050a1c 0%,#030711 55%,#060420 100%);
     user-select:none;touch-action:none;
   }
 
-  /* ---------- Soft room atmosphere (same treatment as light-source) ---------- */
+  /* ---------- Deep-space nebula atmosphere (matches the entry screen) ---------- */
   #room-bg{
-    position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;
-    filter:saturate(1.45) contrast(1.18) brightness(.97);transform:scale(1.02);
-    opacity:1;pointer-events:none;
-  }
-  #pastel-overlay{
     position:absolute;inset:0;z-index:0;pointer-events:none;
     background:
-      radial-gradient(circle at 50% 55%, rgba(255,220,120,.10), transparent 58%),
-      linear-gradient(135deg, rgba(238,232,255,.05), rgba(255,246,220,.04) 60%, rgba(238,232,255,.05));
+      radial-gradient(ellipse 60% 42% at 50% 28%, rgba(125,183,255,.10), transparent 62%),
+      radial-gradient(ellipse 50% 36% at 22% 72%, rgba(157,140,255,.12), transparent 65%),
+      radial-gradient(ellipse 46% 34% at 84% 64%, rgba(90,120,255,.10), transparent 65%);
   }
+  /* soft dark vignette: keeps the centre readable, edges cinematic */
+  #pastel-overlay{
+    position:absolute;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(120% 90% at 50% 44%, transparent 42%, rgba(2,5,14,.5) 100%);
+  }
+  /* thin star field */
   #pattern-layer{
-    position:absolute;inset:0;z-index:0;opacity:.07;pointer-events:none;
+    position:absolute;inset:0;z-index:0;opacity:.5;pointer-events:none;
     background-image:
-      radial-gradient(rgba(139,111,232,.55) 1.4px, transparent 1.6px),
-      radial-gradient(rgba(255,159,67,.5) 1.2px, transparent 1.4px);
-    background-size:64px 64px, 96px 96px;
-    background-position:0 0, 32px 32px;
+      radial-gradient(rgba(244,246,255,.9) 1.1px, transparent 1.5px),
+      radial-gradient(rgba(180,205,255,.7) .9px, transparent 1.3px),
+      radial-gradient(rgba(157,140,255,.55) 1.3px, transparent 1.7px);
+    background-size:190px 190px, 120px 120px, 260px 260px;
+    background-position:0 0, 42px 64px, 96px 28px;
   }
 
   /* ---------- Companion standees (coach corner: lower sides) ---------- */
@@ -88,16 +94,25 @@
     transform:translateY(-10px) scale(1.04);
     filter:drop-shadow(0 16px 20px rgba(0,0,0,.5)) drop-shadow(0 0 14px rgba(255,235,150,.65));
   }
+  /* subtle glowing platform rings under the companions — grounds them in the space UI */
+  .char-ring{position:absolute;z-index:24;pointer-events:none;
+    width:min(22vw,280px);height:min(6vh,52px);border-radius:50%;
+    background:radial-gradient(ellipse at center, rgba(125,183,255,.38), rgba(125,183,255,.12) 55%, transparent 72%);
+    box-shadow:0 0 26px rgba(125,183,255,.22);
+    filter:blur(1px);animation:ringPulse 4s ease-in-out infinite;}
+  #kabir-ring{left:-2vw;bottom:1vh;}
+  #meera-ring{right:-2vw;bottom:2vh;}
+  @keyframes ringPulse{0%,100%{opacity:.7}50%{opacity:1}}
 
   /* ---------- Floating dialogue bubble (near the speaker) ---------- */
   #dialogue{
     position:absolute;z-index:30;cursor:pointer;
     width:min(15.5vw,205px);
     background:var(--panel);
-    border:2px solid #d8ccff;
+    border:2px solid rgba(125,183,255,.6);
     border-radius:16px;
     padding:8px 18px 8px 11px;
-    box-shadow:var(--shadow-card);
+    box-shadow:0 0 16px rgba(125,183,255,.25), var(--shadow-card);
     transition:opacity .25s;
     left:1.5vw;bottom:46vh;
   }
@@ -122,56 +137,75 @@
   #actionbar{position:absolute;left:50%;bottom:4.5vh;transform:translateX(-50%);z-index:40;display:flex;gap:12px;}
   .btn{
     min-height:56px;
-    background:linear-gradient(180deg,#ffe879 0%,#ffd85c 100%);
-    color:#4c3478;font-family:var(--font-heading);font-weight:700;font-size:clamp(16px,1.9vw,22px);
-    border:2px solid #ffbd35;border-radius:999px;padding:13px 40px;
-    box-shadow:var(--shadow-button);cursor:pointer;
-    transition:transform .14s, box-shadow .14s;animation:btnIn .4s ease-out;
+    background:
+      radial-gradient(circle at 50% 115%, rgba(157,140,255,.35), transparent 46%),
+      linear-gradient(180deg, rgba(55,45,125,.95), rgba(18,13,56,.97));
+    color:#F4F6FF;font-family:var(--font-ui);font-weight:500;font-size:clamp(14px,1.6vw,19px);
+    letter-spacing:.1em;text-transform:uppercase;
+    border:2px solid rgba(125,183,255,.9);border-radius:999px;padding:13px 40px;
+    box-shadow:0 0 18px rgba(125,183,255,.4),0 0 40px rgba(157,140,255,.25),
+      inset 0 1px 0 rgba(255,255,255,.12);
+    cursor:pointer;
+    transition:transform .14s, box-shadow .25s, border-color .2s;animation:btnIn .4s ease-out;
   }
-  .btn:hover{transform:translateY(-2px);box-shadow:0 8px 0 rgba(190,120,34,.35);}
-  .btn:active{transform:translateY(3px);box-shadow:0 3px 0 rgba(190,120,34,.35);}
-  .btn:focus-visible{outline:3px solid #ffffff;outline-offset:3px;}
+  .btn:hover{transform:translateY(-2px);border-color:rgba(190,215,255,1);
+    box-shadow:0 0 26px rgba(125,183,255,.6),0 0 52px rgba(157,140,255,.35),inset 0 1px 0 rgba(255,255,255,.14);}
+  .btn:active{transform:translateY(1px);}
+  .btn:focus-visible{outline:2px solid rgba(190,205,255,.95);outline-offset:3px;}
   @keyframes btnIn{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
 
   /* ---------- Workbench stage ---------- */
   #stage{
     position:absolute;left:50%;top:46%;z-index:5;
     transform:translate(-50%,-50%);
-    width:min(62vw,1020px);
-    height:min(58vh,600px);
+    width:min(68vw,1100px);
+    height:min(54vh,600px);
     display:flex;align-items:center;justify-content:center;
   }
   .bench-panel{
     position:relative;width:100%;height:100%;padding:2.4% 3%;
-    background:
-      radial-gradient(circle at center, rgba(255,252,244,.85), transparent 64%),
-      #fffaf0;
+    background:linear-gradient(180deg, rgba(12,24,52,.72), rgba(6,13,32,.8));
     border:2px solid var(--launchpad-border);
-    border-radius:32px;
-    box-shadow:0 0 30px rgba(255,216,77,.28);
+    border-radius:28px;
+    box-shadow:0 0 26px rgba(125,183,255,.28), 0 0 60px rgba(90,120,255,.14),
+      inset 0 1px 0 rgba(255,255,255,.08), inset 0 0 46px rgba(30,60,140,.18);
+    -webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);
     animation:benchIn .6s ease-out;
   }
+  /* faint HUD grid inside the panel, fading out toward the edges */
+  .bench-panel::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:
+      linear-gradient(rgba(125,183,255,.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(125,183,255,.055) 1px, transparent 1px);
+    background-size:46px 46px;
+    -webkit-mask-image:radial-gradient(115% 100% at 50% 50%, #000 52%, transparent 98%);
+    mask-image:radial-gradient(115% 100% at 50% 50%, #000 52%, transparent 98%);}
   @keyframes benchIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
 
   #board{position:absolute;inset:3% 3% 4% 3%;}
   #board svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;touch-action:none;z-index:4;pointer-events:none;}
+  /* dotted guide routes render above the battery/LED/switch images (comps are z 5),
+     but below the terminal dots (z 9) and the demo hand (z 12) */
+  #board svg.guide-svg{z-index:7;}
 
   /* ---------- Wires ---------- */
-  .wbase{fill:none;stroke:#c2bcd8;stroke-width:9;stroke-linecap:round;stroke-linejoin:round;
-    filter:drop-shadow(0 1px 2px rgba(90,80,120,.22));transition:stroke .4s, filter .4s;}
-  #board.live .wbase{stroke:#ffce4d;filter:drop-shadow(0 0 10px rgba(255,197,52,.85));}
+  .wbase{fill:none;stroke:#8fa4cf;stroke-width:9;stroke-linecap:round;stroke-linejoin:round;
+    filter:drop-shadow(0 1px 3px rgba(2,6,18,.6));transition:stroke .4s, filter .4s;}
+  #board.live .wbase{stroke:#DCEAFF;
+    filter:drop-shadow(0 0 4px rgba(160,200,255,.4));}
   .wcur{fill:none;stroke-linecap:round;stroke-linejoin:round;opacity:0;transition:opacity .4s;}
-  #board.live.mode-light .wcur{opacity:1;stroke:#fff7d0;stroke-width:3.5;stroke-dasharray:16 26;
-    animation:flow .9s linear infinite;}
-  #board.live.mode-faint .wcur{opacity:.85;stroke:rgba(139,111,232,.7);stroke-width:5;stroke-dasharray:2.5 30;
+  #board.live.mode-light .wcur{opacity:1;stroke:#1D4ED8;stroke-width:4.5;stroke-dasharray:.1 23.9;
+    animation:flow .9s linear infinite;filter:drop-shadow(0 0 3px rgba(60,110,255,.35));}
+  #board.live.mode-faint .wcur{opacity:.85;stroke:rgba(37,80,190,.8);stroke-width:5;stroke-dasharray:2.5 30;
     animation:flow 2.4s linear infinite;}
-  #board.live.mode-stream .wcur{opacity:1;stroke:#ffd84d;stroke-width:6;stroke-dasharray:4 20;
-    animation:flow .7s linear infinite;
-    filter:drop-shadow(0 0 6px #ffe14d) drop-shadow(0 0 10px #ffd21a);}
+  /* stream mode matches the first screen exactly — same dots, same unhurried pace */
+  #board.live.mode-stream .wcur{opacity:1;stroke:#1D4ED8;stroke-width:4.5;stroke-dasharray:.1 23.9;
+    animation:flow .9s linear infinite;
+    filter:drop-shadow(0 0 3px rgba(60,110,255,.35));}
   @keyframes flow{to{stroke-dashoffset:-96;}}
   .whit{fill:none;stroke:rgba(0,0,0,0);stroke-width:34;stroke-linecap:round;stroke-linejoin:round;cursor:pointer;pointer-events:stroke;}
-  .wtemp{fill:none;stroke:rgba(120,95,225,.72);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;
-    stroke-dasharray:11 14;pointer-events:none;}
+  .wtemp{fill:none;stroke:rgba(125,183,255,.85);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;
+    stroke-dasharray:11 14;pointer-events:none;filter:drop-shadow(0 0 5px rgba(125,183,255,.6));}
 
   /* ---------- Terminals (HTML dots that sit ON the image's terminals) ---------- */
   .tdot{position:absolute;transform:translate(-50%,-50%);
@@ -188,10 +222,32 @@
   @keyframes termPulse{0%,100%{box-shadow:0 1px 4px rgba(120,80,20,.5), 0 0 3px rgba(255,180,50,.4)}
     50%{box-shadow:0 1px 4px rgba(120,80,20,.5), 0 0 14px rgba(255,180,50,.95)}}
   .tdot.busy{background:#fff3c7;border-color:#c2a64d;animation:none;}
-  #board.live .tdot.busy{background:#ffd84d;border-color:#ffbb33;
-    box-shadow:0 0 10px rgba(255,216,77,.95);}
+  #board.live .tdot.busy{background:#E4EFFF;border-color:#7DB7FF;
+    box-shadow:0 0 6px rgba(125,183,255,.6);}
   .tdot.sel{background:#ffd84d;border-color:#ff9f43;transform:translate(-50%,-50%) scale(1.28);animation:termPulse .8s ease-in-out infinite;}
   .tdot.cand{background:#8ee6b4;border-color:#39b57a;animation:termPulse .8s ease-in-out infinite;}
+
+  /* ---------- Guiding hand (Visuals/hand icon.png) ----------
+     .hand-drag glides between two terminals (--hx0/--hy0 → --hx1/--hy1, % of its container);
+     .hand-tap presses in place. The translate anchors the FINGERTIP (≈46% across, 20% down
+     in the artwork) on the target point. */
+  .hand-icon{position:absolute;z-index:12;pointer-events:none;
+    width:clamp(46px,5.6vw,78px);height:auto;
+    filter:drop-shadow(0 4px 10px rgba(0,0,0,.55)) drop-shadow(0 0 14px rgba(125,183,255,.65));}
+  .hand-drag{left:var(--hx0);top:var(--hy0);animation:handDrag 3.4s ease-in-out .6s infinite both;}
+  @keyframes handDrag{
+    0%  {left:var(--hx0);top:var(--hy0);opacity:0;transform:translate(-46%,-20%) scale(1);}
+    9%  {opacity:1;transform:translate(-46%,-20%) scale(1);}
+    17% {left:var(--hx0);top:var(--hy0);transform:translate(-46%,-20%) scale(.8);}   /* press the dot */
+    40% {left:var(--hxm,var(--hx1));top:var(--hym,var(--hy1));transform:translate(-46%,-20%) scale(.8);} /* ride the arc */
+    62% {left:var(--hx1);top:var(--hy1);transform:translate(-46%,-20%) scale(.8);}   /* land on the dot */
+    72% {left:var(--hx1);top:var(--hy1);opacity:1;transform:translate(-46%,-20%) scale(1);} /* release */
+    100%{left:var(--hx1);top:var(--hy1);opacity:0;transform:translate(-46%,-20%) scale(1);}}
+  .hand-tap{animation:handTap 1.5s ease-in-out .3s infinite both;}
+  @keyframes handTap{
+    0%,100%{transform:translate(-46%,-20%) scale(1);opacity:.95;}
+    38%{transform:translate(-46%,-20%) scale(.78);opacity:1;}
+    56%{transform:translate(-46%,-20%) scale(1.04);}}
 
   /* ---------- Components ---------- */
   .comp{position:absolute;transform:translate(-50%,-50%);aspect-ratio:1/1;
@@ -205,7 +261,7 @@
   @keyframes glowPop{0%{transform:translate(-50%,-50%) scale(1)}
     40%{transform:translate(-50%,-50%) scale(1.18)}100%{transform:translate(-50%,-50%) scale(1)}}
   .ledglow{position:absolute;inset:-45%;border-radius:50%;pointer-events:none;z-index:-1;opacity:0;transition:opacity .4s;
-    background:radial-gradient(circle,rgba(255,243,150,.95) 0%,rgba(255,220,80,.5) 35%,rgba(255,210,40,0) 70%);}
+    background:radial-gradient(circle,rgba(255,240,160,.75) 0%,rgba(255,167,42,.4) 36%,rgba(255,167,42,0) 68%);}
   .comp.lit .ledglow{opacity:1;animation:pulseGlow 1.4s ease-in-out infinite;}
   @keyframes pulseGlow{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.12);opacity:1}}
 
@@ -219,8 +275,8 @@
 
   /* switch */
   #switch{cursor:pointer;}
-  .switch-badge{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);
-    background:#888;color:#fff;font-weight:800;font-size:12px;padding:2px 12px;border-radius:999px;
+  .switch-badge{position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);
+    background:rgba(70,84,120,.95);color:#fff;font-weight:800;font-size:12px;padding:2px 12px;border-radius:999px;
     box-shadow:0 3px 6px rgba(0,0,0,.3);letter-spacing:1px;transition:background .2s;z-index:3;pointer-events:none;}
   #switch.on .switch-badge{background:var(--glow-green);}
   #switch.glowtap .cimg{animation:tapPulse 1.1s ease-in-out infinite;}
@@ -232,9 +288,9 @@
     align-items:center;gap:2px;transition:opacity .3s;}
   #wirepile img{width:clamp(54px,5.5vw,84px);height:auto;object-fit:contain;
     filter:drop-shadow(0 4px 8px rgba(0,0,0,.3));}
-  #wirepile .count{background:#ffffff;border:2px solid #d8ccff;border-radius:999px;
+  #wirepile .count{background:rgba(8,20,43,.92);border:2px solid rgba(125,183,255,.55);border-radius:999px;
     padding:2px 12px;font-weight:900;color:var(--text-primary);font-size:clamp(12px,1.1vw,15px);
-    box-shadow:var(--shadow-card);}
+    box-shadow:0 0 12px rgba(125,183,255,.25), var(--shadow-card);}
   #wirepile.empty{opacity:.35;}
   #wirepile.wiggle{animation:wiggle .5s;}
   @keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
@@ -268,9 +324,8 @@
   #entry .eb-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;background:#050311;}
   #entry .eb-vidtint{position:absolute;inset:0;z-index:1;pointer-events:none;
     background:linear-gradient(180deg,rgba(5,3,17,.45) 0%,transparent 24%,transparent 52%,rgba(5,3,17,.60) 100%);}
-  #entry .eb-content{position:relative;z-index:2;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;gap:clamp(20px,3.4vh,34px);padding:0 22px;text-align:center;
-    margin-top:43vh;transform:translateY(-50%);}   /* content centred ~43% down, not too low */
+  #entry .eb-content{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:2;
+    display:flex;flex-direction:column;align-items:center;width:min(94vw,1320px);padding:0 22px;text-align:center;}   /* hero centred, ~46% down */
   #entry .estars{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
   /* drifting nebula / cloud glow layers — deep violet, crimson-magenta, reddish pink
      and cool cyan space clouds, like the poster */
@@ -340,35 +395,34 @@
   /* heading: heavy squared sci-fi logotype (Star-Wars-poster style), plain white.
      It flies in from deep space — tiny, blurred and far away, growing onto the screen. */
   /* clean cinematic science-mystery titling — Space Grotesk, no glass panel */
-  #entry .eb-content{font-family:'Space Grotesk',var(--font-body);}
-  /* eyebrow "The Mystery of" — with a thin glowing rule on each side */
-  #entry .eb-eyebrow{display:flex;align-items:center;justify-content:center;gap:clamp(12px,1.6vw,22px);
-    font-weight:500;letter-spacing:.06em;font-size:clamp(26px,3vw,48px);color:#BFC3FF;
-    text-shadow:0 0 14px rgba(150,165,255,.4);
+  #entry .eb-content{font-family:'Exo 2',var(--font-body);}
+  /* mission label — Orbitron, with a thin glowing rule on each side, ~54px above the title */
+  #entry .eb-eyebrow{display:flex;align-items:center;justify-content:center;gap:clamp(12px,1.6vw,22px);margin:0 0 54px;
+    font-family:'Orbitron',var(--font-body);font-weight:500;letter-spacing:.22em;text-transform:uppercase;
+    font-size:clamp(15px,1.5vw,23px);color:#C7CBFF;
+    text-shadow:0 0 14px rgba(150,165,255,.5);
     animation:fromSpace 1.4s cubic-bezier(.2,.8,.25,1) .15s both;}
-  #entry .eb-eyebrow::before,#entry .eb-eyebrow::after{content:"";height:1px;width:clamp(40px,9vw,140px)}
-  #entry .eb-eyebrow::before{background:linear-gradient(90deg,transparent,rgba(180,190,255,.7))}
-  #entry .eb-eyebrow::after{background:linear-gradient(90deg,rgba(180,190,255,.7),transparent)}
-  /* main title "the Glow Box" — title case, not stretched */
-  #entry h1{font-family:'Space Grotesk',var(--font-heading);font-weight:600;color:#F4F2FF;
-    font-size:clamp(72px,9vw,148px);letter-spacing:.005em;line-height:.95;text-align:center;white-space:nowrap;
-    text-shadow:0 0 26px rgba(150,165,255,.55),0 0 60px rgba(132,86,255,.32),0 2px 12px rgba(0,0,0,.5);
+  #entry .eb-eyebrow::before,#entry .eb-eyebrow::after{content:"";height:1px;width:clamp(40px,9vw,140px);box-shadow:0 0 8px rgba(150,175,255,.8)}
+  #entry .eb-eyebrow::before{background:linear-gradient(90deg,transparent,rgba(180,195,255,.85))}
+  #entry .eb-eyebrow::after{background:linear-gradient(90deg,rgba(180,195,255,.85),transparent)}
+  /* headline "GLOW BOX MYSTERY" — Orbitron, uppercase, one line */
+  #entry h1{margin:0;font-family:'Orbitron',var(--font-heading);font-weight:600;color:#F4F1FF;
+    font-size:clamp(46px,5.4vw,88px);letter-spacing:.18em;line-height:1.02;text-align:center;white-space:nowrap;text-transform:uppercase;
+    text-shadow:0 0 22px rgba(196,208,255,.55),0 0 46px rgba(150,165,255,.4),0 0 74px rgba(140,95,255,.32),0 2px 12px rgba(0,0,0,.5);
     animation:fromSpace 1.5s cubic-bezier(.2,.8,.25,1) .3s both;}
-  @media (max-width:760px){#entry h1{white-space:normal;font-size:clamp(46px,15vw,72px);}}
-  /* thin glowing divider with a small star in the centre */
-  #entry .eb-divider{display:flex;align-items:center;justify-content:center;gap:14px;
+  @media (max-width:760px){#entry h1{white-space:normal;font-size:clamp(34px,10vw,60px);letter-spacing:.12em;}}
+  /* thin glowing divider with a small star in the centre, ~38px below the title */
+  #entry .eb-divider{display:flex;align-items:center;justify-content:center;gap:14px;margin:38px 0 0;
     width:min(400px,74vw);color:#C6CBFF;font-size:14px;line-height:1;
     text-shadow:0 0 10px rgba(150,170,255,.9);
     animation:fromSpace 1.3s cubic-bezier(.2,.8,.25,1) .55s both;}
   #entry .eb-divider::before,#entry .eb-divider::after{content:"";height:1px;flex:1}
   #entry .eb-divider::before{background:linear-gradient(90deg,transparent,rgba(160,175,255,.6))}
   #entry .eb-divider::after{background:linear-gradient(90deg,rgba(160,175,255,.6),transparent)}
-  /* subtitle: high contrast, inside a very soft dark translucent pill for readability */
-  #entry p{font-family:'Space Grotesk',var(--font-body);font-weight:500;color:#DDD9FF;
-    font-size:clamp(20px,2vw,30px);line-height:1.35;text-align:center;max-width:90vw;
-    background:rgba(5,8,28,.28);border-radius:999px;padding:8px 24px;
-    -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
-    text-shadow:0 1px 8px rgba(0,0,0,.45);
+  /* subtitle: Exo 2, no panel — dark text shadow carries readability, ~26px below the divider */
+  #entry p{margin:26px 0 0;font-family:'Exo 2',var(--font-body);font-weight:400;color:#E9E5FF;
+    font-size:clamp(22px,2vw,34px);line-height:1.35;letter-spacing:.035em;text-align:center;max-width:90vw;
+    text-shadow:0 2px 10px rgba(0,0,0,.62),0 1px 4px rgba(0,0,0,.5);
     animation:fromSpace 1.3s cubic-bezier(.2,.8,.25,1) .75s both;}
   @keyframes fromSpace{
     0%{opacity:0;transform:scale(.06);filter:blur(8px)}
@@ -376,18 +430,19 @@
     82%{transform:scale(1.05)}
     100%{opacity:1;transform:scale(1);filter:blur(0)}}
   /* CTA: dark blue-violet glowing capsule, sparkle on the left, subtle slow pulse */
-  #entry .btn{min-width:360px;height:68px;padding:0 38px;border-radius:999px;
-    display:inline-flex;align-items:center;justify-content:center;gap:12px;
-    font-family:'Space Grotesk',var(--font-body);font-weight:600;font-size:21px;text-transform:uppercase;letter-spacing:.12em;
-    color:#F4F1FF;border:2px solid rgba(160,185,255,.9);
+  #entry .btn{width:560px;max-width:92vw;height:76px;padding:0 34px;border-radius:999px;margin-top:42px;
+    display:inline-flex;align-items:center;justify-content:center;gap:14px;
+    font-family:'Orbitron',var(--font-body);font-weight:500;font-size:24px;text-transform:uppercase;letter-spacing:.16em;
+    color:#F4F1FF;border:2px solid rgba(145,195,255,.92);
     background:
-      radial-gradient(circle at 50% 115%, rgba(142,88,255,.35), transparent 44%),
-      linear-gradient(180deg, rgba(31,42,105,.88), rgba(14,10,48,.96));
-    box-shadow:0 0 20px rgba(105,165,255,.48),0 0 44px rgba(132,86,255,.36),
+      radial-gradient(circle at 50% 115%, rgba(142,88,255,.35), transparent 46%),
+      linear-gradient(180deg, rgba(31,42,105,.9), rgba(14,10,48,.96));
+    box-shadow:0 0 22px rgba(105,165,255,.5),0 0 50px rgba(132,86,255,.38),
       inset 0 1px 0 rgba(255,255,255,.12),inset 0 -12px 26px rgba(90,60,180,.28);
     animation:btnIn .5s ease-out 2.3s both, entryGlow 4s ease-in-out 3s infinite;
     transition:transform .2s ease,box-shadow .25s ease,border-color .2s ease;}
   #entry .btn .eb-spark{font-size:.86em;color:#DCE0FF;text-shadow:0 0 10px rgba(150,175,255,.9)}
+  #entry .btn .eb-arrow{font-size:.95em;color:#DCE0FF;text-shadow:0 0 10px rgba(150,175,255,.9)}
   #entry .btn:hover{transform:translateY(-2px);border-color:rgba(190,205,255,1);
     box-shadow:0 6px 30px rgba(120,160,255,.6),0 0 52px rgba(140,95,255,.42),inset 0 1px 0 rgba(255,255,255,.14),inset 0 -12px 26px rgba(90,60,180,.32);}
   #entry .btn:active{transform:translateY(0) scale(.99);}
@@ -398,23 +453,21 @@
 
   /* ---------- Certificate finale ---------- */
   #certificate{position:absolute;inset:0;z-index:65;display:none;align-items:center;justify-content:center;
-    background:rgba(30,22,64,.45);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);}
+    background:rgba(3,7,17,.6);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);}
   #certificate.show{display:flex;animation:fadeIn .4s;}
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   .cert-card{position:relative;width:min(70vw,640px);text-align:center;
-    background:
-      radial-gradient(circle at center, rgba(255,248,190,.8), transparent 70%),
-      #fff9dc;
-    border:3px solid var(--launchpad-border);border-radius:36px;
-    box-shadow:0 0 44px rgba(255,216,77,.5);
+    background:linear-gradient(180deg, rgba(16,30,64,.97), rgba(7,13,32,.98));
+    border:2px solid rgba(125,183,255,.7);border-radius:36px;
+    box-shadow:0 0 44px rgba(125,183,255,.35), 0 0 80px rgba(157,140,255,.2);
     padding:5% 6%;animation:btnIn .5s ease-out;}
   .cert-card .big{font-size:clamp(38px,5vw,64px);}
-  .cert-card h2{font-family:var(--font-heading);color:#4a2f8c;font-size:clamp(22px,2.8vw,36px);margin:8px 0 4px;}
+  .cert-card h2{font-family:var(--font-heading);color:#F4F6FF;font-size:clamp(22px,2.8vw,36px);margin:8px 0 4px;}
   .cert-card .sub{color:var(--text-secondary);font-weight:800;font-size:clamp(13px,1.4vw,18px);margin-bottom:14px;}
   .word-chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;}
-  .word-chips span{background:#ffffff;border:2px solid #d8ccff;border-radius:999px;
-    padding:7px 18px;font-family:var(--font-heading);font-weight:700;color:var(--accent-violet-dark);
-    font-size:clamp(13px,1.4vw,18px);box-shadow:var(--shadow-card);}
+  .word-chips span{background:rgba(10,22,48,.92);border:2px solid rgba(157,140,255,.6);border-radius:999px;
+    padding:7px 18px;font-family:var(--font-heading);font-weight:700;color:#CFE0FF;
+    font-size:clamp(13px,1.4vw,18px);box-shadow:0 0 12px rgba(157,140,255,.22), var(--shadow-card);}
 
   /* ---------- Learning prompts ---------- */
   #choices{
@@ -424,26 +477,31 @@
   }
   #choices.show{pointer-events:auto;}
   .choice-btn{
-    min-height:48px;border:2px solid #d8ccff;border-radius:999px;background:#ffffff;
+    min-height:48px;border:2px solid rgba(125,183,255,.55);border-radius:999px;
+    background:linear-gradient(180deg, rgba(14,26,56,.94), rgba(8,16,38,.96));
     color:var(--text-primary);font-family:var(--font-heading);font-weight:700;
     font-size:clamp(14px,1.5vw,18px);padding:10px 22px;cursor:pointer;
-    box-shadow:var(--shadow-card);transition:transform .14s, border-color .14s, background .14s;
+    box-shadow:0 0 12px rgba(125,183,255,.18), var(--shadow-card);
+    transition:transform .14s, border-color .14s, background .14s, box-shadow .2s;
   }
-  .choice-btn:hover{transform:translateY(-2px);border-color:var(--accent-violet);}
+  .choice-btn:hover{transform:translateY(-2px);border-color:var(--accent-violet);
+    box-shadow:0 0 18px rgba(157,140,255,.35), var(--shadow-card);}
   .choice-btn:active{transform:translateY(2px);}
-  .choice-btn:focus-visible{outline:3px solid #ffffff;outline-offset:3px;}
+  .choice-btn:focus-visible{outline:2px solid rgba(190,205,255,.95);outline-offset:3px;}
   .choice-title{
-    flex-basis:100%;text-align:center;color:#4a2f8c;font-family:var(--font-heading);
+    flex-basis:100%;text-align:center;color:#EAF1FF;font-family:var(--font-heading);
     font-weight:700;font-size:clamp(16px,1.7vw,22px);
-    text-shadow:0 1px 0 rgba(255,255,255,.75);
+    text-shadow:0 2px 10px rgba(0,0,0,.6);
   }
   /* Level-1 headline: the task, front and centre at the top */
   #headline{
     position:absolute;top:16px;left:50%;transform:translateX(-50%);
     z-index:36;display:none;align-items:center;gap:9px;
     max-width:min(84vw,620px);padding:12px 26px;border-radius:999px;
-    background:#ffffff;border:2px solid #d8ccff;box-shadow:0 8px 20px rgba(93,73,201,.16);
-    color:#4a2f8c;font-family:var(--font-heading);font-weight:700;text-align:center;
+    background:linear-gradient(180deg, rgba(16,30,64,.95), rgba(8,16,38,.96));
+    border:2px solid rgba(125,183,255,.6);
+    box-shadow:0 0 18px rgba(125,183,255,.3), var(--shadow-card);
+    color:#EAF1FF;font-family:var(--font-heading);font-weight:700;text-align:center;
     font-size:clamp(15px,2vw,25px);line-height:1.15;
   }
   #headline.show{display:flex;animation:cardPop .3s ease-out;}
@@ -453,24 +511,30 @@
     position:absolute;top:8.5vh;left:50%;transform:translateX(-50%);
     z-index:60;display:none;flex-direction:row;align-items:center;justify-content:center;
     flex-wrap:wrap;column-gap:9px;row-gap:2px;
-    width:max-content;max-width:min(72vw,780px);padding:10px 26px;border-radius:14px;
-    background:
-      radial-gradient(circle at center, rgba(255,248,190,.85), transparent 72%),
-      #fff9dc;
-    border:2px solid var(--launchpad-border);
-    box-shadow:0 0 22px rgba(255,216,77,.45), var(--shadow-soft);
+    width:max-content;max-width:min(72vw,780px);padding:10px 28px;border-radius:999px;
+    background:linear-gradient(180deg, rgba(18,32,68,.96), rgba(8,16,38,.97));
+    border:2px solid rgba(157,140,255,.65);
+    box-shadow:0 0 22px rgba(157,140,255,.35), 0 0 44px rgba(125,183,255,.18), var(--shadow-soft);
     color:var(--text-primary);font-weight:800;text-align:center;
     font-size:clamp(12px,1.35vw,17px);line-height:1.3;pointer-events:none;
   }
-  #concept-card.show{display:flex;animation:cardPopSide .42s cubic-bezier(.2,1.3,.4,1);}
+  #concept-card.show{display:flex;
+    animation:cardPopSide .42s cubic-bezier(.2,1.3,.4,1),
+      conceptGlow 1.8s ease-in-out .5s infinite;}
+  @keyframes conceptGlow{
+    0%,100%{box-shadow:0 0 16px rgba(157,140,255,.35), 0 0 34px rgba(125,183,255,.16), var(--shadow-soft);
+      transform:translateX(-50%) scale(1);border-color:rgba(157,140,255,.65);}
+    50%{box-shadow:0 0 38px rgba(157,140,255,.85), 0 0 80px rgba(125,183,255,.5), var(--shadow-soft);
+      transform:translateX(-50%) scale(1.035);border-color:rgba(196,186,255,.95);}}
   #concept-card.fadeout{animation:cardFade .5s ease-in forwards;}
-  #concept-card .term{font-family:var(--font-heading);color:var(--accent-violet-dark);font-size:1.12em;}
+  #concept-card .term{font-family:var(--font-ui);font-weight:600;color:var(--current-yellow);font-size:1.05em;
+    text-shadow:0 0 12px rgba(255,215,90,.5);}
   @keyframes cardPopSide{0%{opacity:0;transform:translateX(-50%) scale(.5)}
     65%{opacity:1;transform:translateX(-50%) scale(1.06)}100%{opacity:1;transform:translateX(-50%) scale(1)}}
   @keyframes cardFade{from{opacity:1}to{opacity:0;transform:translateX(-50%) scale(.94)}}
   /* wire the child should try pulling — glows to draw the eye */
   .wbase.hintwire{animation:hintWire 1s ease-in-out infinite;}
-  @keyframes hintWire{0%,100%{stroke:#c2bcd8;filter:drop-shadow(0 0 3px rgba(255,150,60,.4))}
+  @keyframes hintWire{0%,100%{stroke:#8fa4cf;filter:drop-shadow(0 0 3px rgba(255,150,60,.4))}
     50%{stroke:#ff7a7a;filter:drop-shadow(0 0 15px rgba(255,120,120,.95))}}
   /* dotted "connect here" guide wires (auto-help after two wrong tries with the switch).
      Red dashes join + to + · blue dashes carry the return path through the switch to −,
@@ -483,10 +547,10 @@
   @keyframes ghostBlink{0%,100%{opacity:.55}50%{opacity:1}}
   /* component name labels shown under the images in the first build */
   .comp-label{position:absolute;top:100%;left:50%;transform:translate(-50%,-14px);display:none;
-    background:#ffffff;border:2px solid #d8ccff;border-radius:999px;padding:3px 14px;
-    font-family:var(--font-heading);font-weight:700;color:#4a2f8c;
+    background:rgba(8,20,43,.92);border:2px solid rgba(125,183,255,.55);border-radius:999px;padding:3px 14px;
+    font-family:var(--font-heading);font-weight:700;color:#EAF1FF;
     font-size:clamp(11px,1.2vw,15px);letter-spacing:.5px;white-space:nowrap;
-    box-shadow:var(--shadow-card);z-index:3;pointer-events:none;}
+    box-shadow:0 0 12px rgba(125,183,255,.22), var(--shadow-card);z-index:3;pointer-events:none;}
   #board.show-labels .comp-label{display:block;}
   /* the bench panel glows green when the circuit is joined correctly, red when wrong */
   .bench-panel.panel-good{border-color:var(--success-green);
@@ -494,21 +558,27 @@
   .bench-panel.panel-bad{border-color:var(--error-coral);
     box-shadow:0 0 34px rgba(255,122,122,.6);}
   /* answer options: a wrong pick shakes with a red glow; the right one glows green */
-  .choice-btn.bad{animation:choiceShake .5s ease;border-color:#ff7a7a;background:#ffe9e9;
+  .choice-btn.bad{animation:choiceShake .5s ease;border-color:#ff7a7a;background:rgba(96,26,38,.92);
     box-shadow:0 0 16px rgba(255,110,110,.8);}
   @keyframes choiceShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}
     40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
-  .choice-btn.good{border-color:#62d58b;background:#e4f9ec;
+  .choice-btn.good{border-color:#62d58b;background:rgba(18,74,48,.92);
     box-shadow:0 0 16px rgba(98,213,139,.85);}
-  /* Back / Undo / Next controls */
-  #navbar{position:absolute;top:16px;left:20px;z-index:46;display:flex;gap:8px;}
-  .navbtn{min-height:42px;padding:8px 16px;border-radius:999px;background:#ffffff;border:2px solid #d8ccff;
-    color:var(--text-primary);font-family:var(--font-heading);font-weight:700;font-size:clamp(12px,1.3vw,16px);
-    box-shadow:var(--shadow-card);cursor:pointer;transition:transform .14s, border-color .14s, opacity .2s;}
-  .navbtn:hover{transform:translateY(-2px);border-color:var(--accent-violet);}
+  /* Back / Undo / Next controls — Undo pinned top-left, Next top-right */
+  #navbar{position:absolute;top:16px;left:20px;right:20px;z-index:46;display:flex;gap:8px;
+    justify-content:space-between;pointer-events:none;}
+  .navbtn{min-height:42px;padding:8px 18px;border-radius:999px;pointer-events:auto;
+    background:linear-gradient(180deg, rgba(16,30,64,.92), rgba(9,18,42,.95));
+    border:2px solid rgba(125,183,255,.7);
+    color:#EAF1FF;font-family:var(--font-ui);font-weight:500;font-size:clamp(11px,1.15vw,14px);
+    letter-spacing:.08em;text-transform:uppercase;
+    box-shadow:0 0 14px rgba(125,183,255,.22), inset 0 1px 0 rgba(255,255,255,.1);
+    cursor:pointer;transition:transform .14s, border-color .14s, box-shadow .2s, opacity .2s;}
+  .navbtn:hover{transform:translateY(-2px);border-color:rgba(180,210,255,.95);
+    box-shadow:0 0 20px rgba(125,183,255,.4), inset 0 1px 0 rgba(255,255,255,.12);}
   .navbtn:active{transform:translateY(1px);}
-  .navbtn:disabled{opacity:.38;cursor:default;transform:none;border-color:#d8ccff;}
-  .navbtn:focus-visible{outline:3px solid #ffffff;outline-offset:3px;}
+  .navbtn:disabled{opacity:.35;cursor:default;transform:none;border-color:rgba(125,183,255,.4);box-shadow:none;}
+  .navbtn:focus-visible{outline:2px solid rgba(190,205,255,.95);outline-offset:3px;}
   #sky-callback{
     position:absolute;inset:0;z-index:4;display:none;pointer-events:none;overflow:hidden;
     background:
@@ -536,7 +606,7 @@
     #choices{bottom:max(14px,env(safe-area-inset-bottom));}
     #concept-card{max-width:92vw;padding:9px 16px;font-size:clamp(13px,3.4vw,16px);}
     #headline{top:max(10px,env(safe-area-inset-top));font-size:clamp(14px,3.8vw,19px);padding:9px 16px;}
-    #navbar{top:auto;bottom:max(12px,env(safe-area-inset-bottom));left:8px;gap:6px;}
+    #navbar{top:auto;bottom:max(12px,env(safe-area-inset-bottom));left:8px;right:8px;gap:6px;}
     .navbtn{min-height:38px;padding:6px 12px;font-size:14px;}
     .btn{min-height:48px;padding:10px 24px;font-size:clamp(16px,5vw,20px);}
     .choice-btn{min-height:46px;padding:9px 16px;font-size:clamp(14px,4vw,17px);}
@@ -557,7 +627,7 @@
     #actionbar{bottom:10px;}
     #choices{bottom:10px;width:min(68vw,660px);}
     #concept-card{max-width:min(74vw,640px);padding:8px 18px;font-size:clamp(12px,1.8vw,16px);}
-    #navbar{top:10px;left:12px;gap:6px;}
+    #navbar{top:10px;left:12px;right:12px;gap:6px;}
     .navbtn{min-height:38px;padding:6px 12px;font-size:13px;}
     .btn{min-height:46px;padding:9px 24px;font-size:clamp(15px,2.2vw,19px);}
     .cert-card{width:min(76vw,600px);padding:24px 28px;border-radius:28px;}
@@ -595,6 +665,8 @@
   </div>
   <div id="stage"></div>
 
+  <div id="kabir-ring" class="char-ring" aria-hidden="true"></div>
+  <div id="meera-ring" class="char-ring" aria-hidden="true"></div>
   <img id="kabir" alt="Kabir">
   <img id="meera" alt="Meera">
 
@@ -641,11 +713,11 @@
     <div class="eb-vidtint"></div>
     <div class="eb-shade"></div>
     <div class="eb-content">
-      <div class="eb-eyebrow">The Mystery of</div>
-      <h1>the Glow Box</h1>
+      <div class="eb-eyebrow">MISSION 2 &nbsp;•&nbsp; CIRCUIT QUEST</div>
+      <h1>GLOW BOX MYSTERY</h1>
       <div class="eb-divider" aria-hidden="true">✦</div>
-      <p>Something made the bulb glow. Can you find out why?</p>
-      <button class="btn" id="entry-btn"><span class="eb-spark" aria-hidden="true">✦</span>Begin the Mystery →</button>
+      <p>Investigate what makes the park lamp glow?</p>
+      <button class="btn" id="entry-btn" aria-label="Start investigation"><span class="eb-spark" aria-hidden="true">✦</span>START INVESTIGATION<span class="eb-arrow" aria-hidden="true">→</span></button>
     </div>
   </div>
 </div>
@@ -670,9 +742,9 @@ const IMG = {
   switch:  V("switch.png"),
   switchOn:V("switch on.png"),
   wire:    V("wires.png"),
+  hand:    V("hand icon transparent.png"),
 };
-document.getElementById("room-bg").style.backgroundImage =
-  `url("${V("room background with no character..png")}")`;
+/* room photo removed — #room-bg is now a pure-CSS nebula layer (cosmic HUD reskin) */
 
 /* ============ Audio removed — the Glow-Box game runs silently ============ */
 /* ac()/beep()/snd.* are kept as no-ops so the many call sites need no changes. */
@@ -779,18 +851,23 @@ dlgBox.addEventListener("click", showNextLine);
 window.addEventListener("resize", ()=>{
   if(!dlgBox.classList.contains("hide") && dlgSpeaker.textContent) positionDialogue(dlgSpeaker.textContent);
   redrawWires();
+  positionHandDrag();
 });
+/* any touch anywhere resets the 10s idle-hint clock */
+gameEl.addEventListener("pointerdown", ()=>{ if(stage>=1) armIdleHint(); }, true);
 
 /* ============ Action button ============ */
 function setAction(label, cb){
+  removeHand();                          // stale hints (e.g. on the switch) die with the new button
   actionbar.innerHTML = "";
   clearChoices();
+  fadeConcept();                         // the top card bows out as the next-stage button arrives
   const b = document.createElement("button");
   b.className = "btn"; b.textContent = label;
-  b.addEventListener("click", ()=>{ snd.click(); cb(); });
+  b.addEventListener("click", ()=>{ removeHand(); snd.click(); cb(); });
   actionbar.appendChild(b);
 }
-function clearAction(){ actionbar.innerHTML = ""; }
+function clearAction(){ if(actionbar.querySelector(".hand-icon")) removeHand(); actionbar.innerHTML = ""; }
 function setChoices(prompt, options, onPick, onWrong){
   clearAction();
   choicesEl.innerHTML = "";
@@ -828,7 +905,7 @@ function clearChoices(){
   choicesEl.classList.remove("show");
   choicesEl.innerHTML = "";
 }
-function showConcept(term, text, ms=17000){
+function showConcept(term, text, ms=15000){
   hideHeadline();
   conceptEl.classList.remove("fadeout");
   conceptEl.innerHTML = `<span class="term">${term}</span><span>${text}</span>`;
@@ -845,6 +922,14 @@ function hideConcept(){
   clearTimeout(showConcept.timer);
   clearTimeout(showConcept.fadeTimer);
   conceptEl.classList.remove("show","fadeout");
+}
+/* gentle version: the card fades out (used when the next-stage button appears) */
+function fadeConcept(){
+  if(!conceptEl.classList.contains("show")) return;
+  clearTimeout(showConcept.timer);
+  clearTimeout(showConcept.fadeTimer);
+  conceptEl.classList.add("fadeout");
+  showConcept.fadeTimer = setTimeout(()=>conceptEl.classList.remove("show","fadeout"), 520);
 }
 const headlineEl = $("#headline");
 function showHeadline(text){
@@ -899,13 +984,14 @@ const MAX_WIRES = 3;
 let wires = [];            // {a, b, pts, g, base, curp, hit}
 let switchOn = false;
 let switchVisible = false; // the switch only appears once it is introduced (Stage 5)
-let board = null, boardSvg = null, wireLayer = null, tempPath = null;
+let board = null, boardSvg = null, wireLayer = null, guideLayer = null, tempPath = null;
 let cur = { lit:false, switchInLoop:false };
 let dragging = null;       // {from, pts, moved, startPt}
 let selectedTerm = null;
 
 let polarityHelpShown = false;      // a reversed loop has prompted the "check the signs" hint this build
 let polarityPraisedThisBuild = false; // the "+ meets +, − meets −" reinforcement has shown this build
+let panelGoodTimer = null;            // the green success glow fades after 5s
 function buildBench(){
   wires = [];
   ghostWires = [];              // the rebuilt board wipes any dotted guide wires with it
@@ -927,6 +1013,9 @@ function buildBench(){
     <svg viewBox="0 0 ${VBW} ${VBH}" preserveAspectRatio="none">
       <g id="wire-layer"></g>
     </svg>
+    <svg class="guide-svg" viewBox="0 0 ${VBW} ${VBH}" preserveAspectRatio="none" aria-hidden="true">
+      <g id="guide-layer"></g>
+    </svg>
 
     <div class="comp" id="bulb" style="left:75%;top:42%;width:27%;">
       <div class="ledglow"></div>
@@ -939,7 +1028,7 @@ function buildBench(){
       <div class="comp-label">POWER SOURCE</div>
     </div>
 
-    <div class="comp" id="switch" style="left:50%;top:82%;width:16%;">
+    <div class="comp" id="switch" style="left:50%;top:77%;width:16%;">
       <img class="cimg" src="${IMG.switch}" alt="switch">
       <div class="switch-badge">OFF</div>
     </div>
@@ -953,6 +1042,7 @@ function buildBench(){
 
   boardSvg = board.querySelector("svg");
   wireLayer = board.querySelector("#wire-layer");
+  guideLayer = board.querySelector("#guide-layer");
 
   // terminal dots sit inside their component, right on the artwork's terminals
   Object.keys(TERMS).forEach(id=>{
@@ -1066,6 +1156,7 @@ function addWire(a, b, pts){
   hit.addEventListener("pointerdown", e=>{
     if(dragging) return;
     e.preventDefault(); e.stopPropagation();
+    removeHand();
     removeWire(w); snd.pop(); noteInteraction();
     refreshCircuit();
   });
@@ -1094,7 +1185,38 @@ function guideRouteD(a, b, kind){
   if(kind==="viaAx"){
     return pathFromPoints([A, {x:A.x, y:B.y}, B]);
   }
+  if(kind==="free"){
+    const {c1, c2} = freeCurveCtrls(A, B);
+    return `M ${A.x.toFixed(1)} ${A.y.toFixed(1)} C ${c1.x.toFixed(1)} ${c1.y.toFixed(1)}, ${c2.x.toFixed(1)} ${c2.y.toFixed(1)}, ${B.x.toFixed(1)} ${B.y.toFixed(1)}`;
+  }
+  if(kind==="bow"){
+    const {c1, c2} = bowCurveCtrls(A, B);
+    return `M ${A.x.toFixed(1)} ${A.y.toFixed(1)} C ${c1.x.toFixed(1)} ${c1.y.toFixed(1)}, ${c2.x.toFixed(1)} ${c2.y.toFixed(1)}, ${B.x.toFixed(1)} ${B.y.toFixed(1)}`;
+  }
   return autoRoute(A, B);
+}
+/* relaxed sagging curve, like a wire the child drew by hand — no corners.
+   Sags below the straight line; if the panel bottom is too close, arcs above instead. */
+function bowCurveCtrls(A, B){
+  const dx = B.x-A.x, dy = B.y-A.y;
+  let sag = Math.max(20, Math.min(40, Math.hypot(dx,dy)*0.18));
+  const room = VBH - Math.max(A.y, B.y) - 10;
+  if(room < sag) sag = (room > 8 ? room : -sag*0.8);
+  return {
+    c1:{x:A.x+dx*0.30, y:A.y+dy*0.30+sag},
+    c2:{x:A.x+dx*0.70, y:A.y+dy*0.70+sag}
+  };
+}
+/* hand-drawn arc that clearly LEAVES A: rises straight up out of the dot,
+   sweeps across, then drops down into B — both endpoints unmistakable.
+   Shared by the dotted guide and the demo hand so they travel together. */
+function freeCurveCtrls(A, B){
+  const dx = B.x-A.x;
+  const lift = Math.max(46, Math.min(80, Math.abs(dx)*0.22));
+  return {
+    c1:{x:A.x+dx*0.06, y:A.y-lift*0.95},           // near-vertical departure from A
+    c2:{x:B.x-dx*0.10, y:Math.min(A.y, B.y)-lift}  // eases over, then descends into B
+  };
 }
 function clearGhostWires(){
   ghostWires.forEach(g=>{ if(g.el && g.el.parentNode) g.el.parentNode.removeChild(g.el); });
@@ -1104,16 +1226,118 @@ function showGuideWires(pairs){
   clearGhostWires();
   pairs.forEach(([a, b, cls, kind])=>{
     const el = mkPath("wghost" + (cls ? " "+cls : ""), guideRouteD(a, b, kind));
-    wireLayer.appendChild(el);
+    (guideLayer || wireLayer).appendChild(el);   // guide layer sits ABOVE the components
     ghostWires.push({a, b, el, kind});
   });
 }
-function clearWireHints(){ wires.forEach(w=>{ if(w.base) w.base.classList.remove("hintwire"); }); }
+function clearWireHints(){ removeHand(); wires.forEach(w=>{ if(w.base) w.base.classList.remove("hintwire"); }); }
+
+/* ---- guiding hand (Visuals/hand icon.png): drag demos + tap hints ----
+   One hand at a time; removeHand() clears whichever is showing. */
+let handEl = null, handTimer = null, handDragPair = null, handDragKind = "free", tutDone = false;
+function handImg(cls){
+  const h = document.createElement("img");
+  h.src = IMG.hand; h.alt = ""; h.className = "hand-icon "+cls;
+  h.setAttribute("aria-hidden","true");
+  return h;
+}
+function removeHand(){
+  clearTimeout(handTimer); handTimer = null; handDragPair = null;
+  if(handEl && handEl.parentNode) handEl.parentNode.removeChild(handEl);
+  handEl = null;
+}
+function positionHandDrag(){
+  if(!handEl || !board || !handDragPair) return;
+  const A = termCenterVB(handDragPair[0]), B = termCenterVB(handDragPair[1]);
+  // midpoint of the same freehand curve a drawn wire would take (cubic bezier at t=0.5),
+  // so the hand rides a natural wire path instead of cutting straight across
+  const {c1, c2} = handDragKind==="bow" ? bowCurveCtrls(A, B) : freeCurveCtrls(A, B);
+  const M = {x:(A.x+3*c1.x+3*c2.x+B.x)/8, y:(A.y+3*c1.y+3*c2.y+B.y)/8};
+  handEl.style.setProperty("--hx0", (A.x/VBW*100).toFixed(2)+"%");
+  handEl.style.setProperty("--hy0", (A.y/VBH*100).toFixed(2)+"%");
+  handEl.style.setProperty("--hxm", (M.x/VBW*100).toFixed(2)+"%");
+  handEl.style.setProperty("--hym", (M.y/VBH*100).toFixed(2)+"%");
+  handEl.style.setProperty("--hx1", (B.x/VBW*100).toFixed(2)+"%");
+  handEl.style.setProperty("--hy1", (B.y/VBH*100).toFixed(2)+"%");
+}
+/* hand glides from terminal a to terminal b, pressing at both ends.
+   kind picks the path shape: "free" arcs over the top, "bow" sags like a drawn wire */
+function showHandDrag(a, b, kind){
+  removeHand();
+  handEl = handImg("hand-drag"); handDragPair = [a, b];
+  handDragKind = kind || ((a==="bp"||b==="bp") ? "free" : "bow");
+  board.appendChild(handEl);
+  positionHandDrag();
+}
+/* hand taps in place at a board viewBox point */
+function showHandTapVB(x, y){
+  removeHand();
+  handEl = handImg("hand-tap");
+  handEl.style.left = (x/VBW*100).toFixed(2)+"%";
+  handEl.style.top  = (y/VBH*100).toFixed(2)+"%";
+  board.appendChild(handEl);
+}
+/* hand taps on the action button (appended inside the actionbar) */
+function showHandTapOnAction(){
+  removeHand();
+  if(!actionbar.querySelector(".btn")) return;
+  handEl = handImg("hand-tap");
+  handEl.style.left = "74%"; handEl.style.top = "46%";
+  actionbar.appendChild(handEl);
+}
+/* first-build tutorial: demo joining battery + to LED + over a freehand dotted path.
+   Ends the moment the child touches a terminal. */
+function showTutorial(){
+  if(tutDone || !board || handEl) return;
+  showHandDrag("bp", "l1");
+  showGuideWires([["bp","l1","pos","free"]]);   // curvy + to + path under the moving hand
+}
+function endTutorial(){
+  if(tutDone) return;
+  tutDone = true;
+  removeHand();
+  clearGhostWires();
+}
+
+/* ---- 10s idle hint: whatever the game is waiting on, the hand shows it ----
+   Re-arms itself, so as long as the child stays idle the hand keeps helping. */
+let idleHintTimer = null;
+function armIdleHint(){
+  clearTimeout(idleHintTimer);
+  idleHintTimer = setTimeout(showIdleHint, 10000);
+}
+function showIdleHint(){
+  armIdleHint();                                  // keep watching
+  if(handEl || stage<1 || dragging) return;       // a hint is already up, or nothing started yet
+  // 1) an action button is waiting → tap it (answer choices never get a hand)
+  if(actionbar.querySelector(".btn")){ showHandTapOnAction(); return; }
+  if(choicesEl.classList.contains("show")) return;   // let the child read and pick freely
+  if(!board) return;
+  // 2) "stop the glow" step → tap the wire to pull
+  if(stage===3 && !pathQuestionAnswered && wires.length){ hintRemoveWire(); return; }
+  // 3) circuit built but the switch is off → tap the switch
+  if(switchVisible && !switchOn && cur.switchWouldComplete){
+    const sw = board.querySelector("#switch");
+    if(sw){ const r = sw.getBoundingClientRect();
+      const c = toVB({clientX:r.left+r.width/2, clientY:r.top+r.height/2});
+      showHandTapVB(c.x, c.y); return; }
+  }
+  // 4) building → demo the next missing join (first pair whose both dots are free)
+  if(!cur.lit){
+    const pairs = switchVisible ? [["bp","l1"],["l2","s1"],["s2","bn"]] : [["bp","l1"],["bn","l2"]];
+    const next = pairs.find(([a,b])=>!occupiedBy(a) && !occupiedBy(b));
+    if(next) showHandDrag(next[0], next[1]);
+  }
+}
 /* nudge for "stop the glow": glow one wire so the child sees a wire is the thing to pull */
 function hintRemoveWire(){
   clearWireHints();
   const w = wires.find(x=>TERMS[x.a].comp==="battery" || TERMS[x.b].comp==="battery") || wires[0];
-  if(w && w.base) w.base.classList.add("hintwire");
+  if(w && w.base){
+    w.base.classList.add("hintwire");
+    // hand taps the middle of the glowing wire — "pull this one"
+    try{ const p = w.base.getPointAtLength(w.base.getTotalLength()/2); showHandTapVB(p.x, p.y); }catch(e){}
+  }
 }
 function removeWire(w){
   const i = wires.indexOf(w);
@@ -1125,6 +1349,35 @@ function clearAllWires(){
   wires.slice().forEach(removeWire);
   setSelected(null);
   markCandidates(null, false);
+}
+/* After a wrong build is pointed out, the wires clear themselves a beat later so the
+   child always starts the next try on a clean bench. The predicate re-checks that the
+   build is STILL wrong when the timer fires (skips if the child already fixed it). */
+let wrongClearTimer = null;
+function scheduleWrongClear(stillWrong){
+  clearTimeout(wrongClearTimer);
+  wrongClearTimer = setTimeout(function tick(){
+    if(cur.lit) return;
+    if(dragging){ wrongClearTimer = setTimeout(tick, 1200); return; }   // mid-drag: check again shortly
+    if(stillWrong && !stillWrong()) return;
+    clearAllWires();
+    refreshCircuit();
+  }, 2400);
+}
+/* battery split: one battery end wired to the switch, the other to the LED, and the
+   LED and switch NOT joined to each other. A complete loop that merely has its switch
+   OFF has the same battery signature — that build is CORRECT, never a split. */
+function batterySplit(){
+  if(cur.lit || cur.switchWouldComplete) return false;
+  const wp = occupiedBy("bp"), wn = occupiedBy("bn");
+  if(!wp || !wn) return false;
+  const oc = w => TERMS[w.a].comp==="battery" ? TERMS[w.b].comp : TERMS[w.a].comp;
+  const ends = new Set([oc(wp), oc(wn)]);
+  if(!(ends.has("switch") && ends.has("bulb"))) return false;
+  return !wires.some(w=>{
+    const c1 = TERMS[w.a].comp, c2 = TERMS[w.b].comp;
+    return (c1==="bulb" && c2==="switch") || (c1==="switch" && c2==="bulb");
+  });
 }
 
 /* ---- draw a wire: press a terminal, bend the line any way, release on another ---- */
@@ -1149,6 +1402,8 @@ function onBoardDown(e){
   if(id && !occupiedBy(id)){ e.preventDefault(); ac(); startWireFrom(id, e); }
 }
 function startWireFrom(id, e){
+  endTutorial();                         // the child is doing it themselves now
+  removeHand();                          // any tap/redraw hint hand has served its purpose
   noteInteraction();
   const existing = occupiedBy(id);
   if(existing){
@@ -1220,6 +1475,7 @@ function tryConnect(a, b, pts){
 /* ---- switch ---- */
 function onSwitchTap(){
   if(stage < 1) return;
+  removeHand();                          // the tap hint served its purpose
   noteInteraction();
   switchOn = !switchOn;
   const sEl = board.querySelector("#switch");
@@ -1293,10 +1549,18 @@ function refreshCircuit(){
   board.classList.toggle("live", cur.lit);
   const bulbEl = board.querySelector("#bulb");
   bulbEl.classList.toggle("lit", cur.lit);
-  // the whole bench panel answers the build: green glow = joined correctly, red = wrong
+  // the whole bench panel answers the build: green glow = joined correctly, red = wrong.
+  // The green is a moment of feedback, not a state — it fades after 5s.
   const panel = board.parentNode;
   if(panel && panel.classList.contains("bench-panel")){
-    panel.classList.toggle("panel-good", cur.lit);
+    if(cur.lit && !prev.lit){
+      panel.classList.add("panel-good");
+      clearTimeout(panelGoodTimer);
+      panelGoodTimer = setTimeout(()=>panel.classList.remove("panel-good"), 5000);
+    } else if(!cur.lit){
+      clearTimeout(panelGoodTimer);
+      panel.classList.remove("panel-good");
+    }
     panel.classList.toggle("panel-bad", !cur.lit && !!(cur.wrongPolarity || cur.badLoop));
   }
   // terminal dots: quiet once occupied, invite while free (during build stages)
@@ -1327,23 +1591,17 @@ function polarityFeedback(prev, cur){
     ]);
     // in the switch stage a reversed loop also counts as a wrong try toward the auto-guide
     if(stage===5){ s5wrong++; if(s5wrong>=2) showSwitchGuide(); }
-    // first build: after the child sees the red glow and hears the prompt, the wrong
-    // wires clear by themselves so they can try again fresh
-    if(stage===1){
-      setTimeout(()=>{
-        if(stage===1 && cur.wrongPolarity && !cur.lit){
-          clearAllWires();
-          refreshCircuit();
-        }
-      }, 2400);
-    }
+    // every build: after the child sees the red glow and hears the prompt, the wrong
+    // wires clear by themselves so they can draw again fresh
+    scheduleWrongClear(()=> cur.wrongPolarity && !cur.lit);
     return;
   }
-  if(cur.lit && !prev.lit && polarityHelpShown && !polarityPraisedThisBuild){
+  if(cur.lit && !prev.lit && polarityHelpShown && !polarityPraisedThisBuild && stage<5){
     polarityPraisedThisBuild = true;
     // they fixed a reversed loop — reinforce why it glows now (concept card, so it
-    // sits alongside the stage dialogue instead of interrupting it)
-    showConcept("The LED glows when", "its + meets the battery's +, and − meets −.", 8000);
+    // sits alongside the stage dialogue instead of interrupting it). Switch stages
+    // keep their own card ("Switch =") — no polarity card there.
+    showConcept("The LED glows when", "its + meets the battery's +, and − meets −.", 6000);
   }
 }
 function setFlowMode(mode){
@@ -1357,6 +1615,8 @@ function setFlowMode(mode){
 let stage = 0;
 let chapterIdx = 0;        // which top-level step Back/Next navigate between
 let currentReplayReady = false;
+let currentReplayArmed = false;  // Current card is up: an early re-light counts as the replay
+let pendingActionTimer = null;   // delayed CTA reveal — cancelled if the child acts first
 let pathQuestionAnswered = false;
 let switchDoorSeen = false;
 let switchDoorDone = false;
@@ -1588,13 +1848,18 @@ function noteInteraction(){
   if(stage===1) armNudge();
 }
 function onGlow(){
+  removeHand();                          // the goal is reached — no hint should linger
   celebrateFirstGlow();
   if(stage===1){
     clearTimeout(nudgeTimer);
     snd.success();
     startStage2();
-  } else if(stage===2 && currentReplayReady){
+  } else if(stage===2 && (currentReplayReady || currentReplayArmed)){
+    // accepted even if the child re-lit the circuit BEFORE the button appeared
+    clearTimeout(pendingActionTimer);
+    clearAction();
     currentReplayReady = false;
+    currentReplayArmed = false;
     snd.success();
     setDialogue([
       {who:"Kabir", text:"Can you see it travel again?", kabir:"kabirHappy"},
@@ -1636,18 +1901,36 @@ let s5promptKey = null, s5wrong = 0, switchGuideShown = false;
 function showSwitchGuide(){
   if(switchGuideShown || stage!==5) return;
   switchGuideShown = true;
-  // battery + → LED + (red, arcing over the top) · LED − → switch → battery − (blue,
-  // clean L-shaped runs) — the dash colours match the + / − rings on the dots
-  showGuideWires([
-    ["bp","l1","pos","over"],
-    ["l2","s1","neg","viaAx"],
-    ["s2","bn","neg","viaAx"],
-  ]);
+  // no dotted answer lines — the hand demonstrates the joins, one wire at a time,
+  // along the same relaxed path a drawn wire would take
   setDialogue([{who:"Kabir", text:"Let's connect them now.", kabir:"kabirHappy"}]);
+  // wrong wires melt away first (never a correct loop just waiting for its switch),
+  // then the hand shows the first missing join
+  scheduleWrongClear(()=> !cur.lit && !cur.switchWouldComplete);
+  setTimeout(()=>{ if(stage===5 && !cur.lit && !handEl) showIdleHint(); }, 3000);
 }
 function switchStageCoach(){
-  if(stage!==5) return;
+  if(stage!==5 && stage!==6) return;
   if(cur.lit){ s5promptKey = null; return; }
+  // a correct loop that only needs the switch tapped ON is NOT a wrong build —
+  // afterCircuitRefresh already coaches "tap the switch"
+  if(cur.switchWouldComplete){ s5promptKey = null; return; }
+  // battery split: one battery end wired to the switch, the other to the LED — the
+  // three parts hang off the battery instead of forming one loop
+  if(batterySplit()){
+    if(s5promptKey!=="splitBattery"){
+      s5promptKey = "splitBattery";
+      if(stage===5 && !switchGuideShown){
+        s5wrong++;
+        if(s5wrong>=2){ showSwitchGuide(); return; }
+      }
+      // no auto-clear here: a split is a half-finished build, not a dead end —
+      // the child still has a wire left to close the loop themselves
+      setDialogue([{who:"Kabir", text:"Connect all the points of power source, LED and switch with each other.", kabir:"kabirThink"}]);
+    }
+    return;
+  }
+  if(stage===6){ s5promptKey = null; return; }   // stage 6 gets only the split-battery coaching above
   // wait until BOTH of the switch's pins are wired — only then is the attempt complete
   // enough to point out which part was left out
   if(!(occupiedBy("s1") && occupiedBy("s2"))){ s5promptKey = null; return; }
@@ -1665,6 +1948,8 @@ function switchStageCoach(){
     s5wrong++;
     if(s5wrong>=2){ showSwitchGuide(); return; }
     setDialogue([{who:"Meera", text, meera:"meeraThink"}]);
+    const k = key;
+    scheduleWrongClear(()=> s5promptKey===k && !cur.lit);   // wrong build clears for a fresh try
   }
   if(!key) s5promptKey = null;
 }
@@ -1709,6 +1994,8 @@ function startStage1(){
   guideDialogue([
     {who:"Meera", text:"Can you make this LED glow?", meera:"meeraIdea"},
   ]);
+  showTutorial();                        // hand demo: how to join the battery and LED dots
+  armIdleHint();                         // from here on, 10s of stillness brings the helping hand
   armNudge();
 }
 /* Nudges are no longer on an idle timer — they only appear when the child makes a
@@ -1724,10 +2011,13 @@ function nudgeOnMistake(){
 function startStage2(){
   stage = 2;
   setChapter(1);
+  endTutorial();                         // safety: never carry the demo hand past the first build
   hideHeadline();
   if(board) board.classList.remove("show-labels");   // the name tags belong to the first build only
   setFlowMode("faint");
   setCompanions("kabirThink","meeraIdea");
+  // the polarity card pops at the top while Meera says the + meets + line
+  showConcept("The LED glows when", "its + meets the battery's +, and − meets −.", 12000);
   setDialogue([
     {who:"Meera", text:"It glows! The LED only lights when + meets the battery's + and − meets −.", meera:"meeraIdea"},
     {who:"Kabir", text:"Wait... something is travelling!", kabir:"kabirThink"},
@@ -1742,30 +2032,37 @@ function askTravellingThingQuestion(){
   ], ()=>{
     setDialogue([
       {who:"Kabir", text:"Yes! It is like a travelling glow thing.", kabir:"kabirHappy"},
-      {who:"Meera", text:"Scientists call this travelling thing current.", meera:"meeraIdea"},
     ], ()=>{
       markStageDone();
       showConcept("Current =", "the travelling thing that moves through the wire.");
-      setAction("Make current travel again", ()=>{
-        currentReplayReady = true;
-        resetBenchForBuild("stream");
-        guideDialogue([
-          {who:"Kabir", text:"Can you make the current travel again?", kabir:"kabirHappy"},
-        ]);
-      });
+      currentReplayArmed = true;           // doing it now, before the button appears, also counts
+      // let the card have the child's full attention first — the button follows 8s later
+      clearTimeout(pendingActionTimer);
+      pendingActionTimer = setTimeout(()=>{
+        if(stage!==2) return;
+        setAction("Make current travel again", ()=>{
+          currentReplayReady = true;
+          resetBenchForBuild("stream");
+          guideDialogue([
+            {who:"Kabir", text:"Can you make the current travel again?", kabir:"kabirHappy"},
+          ]);
+        });
+        showHandTapOnAction();           // hand shows the child where to tap
+      }, 8000);
     });
   });
 }
 function startStage3(){
   stage = 3;
   setChapter(2);
+  currentReplayArmed = false;
   pathQuestionAnswered = false;
   hideConcept();
   clearGuide();                                  // undo here IS the goal (break the path) — don't re-prompt
   setFlowMode("stream");
   setCompanions("kabirHappy","meeraThink");
   setDialogue([
-    {who:"Meera", text:"Can you stop the glow without removing the LED?", meera:"meeraThink"},
+    {who:"Meera", text:"Yes! But can you stop the glow without removing the LED?", meera:"meeraThink"},
   ], ()=>{ if(stage===3) hintRemoveWire(); });   // glow a wire so the child sees to pull it
 }
 function askBrokenPathQuestion(){
@@ -1800,6 +2097,13 @@ function startStage4(){
   guideDialogue([
     {who:"Meera", text:"Can you fix the path and bring the glow back?", meera:"meeraIdea"},
   ]);
+  // still broken after 13s → the hand shows redrawing the missing wire across the gap
+  clearTimeout(handTimer);
+  handTimer = setTimeout(()=>{
+    if(stage!==4 || cur.lit || dragging) return;
+    const free = ["bp","bn","l1","l2"].filter(t=>!occupiedBy(t));
+    if(free.length===2 && TERMS[free[0]].comp!==TERMS[free[1]].comp) showHandDrag(free[0], free[1]);
+  }, 13000);
 }
 function startStage4Concept(){
   stage = 40;
@@ -1827,6 +2131,7 @@ function startStage5(){
   s5promptKey = null; s5wrong = 0; switchGuideShown = false;
   resetBenchForBuild("stream");
   revealSwitch();                        // the switch appears now that it is introduced
+  showHeadline("Light the bulb using the switch");
   board.querySelector("#switch").classList.add("glowtap");
   setCompanions("kabirThink","meeraIdea");
   setDialogue([
@@ -1843,6 +2148,7 @@ function completeSwitchDoor(){
   markStageDone();
   clearGuide();
   clearGhostWires();
+  hideHeadline();
   board.querySelector("#switch").classList.remove("glowtap");
   snd.success();
   setDialogue([
@@ -1850,7 +2156,17 @@ function completeSwitchDoor(){
     {who:"Kabir", text:"Open door: current stops. Closed door: current travels.", kabir:"kabirHappy"},
   ], ()=>{
     showConcept("Switch =", "opens and closes the circuit.");
-    setAction("Build the full recipe", startStage6);
+    // the circuit the child just built IS the complete circuit — celebrate right here
+    snd.bigwin();
+    confetti();
+    setCompanions("kabirCelebrate","meeraCelebrate");
+    setDialogue([
+      {who:"Kabir", text:"Current is travelling!", kabir:"kabirCelebrate"},
+      {who:"Meera", text:"The circuit is complete!", meera:"meeraCelebrate"},
+      {who:"Kabir", text:"And the LED makes the current seeable as light!", kabir:"kabirCelebrate"},
+    ], ()=>{
+      if(stage===50) setAction("Finish", startStage7);
+    });
   });
 }
 function startStage6(){
@@ -1858,14 +2174,15 @@ function startStage6(){
   setChapter(5);
   recipeDone = false;
   recipeNudged = false;
+  s5promptKey = null;                    // the split-battery coaching can fire fresh here
   resetBenchForBuild("stream");
   setCompanions("kabirHappy","meeraIdea");
   setDialogue([
-    {who:"Meera", text:"Now make the full glow recipe.", meera:"meeraIdea"},
+    {who:"Meera", text:"Now make the complete circuit.", meera:"meeraIdea"},
     {who:"Kabir", text:"It needs a source, a path, and a way to start and stop.", kabir:"kabirHappy"},
   ]);
   lastGuide = [
-    {who:"Meera", text:"Now make the full glow recipe.", meera:"meeraIdea"},
+    {who:"Meera", text:"Now make the complete circuit.", meera:"meeraIdea"},
     {who:"Kabir", text:"It needs a source, a path, and a way to start and stop.", kabir:"kabirHappy"},
   ];
 }
@@ -1888,7 +2205,7 @@ function completeRecipe(){
 }
 function startStage7(){
   stage = 7;
-  setChapter(6);
+  setChapter(5);
   hideConcept();
   clearAction();
   skyCallbackEl.classList.add("show");
@@ -1906,7 +2223,7 @@ function startStage7(){
 }
 
 /* ============ Back / Undo / Next navigation ============ */
-const CHAPTERS = [startStage1, startStage2, startStage3, startStage4, startStage5, startStage6, startStage7];
+const CHAPTERS = [startStage1, startStage2, startStage3, startStage4, startStage5, startStage7];
 /* The Next tab only appears once the current screen's steps are complete —
    markStageDone() is called at each stage's completion beat. */
 let stageDone = false;
@@ -1924,6 +2241,9 @@ function updateNav(){
 function goChapter(i){
   i = Math.max(0, Math.min(CHAPTERS.length-1, i));
   stopVoice(); clearDlgTimer(); clearAction(); clearChoices(); hideConcept(); clearWireHints();
+  clearTimeout(wrongClearTimer);         // a pending auto-clear belongs to the old chapter
+  clearTimeout(pendingActionTimer);      // so does a pending delayed button
+  armIdleHint();
   $("#certificate").classList.remove("show");
   CHAPTERS[i]();
 }

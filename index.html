@@ -6,6 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Michroma&family=Montserrat:wght@400;500;600&family=Nunito:wght@400;600;700;800&family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Exo+2:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 /* ============================================================
@@ -506,9 +507,9 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 
 /* bottom-centre segmented control: [Back | Reset | Hint] — soft floating control deck */
 .discover-dock{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);z-index:7;display:flex;align-items:stretch;padding:5px;border-radius:16px;
-  background:linear-gradient(180deg,rgba(30,17,56,.78),rgba(48,26,76,.58));border:1px solid rgba(255,234,185,.42);
+  background:linear-gradient(180deg,rgba(255,216,107,.40),rgba(206,146,44,.24));border:1px solid rgba(255,228,150,.55);
   backdrop-filter:blur(10px) saturate(1.05);-webkit-backdrop-filter:blur(10px) saturate(1.05);
-  box-shadow:0 16px 40px rgba(0,0,0,.36),0 0 13px rgba(255,233,180,.26),0 0 26px rgba(168,85,247,.20),inset 0 1px 0 rgba(255,255,255,.13);
+  box-shadow:0 16px 40px rgba(0,0,0,.36),0 0 16px rgba(255,214,110,.38),0 0 30px rgba(255,190,80,.20),inset 0 1px 0 rgba(255,255,255,.18);
   animation:huntFieldIn .6s ease .2s both,dockFloat 6s ease-in-out 1s infinite}
 @keyframes dockFloat{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
 .discover-dock .seg{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:90px;height:46px;padding:0;border:0;cursor:pointer;
@@ -525,24 +526,56 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   backdrop-filter:blur(16px) saturate(1.05);-webkit-backdrop-filter:blur(16px) saturate(1.05);
   box-shadow:0 10px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.09);transition:transform .15s,box-shadow .2s;animation:huntFieldIn .6s ease .2s both}
 .discover-sound:hover{transform:scale(1.06)}
-/* Skip — SAME design, format and size as the Next / Finish button (golden yellow) */
+/* Skip — small golden-glass tab, SAME colour shade as the bottom control dock;
+   this size (13.5px / 9px 18px / 38px) is shared by every Skip and Next tab in the game */
 .discover-skip{position:absolute;top:14px;right:70px;z-index:7;cursor:pointer;
-  font-family:var(--font);font-weight:800;font-size:19px;padding:14px 30px;min-height:52px;border-radius:var(--pill);
-  color:#241a00;background:linear-gradient(180deg,var(--gold),var(--gold-deep));
-  border:none;box-shadow:0 6px 18px rgba(244,183,64,.35);
+  font-family:var(--font);font-weight:800;font-size:13.5px;letter-spacing:.03em;padding:9px 18px;min-height:38px;border-radius:var(--pill);
+  color:#fff3d0;background:linear-gradient(180deg,rgba(255,216,107,.40),rgba(206,146,44,.24));
+  border:1px solid rgba(255,228,150,.55);
+  backdrop-filter:blur(10px) saturate(1.05);-webkit-backdrop-filter:blur(10px) saturate(1.05);
+  box-shadow:0 8px 20px rgba(0,0,0,.28),0 0 12px rgba(255,214,110,.30),inset 0 1px 0 rgba(255,255,255,.16);
   transition:transform .15s,box-shadow .2s;animation:huntFieldIn .6s ease .2s both}
-.discover-skip:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(244,183,64,.5)}
+.discover-skip:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.32),0 0 18px rgba(255,214,110,.45)}
+/* video Skip + finale Next — same golden-glass tab as the game's Skip / Next */
+.vid-skipbar .btn,.finale-actions .btn{font-size:13.5px;font-weight:800;letter-spacing:.03em;padding:9px 18px;min-height:38px;min-width:38px;
+  color:#fff3d0;background:linear-gradient(180deg,rgba(255,216,107,.40),rgba(206,146,44,.24));
+  border:1px solid rgba(255,228,150,.55);
+  backdrop-filter:blur(10px) saturate(1.05);-webkit-backdrop-filter:blur(10px) saturate(1.05);
+  box-shadow:0 8px 20px rgba(0,0,0,.28),0 0 12px rgba(255,214,110,.30),inset 0 1px 0 rgba(255,255,255,.16)}
+.vid-skipbar .btn:hover,.finale-actions .btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.32),0 0 18px rgba(255,214,110,.45)}
+/* the finale's ghost "Play Again" keeps its own look */
+.finale-actions .btn.ghost{background:transparent;color:var(--text);border:2px solid var(--indigo-line);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none}
 .videocap{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);z-index:7;
   max-width:80vw;text-align:center;pointer-events:none;opacity:0;transition:opacity .15s;
   color:#fff;font-size:clamp(15px,2vw,24px);line-height:1.35;font-weight:600;
   text-shadow:0 2px 4px rgba(0,0,0,.9);background:rgba(0,0,0,.5);padding:6px 16px;border-radius:10px}
 .discover-sound:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .discover-sound.snd-off{filter:grayscale(.6) brightness(.9)}
-/* "Next / Finish" button — bottom-right corner, classic golden yellow */
+/* "Next / Finish" button — bottom-right corner, same golden-glass tab + size as Skip */
 .discover-next{position:absolute;right:20px;bottom:20px;z-index:8}
-.discover-next .btn{background:linear-gradient(180deg,var(--gold),var(--gold-deep));color:#241a00;
-  border:none;box-shadow:0 6px 18px rgba(244,183,64,.35)}
-.discover-next .btn:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(244,183,64,.5)}
+.discover-next .btn{font-size:13.5px;font-weight:800;letter-spacing:.03em;padding:9px 18px;min-height:38px;min-width:38px;
+  color:#fff3d0;background:linear-gradient(180deg,rgba(255,216,107,.40),rgba(206,146,44,.24));
+  border:1px solid rgba(255,228,150,.55);
+  backdrop-filter:blur(10px) saturate(1.05);-webkit-backdrop-filter:blur(10px) saturate(1.05);
+  box-shadow:0 8px 20px rgba(0,0,0,.28),0 0 12px rgba(255,214,110,.30),inset 0 1px 0 rgba(255,255,255,.16)}
+.discover-next .btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.32),0 0 18px rgba(255,214,110,.45)}
+/* first-play guiding hand (Cassiopeia): taps star 1, glides to star 2 — shows that
+   selecting two stars draws the line between them. The translate anchors the
+   FINGERTIP (≈46% across, 20% down in the artwork) on the star. */
+.discover-hand{position:absolute;left:var(--hx0);top:var(--hy0);z-index:8;pointer-events:none;
+  width:clamp(46px,5.5vw,80px);height:auto;
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.55)) drop-shadow(0 0 14px rgba(125,183,255,.65));
+  animation:handStars 3.4s ease-in-out .8s infinite both}
+@keyframes handStars{
+  0%  {left:var(--hx0);top:var(--hy0);opacity:0;transform:translate(-46%,-20%) scale(1)}
+  9%  {opacity:1;transform:translate(-46%,-20%) scale(1)}
+  17% {left:var(--hx0);top:var(--hy0);transform:translate(-46%,-20%) scale(.78)}   /* tap star 1 */
+  27% {left:var(--hx0);top:var(--hy0);transform:translate(-46%,-20%) scale(1)}
+  55% {left:var(--hx1);top:var(--hy1);transform:translate(-46%,-20%) scale(1)}     /* glide to star 2 */
+  63% {left:var(--hx1);top:var(--hy1);transform:translate(-46%,-20%) scale(.78)}   /* tap star 2 */
+  75% {left:var(--hx1);top:var(--hy1);opacity:1;transform:translate(-46%,-20%) scale(1)}
+  100%{left:var(--hx1);top:var(--hy1);opacity:0;transform:translate(-46%,-20%) scale(1)}}
+@media (prefers-reduced-motion: reduce){.discover-hand{animation:none;opacity:.9}}
 /* Cassiopeia: Meera stays the standard SIZE but is pushed flush into the bottom-left
    corner. The image has transparent padding, so negative margins pull her body into
    the corner / down to the ground; .discover-stage overflow:hidden clips the rest. */
@@ -838,12 +871,12 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 .home-mission::after{background:linear-gradient(90deg,rgba(216,204,255,.6),transparent)}
 .home-title{margin:0;font-family:'Michroma',var(--font);font-weight:400;line-height:1.18;
   color:#F4F2FF;text-transform:uppercase;letter-spacing:.13em;padding-left:.13em;
-  font-size:clamp(58px,7vw,118px);
+  font-size:clamp(55px,6.75vw,110px);
   text-shadow:0 0 30px rgba(196,158,255,.55),0 0 62px rgba(150,120,255,.30),0 2px 12px rgba(0,0,0,.55);
   animation:fromSpace 1.6s cubic-bezier(.2,.8,.25,1) .45s both}
 .home-title span{display:block}
 /* keep the long top line from clipping on small screens */
-@media (max-width:600px){.home-title{font-size:clamp(34px,10.5vw,58px)}}
+@media (max-width:600px){.home-title{font-size:clamp(38px,11.9vw,60px)}}
 .home-tag{margin:0;font-family:'Montserrat',var(--font);font-weight:400;
   color:#DCD4FF;letter-spacing:.02em;font-size:clamp(15px,1.8vw,21px);
   text-shadow:0 1px 10px rgba(0,0,0,.4);
@@ -1349,21 +1382,22 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 /* Glow-Box Mystery styled launch gate — mirrors the activity's own entry screen:
    Orbitron logotype flying in from space, then a soft-glow "Let's go" button */
 /* clean cinematic science-mystery titling — Space Grotesk, no glass panel */
-.gbg-eyebrow{display:flex;align-items:center;justify-content:center;gap:clamp(12px,1.6vw,22px);
-  font-family:'Space Grotesk',var(--font);font-weight:500;letter-spacing:.06em;
-  font-size:clamp(26px,3vw,48px);color:#BFC3FF;text-shadow:0 0 14px rgba(150,165,255,.4);
+.gbg-eyebrow{display:flex;align-items:center;justify-content:center;gap:clamp(12px,1.6vw,22px);margin:0 0 54px;
+  font-family:'Orbitron',var(--font);font-weight:500;letter-spacing:.22em;text-transform:uppercase;
+  font-size:clamp(15px,1.5vw,23px);color:#C7CBFF;text-shadow:0 0 14px rgba(150,165,255,.5);
   animation:fromSpace 1.4s cubic-bezier(.2,.8,.25,1) .15s both;}
-.gbg-eyebrow::before,.gbg-eyebrow::after{content:"";height:1px;width:clamp(40px,9vw,140px)}
-.gbg-eyebrow::before{background:linear-gradient(90deg,transparent,rgba(180,190,255,.7))}
-.gbg-eyebrow::after{background:linear-gradient(90deg,rgba(180,190,255,.7),transparent)}
-.gbg-title{margin:0;font-family:'Space Grotesk',var(--font);font-weight:600;color:#F4F2FF;
-  letter-spacing:.005em;line-height:.95;text-align:center;white-space:nowrap;
-  font-size:clamp(72px,9vw,148px);
-  text-shadow:0 0 26px rgba(150,165,255,.55),0 0 60px rgba(132,86,255,.32),0 2px 12px rgba(0,0,0,.5);
+.gbg-eyebrow::before,.gbg-eyebrow::after{content:"";height:1px;width:clamp(40px,9vw,140px);
+  box-shadow:0 0 8px rgba(150,175,255,.8)}
+.gbg-eyebrow::before{background:linear-gradient(90deg,transparent,rgba(180,195,255,.85))}
+.gbg-eyebrow::after{background:linear-gradient(90deg,rgba(180,195,255,.85),transparent)}
+.gbg-title{margin:0;font-family:'Orbitron',var(--font);font-weight:600;color:#F4F1FF;
+  letter-spacing:.18em;line-height:1.02;text-align:center;white-space:nowrap;text-transform:uppercase;
+  font-size:clamp(46px,5.4vw,88px);
+  text-shadow:0 0 22px rgba(196,208,255,.55),0 0 46px rgba(150,165,255,.4),0 0 74px rgba(140,95,255,.32),0 2px 12px rgba(0,0,0,.5);
   animation:fromSpace 1.5s cubic-bezier(.2,.8,.25,1) .3s both;}
-@media (max-width:760px){.gbg-title{white-space:normal;font-size:clamp(46px,15vw,72px)}}
+@media (max-width:760px){.gbg-title{white-space:normal;font-size:clamp(34px,10vw,60px);letter-spacing:.12em}}
 /* thin glowing divider with a small star in the centre */
-.gbg-divider{display:flex;align-items:center;justify-content:center;gap:14px;
+.gbg-divider{display:flex;align-items:center;justify-content:center;gap:14px;margin:38px 0 0;
   width:min(400px,74vw);color:#C6CBFF;font-size:14px;line-height:1;
   text-shadow:0 0 10px rgba(150,170,255,.9);
   animation:fromSpace 1.3s cubic-bezier(.2,.8,.25,1) .55s both;}
@@ -1371,25 +1405,24 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 .gbg-divider::before{background:linear-gradient(90deg,transparent,rgba(160,175,255,.6))}
 .gbg-divider::after{background:linear-gradient(90deg,rgba(160,175,255,.6),transparent)}
 /* subtitle: high contrast, inside a very soft dark translucent pill for readability */
-.gbg-sub{margin:0;font-family:'Space Grotesk',var(--font);font-weight:500;color:#DDD9FF;
-  font-size:clamp(20px,2vw,30px);line-height:1.35;text-align:center;max-width:90vw;
-  background:rgba(5,8,28,.28);border-radius:999px;padding:8px 24px;
-  -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
-  text-shadow:0 1px 8px rgba(0,0,0,.45);
+.gbg-sub{margin:26px 0 0;font-family:'Exo 2',var(--font);font-weight:400;color:#E9E5FF;
+  font-size:clamp(22px,2vw,34px);line-height:1.35;letter-spacing:.035em;text-align:center;max-width:90vw;
+  text-shadow:0 2px 10px rgba(0,0,0,.62),0 1px 4px rgba(0,0,0,.5);
   animation:fromSpace 1.3s cubic-bezier(.2,.8,.25,1) .75s both;}
 /* CTA: dark blue-violet glowing capsule, sparkle on the left, subtle slow pulse */
-.gbg-btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;
-  min-width:360px;height:68px;padding:0 38px;border-radius:999px;
-  font-family:'Space Grotesk',var(--font);font-weight:600;font-size:21px;text-transform:uppercase;letter-spacing:.12em;
-  color:#F4F1FF;border:2px solid rgba(160,185,255,.9);
+.gbg-btn{display:inline-flex;align-items:center;justify-content:center;gap:14px;cursor:pointer;margin-top:42px;
+  width:560px;max-width:92vw;height:76px;padding:0 34px;border-radius:999px;
+  font-family:'Orbitron',var(--font);font-weight:500;font-size:24px;text-transform:uppercase;letter-spacing:.16em;
+  color:#F4F1FF;border:2px solid rgba(145,195,255,.92);
   background:
-    radial-gradient(circle at 50% 115%, rgba(142,88,255,.35), transparent 44%),
-    linear-gradient(180deg, rgba(31,42,105,.88), rgba(14,10,48,.96));
-  box-shadow:0 0 20px rgba(105,165,255,.48),0 0 44px rgba(132,86,255,.36),
+    radial-gradient(circle at 50% 115%, rgba(142,88,255,.35), transparent 46%),
+    linear-gradient(180deg, rgba(31,42,105,.9), rgba(14,10,48,.96));
+  box-shadow:0 0 22px rgba(105,165,255,.5),0 0 50px rgba(132,86,255,.38),
     inset 0 1px 0 rgba(255,255,255,.12),inset 0 -12px 26px rgba(90,60,180,.28);
   animation:gbgIn .5s ease-out 2.3s both, gbgGlow 4s ease-in-out 3s infinite;
   transition:transform .2s ease,box-shadow .25s ease,border-color .2s ease;}
 .gbg-btn .gbg-spark{font-size:.86em;color:#DCE0FF;text-shadow:0 0 10px rgba(150,175,255,.9)}
+.gbg-btn .gbg-arrow{font-size:.95em;color:#DCE0FF;text-shadow:0 0 10px rgba(150,175,255,.9)}
 .gbg-btn:hover{transform:translateY(-2px);border-color:rgba(190,205,255,1);
   box-shadow:0 6px 30px rgba(120,160,255,.6),0 0 52px rgba(140,95,255,.42),inset 0 1px 0 rgba(255,255,255,.14),inset 0 -12px 26px rgba(90,60,180,.32);}
 .gbg-btn:active{transform:translateY(0) scale(.99);}
@@ -2423,6 +2456,7 @@ function videoScene(src, doneLabel, onAdvance, maxSecs, dissolveMs){
   s.appendChild(video);
 
   const bar=document.createElement("div");
+  bar.className="vid-skipbar";
   bar.style.cssText="position:absolute;right:18px;bottom:18px;z-index:6;display:flex;gap:12px";
   s.appendChild(bar);
 
@@ -3267,6 +3301,7 @@ SCENES.discover=()=>{
   const field=createStarField(fieldBox,lf.stars,{starScale:0.32, vbW:VBW, onChange:()=>{
     if(solved) return;
     const n=field.edges().length;
+    if(n) removeHandHint();                                    // first line drawn — the demo hand has done its job
     if(n===dPrev+1){ const e=field.edges()[n-1]; travelParticle(e[0],e[1]); }   // golden dot on the new line
     dPrev=n;
     if(autoSolving) return;                                    // Meera is drawing the answer herself
@@ -3281,7 +3316,10 @@ SCENES.discover=()=>{
         drawLocked=true; field.lock(true);
         if(failCount>=2){ autoReveal(); return; }              // 2 wrong attempts → Meera shows the pattern
         cueBtn.classList.add("attn");                          // 1 wrong attempt → the Hint tab pulses
-        setSay("Hmm, that doesn't match. Tap Clear and try again!", A_CLEAR);
+        setSay("Hmm, that doesn't match. Try again!", A_CLEAR);
+        // the wrong tracing wipes itself after a moment, so the child starts fresh
+        // (clear → onChange n===0 → unlock + reset the prompt)
+        setTimeout(()=>{ if(!solved&&!autoSolving&&drawLocked&&state.currentScene==="discover"&&field.edges().length) field.clear(); },2200);
       }
     } else if(drawLocked){ setSay("Tap Clear to remove your lines, then try again!"); }
     else { attemptScored=false; setSay("Keep connecting to match the picture!"); }
@@ -3311,6 +3349,26 @@ SCENES.discover=()=>{
   s.addEventListener("pointerdown",armIdle,true);
   armIdle();
 
+  // ---- first-play hand hint (Cassiopeia): its first star glows right away and a
+  //      hand demos the gesture — select one star, then a second, and the line
+  //      draws itself between them. Gone after the child's first line (or Hint). ----
+  let handHint=null;
+  function removeHandHint(){ if(handHint){ handHint.remove(); handHint=null; } }
+  if(c.id==="cassiopeia" && lf.edges.length){
+    const [ha,hb]=lf.edges[0];
+    field.mark([ha],"startglow");                     // the pattern's first star glows from the start
+    handHint=document.createElement("img");
+    handHint.src=encodeURI("Visuals/hand icon transparent.png");
+    handHint.alt=""; handHint.setAttribute("aria-hidden","true");
+    handHint.className="discover-hand";
+    handHint.style.setProperty("--hx0",(lf.stars[ha].x/aspect*100).toFixed(2)+"%");
+    handHint.style.setProperty("--hy0",(lf.stars[ha].y*100).toFixed(2)+"%");
+    handHint.style.setProperty("--hx1",(lf.stars[hb].x/aspect*100).toFixed(2)+"%");
+    handHint.style.setProperty("--hy1",(lf.stars[hb].y*100).toFixed(2)+"%");
+    s.appendChild(handHint);
+    setSay(FIND+" Tap two stars, one after the other — a line will join them!");
+  }
+
   // ---- after 2 wrong attempts: draw the constellation for the child, then ask the questions ----
   function autoReveal(){
     if(solved||autoSolving) return;
@@ -3320,9 +3378,12 @@ SCENES.discover=()=>{
     setSay("Good try! Watch — here is the pattern.");
     setTimeout(()=>{
       if(solved||state.currentScene!=="discover") return;
-      field.clear();
-      lf.edges.forEach((e,i)=>setTimeout(()=>{ if(!solved&&state.currentScene==="discover") field.connect(e[0],e[1]); },i*420));
-      setTimeout(()=>{ if(!solved&&state.currentScene==="discover") win(true); }, lf.edges.length*420+400);
+      field.clear();                       // wipe the wrong tracing first…
+      setTimeout(()=>{                     // …then a beat with an empty sky before the answer draws
+        if(solved||state.currentScene!=="discover") return;
+        lf.edges.forEach((e,i)=>setTimeout(()=>{ if(!solved&&state.currentScene==="discover") field.connect(e[0],e[1]); },i*420));
+        setTimeout(()=>{ if(!solved&&state.currentScene==="discover") win(true); }, lf.edges.length*420+400);
+      },900);
     },900);
   }
   setTimeout(()=>{ if(state.currentScene==="discover" && fieldBox.isConnected){ fieldBox.classList.add("amb"); addSkyAtmosphere(fieldBox); } },0);   // build atmosphere + wisps after first paint (avoids entry lag)
@@ -3335,6 +3396,7 @@ SCENES.discover=()=>{
   // Hint = dotted outline of the WHOLE constellation + its stars turn blue; stays until traced
   const cueBtn=segBtn("💡","Hint",()=>{
     if(solved||autoSolving) return;
+    removeHandHint();                                          // the dotted guide takes over from the demo hand
     cueBtn.classList.remove("attn");
     hintOn=true;
     field.guide(lf.edges);
@@ -3601,9 +3663,9 @@ SCENES.discover=()=>{
    placed clear of Meera (bottom-left) and the top controls/clue button. */
 const SHARED_LAYOUT={
   // {cx,w} are fractions of the field width (0..aspect); {cy,h} are fractions of height (0..1)
-  cassiopeia:{cx:0.50, cy:0.15, w:0.58, h:0.16},   // top band, centre
-  scorpius:  {cx:0.40, cy:0.56, w:0.24, h:0.50},   // mid-left (clear of Meera, right of her)
-  orion:     {cx:0.84, cy:0.55, w:0.26, h:0.56}    // mid-right — each constellation in its own zone
+  cassiopeia:{cx:0.50, cy:0.34, w:0.58, h:0.16},   // middle band, centre (top cut the reveal figure)
+  scorpius:  {cx:0.40, cy:0.63, w:0.24, h:0.40},   // lower-left (clear of Meera, right of her, below Cassiopeia)
+  orion:     {cx:0.84, cy:0.64, w:0.26, h:0.42}    // lower-right — each constellation in its own zone
 };
 let _sharedFieldCache=null;
 function buildSharedField(aspect){
@@ -3949,14 +4011,14 @@ function showLightSourceGate(){
 
   // foreground: Glow-Box title / tagline / Check the Bulb button
   const c=document.createElement("div");
-  c.style.cssText="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(20px,3.4vh,34px);padding:0 22px;text-align:center;margin-top:43vh;transform:translateY(-50%)";
-  c.innerHTML='<div class="gbg-eyebrow">The Mystery of</div>'+
-              '<h1 class="gbg-title">the Glow Box</h1>'+
+  c.style.cssText="position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:2;display:flex;flex-direction:column;align-items:center;width:min(94vw,1320px);padding:0 22px;text-align:center";
+  c.innerHTML='<div class="gbg-eyebrow">MISSION 2 &nbsp;•&nbsp; CIRCUIT QUEST</div>'+
+              '<h1 class="gbg-title">GLOW BOX MYSTERY</h1>'+
               '<div class="gbg-divider" aria-hidden="true">✦</div>'+
-              '<p class="gbg-sub">Something made the bulb glow. Can you find out why?</p>';
+              '<p class="gbg-sub">Investigate what makes the park lamp glow?</p>';
   const btn=document.createElement("button"); btn.type="button"; btn.className="gbg-btn";
-  btn.innerHTML='<span class="gbg-spark" aria-hidden="true">✦</span>Begin the Mystery →';
-  btn.setAttribute("aria-label","Begin the Mystery");
+  btn.innerHTML='<span class="gbg-spark" aria-hidden="true">✦</span>START INVESTIGATION<span class="gbg-arrow" aria-hidden="true">→</span>';
+  btn.setAttribute("aria-label","Start investigation");
   btn.addEventListener("click", openLightSource);   // real click keeps the iframe's audio/video autoplay unlocked
   c.appendChild(btn);
   s.appendChild(c); screen.appendChild(s);
@@ -4033,7 +4095,7 @@ SCENES.finale=()=>{
   const c=document.createElement("div"); c.className="center";
   c.style.cssText="position:relative;z-index:1;justify-content:flex-end;padding-bottom:32px";
   const dlg=document.createElement("div"); dlg.className="dialogue"; dlg.style.maxWidth="780px"; c.appendChild(dlg);
-  const actions=document.createElement("div"); actions.style.minHeight="56px"; c.appendChild(actions);
+  const actions=document.createElement("div"); actions.className="finale-actions"; actions.style.minHeight="56px"; c.appendChild(actions);
   s.appendChild(c); screen.appendChild(s);
 
   let i=0;
@@ -4113,6 +4175,7 @@ document.getElementById("narrToggle").onclick=toggleNarration;
    so every scene's image/video is ready before the child reaches it ---- */
 (function preloadAssets(){
   var imgs=[
+    "Visuals/hand icon transparent.png",    // Cassiopeia first-play hand hint
     "Visuals/Meera with cassiopeia.webp",
     "Visuals/cassiopeia figure cutout.webp",
     "Visuals/scorpion.webp",
