@@ -505,6 +505,7 @@
     font-size:clamp(15px,2vw,25px);line-height:1.15;
   }
   #headline.show{display:flex;animation:cardPop .3s ease-out;}
+  #headline.big{font-size:clamp(17px,2.3vw,28px);}   /* slightly larger task text ("Light the LED using the switch") */
   /* Concept reveal: a short, WIDE strip sitting on top of the bench panel —
      it runs horizontally so it never covers the circuit built below it */
   #concept-card{
@@ -682,7 +683,6 @@
   <div id="concept-card" aria-live="polite"></div>
   <div id="navbar">
     <button id="nav-undo" class="navbtn" type="button" title="Undo last wire">⟲ Undo</button>
-    <button id="nav-next" class="navbtn" type="button" title="Go to next step">Next ▶</button>
   </div>
 
   <div id="certificate">
@@ -932,8 +932,9 @@ function fadeConcept(){
   showConcept.fadeTimer = setTimeout(()=>conceptEl.classList.remove("show","fadeout"), 520);
 }
 const headlineEl = $("#headline");
-function showHeadline(text){
+function showHeadline(text, big){
   headlineEl.textContent = text;
+  headlineEl.classList.toggle("big", !!big);
   headlineEl.classList.add("show");
 }
 function hideHeadline(){ headlineEl.classList.remove("show"); }
@@ -2131,7 +2132,7 @@ function startStage5(){
   s5promptKey = null; s5wrong = 0; switchGuideShown = false;
   resetBenchForBuild("stream");
   revealSwitch();                        // the switch appears now that it is introduced
-  showHeadline("Light the bulb using the switch");
+  showHeadline("Light the LED using the switch", true);
   board.querySelector("#switch").classList.add("glowtap");
   setCompanions("kabirThink","meeraIdea");
   setDialogue([
@@ -2211,8 +2212,7 @@ function startStage7(){
   skyCallbackEl.classList.add("show");
   setCompanions("kabirHappy","meeraHappy");
   setDialogue([
-    {who:"Meera", text:"We first knew Orion's name.", meera:"meeraHappy"},
-    {who:"Kabir", text:"Now we know one glow recipe too.", kabir:"kabirHappy"},
+    {who:"Kabir", text:"Now we know the park lamp glows because of the glowing LED.", kabir:"kabirHappy"},
     {who:"Meera", text:"Our LED needed a source, a complete path, and current.", meera:"meeraIdea"},
     {who:"Kabir", text:"A real star must have its own glow recipe.", kabir:"kabirThink"},
     {who:"Meera", text:"But what powers a real star?", meera:"meeraThink"},
@@ -2247,7 +2247,8 @@ function goChapter(i){
   $("#certificate").classList.remove("show");
   CHAPTERS[i]();
 }
-$("#nav-next").addEventListener("click", ()=>{ snd.click(); goChapter(chapterIdx+1); });
+const navNextBtn = $("#nav-next");   // the Next tab was removed from the navbar; stages advance on their own
+if(navNextBtn) navNextBtn.addEventListener("click", ()=>{ snd.click(); goChapter(chapterIdx+1); });
 $("#nav-undo").addEventListener("click", ()=>{
   if(!wires.length) return;
   snd.pop();

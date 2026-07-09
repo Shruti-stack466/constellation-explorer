@@ -506,7 +506,7 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 .step-track .step-arrow{font-size:9px;color:rgba(226,232,240,.28)}
 
 /* bottom-centre segmented control: [Back | Reset | Hint] — soft floating control deck */
-.discover-dock{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);z-index:7;display:flex;align-items:stretch;padding:5px;border-radius:16px;
+.discover-dock{position:absolute;left:50%;bottom:44px;transform:translateX(-50%);z-index:7;display:flex;align-items:stretch;padding:5px;border-radius:16px;
   background:linear-gradient(180deg,rgba(255,216,107,.40),rgba(206,146,44,.24));border:1px solid rgba(255,228,150,.55);
   backdrop-filter:blur(10px) saturate(1.05);-webkit-backdrop-filter:blur(10px) saturate(1.05);
   box-shadow:0 16px 40px rgba(0,0,0,.36),0 0 16px rgba(255,214,110,.38),0 0 30px rgba(255,190,80,.20),inset 0 1px 0 rgba(255,255,255,.18);
@@ -526,9 +526,10 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   backdrop-filter:blur(16px) saturate(1.05);-webkit-backdrop-filter:blur(16px) saturate(1.05);
   box-shadow:0 10px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.09);transition:transform .15s,box-shadow .2s;animation:huntFieldIn .6s ease .2s both}
 .discover-sound:hover{transform:scale(1.06)}
-/* Skip — small golden-glass tab, SAME colour shade as the bottom control dock;
-   this size (13.5px / 9px 18px / 38px) is shared by every Skip and Next tab in the game */
-.discover-skip{position:absolute;top:14px;right:70px;z-index:7;cursor:pointer;
+/* Skip — small golden-glass tab in the bottom-right corner, SAME colour shade as the
+   bottom control dock; this size (13.5px / 9px 18px / 38px) is shared by every Skip
+   and Next tab in the game */
+.discover-skip{position:absolute;bottom:20px;right:20px;z-index:7;cursor:pointer;
   font-family:var(--font);font-weight:800;font-size:13.5px;letter-spacing:.03em;padding:9px 18px;min-height:38px;border-radius:var(--pill);
   color:#fff3d0;background:linear-gradient(180deg,rgba(255,216,107,.40),rgba(206,146,44,.24));
   border:1px solid rgba(255,228,150,.55);
@@ -639,12 +640,12 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 .guess-box.compact .guess-input{height:38px;font-size:clamp(13px,1.7vw,15px)}
 .guess-box.compact .guess-go{height:38px;min-height:38px;font-size:13px;padding:0 15px}
 /* "thinking choices" — raised magical answer buttons (equal weight) */
-/* Same / Different tray + tabs — identical look to the bottom control dock (.discover-dock .seg) */
-.choice-tray{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);z-index:9;display:flex;align-items:stretch;gap:2px;
+/* Same / Different tray + tabs — identical golden-glass look as the bottom control dock */
+.choice-tray{position:absolute;left:50%;bottom:44px;transform:translateX(-50%);z-index:9;display:flex;align-items:stretch;gap:2px;
   padding:5px;border-radius:16px;
-  background:linear-gradient(180deg,rgba(30,17,56,.78),rgba(48,26,76,.58));border:1px solid rgba(255,234,185,.42);
+  background:linear-gradient(180deg,rgba(255,216,107,.40),rgba(206,146,44,.24));border:1px solid rgba(255,228,150,.55);
   backdrop-filter:blur(10px) saturate(1.05);-webkit-backdrop-filter:blur(10px) saturate(1.05);
-  box-shadow:0 16px 40px rgba(0,0,0,.36),0 0 13px rgba(255,233,180,.26),0 0 26px rgba(168,85,247,.20),inset 0 1px 0 rgba(255,255,255,.13);
+  box-shadow:0 16px 40px rgba(0,0,0,.36),0 0 16px rgba(255,214,110,.38),0 0 30px rgba(255,190,80,.20),inset 0 1px 0 rgba(255,255,255,.18);
   animation:guessUp .42s cubic-bezier(.2,.9,.2,1) both}
 .choice-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:120px;height:58px;padding:0 20px;border:0;cursor:pointer;
   background:transparent;color:#e7ecf5;border-radius:14px;font:inherit;
@@ -665,14 +666,14 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 .choice-tray.sep{background:transparent;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;
   padding:0;gap:12px;flex-wrap:wrap;justify-content:center;max-width:min(94vw,760px)}
 .choice-tray.sep .choice-card{height:auto;min-height:58px;padding:10px 20px;border-radius:16px;
-  background:linear-gradient(180deg,rgba(30,17,56,.78),rgba(48,26,76,.58));border:1px solid rgba(255,234,185,.42);
+  background:linear-gradient(180deg,rgba(255,216,107,.40),rgba(206,146,44,.24));border:1px solid rgba(255,228,150,.55);
   backdrop-filter:blur(10px) saturate(1.05);-webkit-backdrop-filter:blur(10px) saturate(1.05);
-  box-shadow:0 16px 40px rgba(0,0,0,.36),0 0 13px rgba(255,233,180,.26),0 0 26px rgba(168,85,247,.20),inset 0 1px 0 rgba(255,255,255,.13)}
-.choice-tray.sep .choice-card:hover{background:linear-gradient(180deg,rgba(255,212,94,.18),rgba(48,26,76,.66))}
+  box-shadow:0 16px 40px rgba(0,0,0,.36),0 0 16px rgba(255,214,110,.38),0 0 30px rgba(255,190,80,.20),inset 0 1px 0 rgba(255,255,255,.18)}
+.choice-tray.sep .choice-card:hover{background:linear-gradient(180deg,rgba(255,224,130,.50),rgba(206,146,44,.34))}
 .choice-tray.sep .choice-card .cc-text{white-space:normal;text-transform:none;font-size:13.5px;line-height:1.3;max-width:210px}
-/* Hint tab pulses after the first wrong attempt */
-.discover-dock .seg.attn{background:rgba(255,212,94,.14);animation:segPulse 1.4s ease-in-out infinite}
-@keyframes segPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,212,94,.55)}50%{box-shadow:0 0 16px 5px rgba(255,212,94,.45)}}
+/* Hint tab pulses with a WHITE glow after the first wrong attempt */
+.discover-dock .seg.attn{background:rgba(255,255,255,.16);animation:segPulse 1.4s ease-in-out infinite}
+@keyframes segPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.65)}50%{box-shadow:0 0 16px 5px rgba(255,255,255,.6)}}
 /* Hint taken: the stars that belong to the pattern turn DARK BLUE and shine
    steadily (twinkle off, full brightness) until traced gold */
 .tracefield .starnode.traceblue:not(.used) .starshape{fill:#1e4fd6;stroke:#6ea3ff;
@@ -693,12 +694,13 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 .choice-tray.sep .choice-card.right{border-color:rgba(131,232,178,.95);
   background:linear-gradient(180deg,rgba(30,96,64,.82),rgba(20,64,44,.66));
   box-shadow:0 0 18px 5px rgba(131,232,178,.55),inset 0 1px 0 rgba(255,255,255,.12)}
-/* 12s of inactivity: the constellation's starting star pulses with a blue glow */
-.tracefield .starnode.startglow .starshape{fill:#9fd4ff;stroke:#e6f4ff;
+/* 12s of inactivity: the constellation's starting star pulses with a DARK BLUE glow
+   (same shade as the hint's traceblue stars) */
+.tracefield .starnode.startglow .starshape{fill:#1e4fd6;stroke:#6ea3ff;
   animation:blueStartPulse 1.2s ease-in-out infinite !important;transform-box:fill-box;transform-origin:center}
 @keyframes blueStartPulse{
-  0%,100%{transform:scale(1);opacity:1;filter:drop-shadow(0 0 3px #4fa8ff) drop-shadow(0 0 8px rgba(80,160,255,.8))}
-  50%{transform:scale(1.6);opacity:1;filter:drop-shadow(0 0 6px #8cc6ff) drop-shadow(0 0 16px rgba(80,160,255,1))}}
+  0%,100%{transform:scale(1);opacity:1;filter:drop-shadow(0 0 3px #2f6bff) drop-shadow(0 0 8px rgba(47,107,255,.85))}
+  50%{transform:scale(1.6);opacity:1;filter:drop-shadow(0 0 6px #4f8bff) drop-shadow(0 0 16px rgba(47,107,255,1))}}
 
 /* ---------- desktop fit: keep every page inside one screen ----------
    On a desktop the whole app is locked to the viewport height so that
@@ -3201,13 +3203,10 @@ SCENES.discover=()=>{
   const head=document.createElement("div"); head.className="discover-head";
   head.innerHTML='<div class="discover-badge"><span class="db-ico" aria-hidden="true">🌌</span>'+
                  '<div class="db-text"><div class="db-title">Mission 1</div>'+
-                 '<div class="db-sub">Star Story Space</div></div></div>'+
-                 '<div class="step-track" aria-label="Activity steps">'+
-                   '<span class="step" data-step="spot">Spot</span><span class="step-arrow">→</span>'+
-                   '<span class="step" data-step="imagine">Imagine</span><span class="step-arrow">→</span>'+
-                   '<span class="step" data-step="explain">Explain</span><span class="step-arrow">→</span>'+
-                   '<span class="step" data-step="reveal">Reveal</span></div>';
+                 '<div class="db-sub">Star Story Space</div></div></div>';
   s.appendChild(head);
+  // (the Spot → Imagine → Explain → Reveal step tracker was removed; setStep stays
+  //  as a no-op so the stage markers throughout the flow keep working unchanged)
   const STEP_ORDER=["spot","imagine","explain","reveal"];
   function setStep(name){ const i=STEP_ORDER.indexOf(name);
     head.querySelectorAll(".step").forEach(el=>{ const j=STEP_ORDER.indexOf(el.dataset.step);
@@ -3268,6 +3267,10 @@ SCENES.discover=()=>{
     return {stars:sf.stars, edges:m.edges, constIdx:m.constIdx, brightIdx:m.brightIdx}; })();
   let solved=false, cuesUsed=0, failCount=0, attemptScored=false, autoSolving=false, hintOn=false, drawLocked=false;
   const targetCount=c.edges.length;
+  // don't judge the attempt on a strict line count: the child may need an extra
+  // line or two to travel around the figure. The SHAPE still has to match
+  // (shapesMatch keeps its high recall + geometry bar) — only the count is lenient.
+  const LINE_SLACK=2;
   const SHAPE_TOL=(c.tol!=null)?c.tol:0.22;
   function isMatch(){ return shapesMatch(c.stars,c.edges, lf.stars,field.edges(), SHAPE_TOL); }
 
@@ -3309,9 +3312,10 @@ SCENES.discover=()=>{
     if(hintOn) glowNextPath(null);                             // re-aim the glowing "connect this next" path
     if(isMatch()){ win(); return; }
     if(n===0){ attemptScored=false; drawLocked=false; field.lock(false); setSay(FIND); return; }
-    if(n>=targetCount){
-      // a complete figure that doesn't match — the attempt is submitted: freeze drawing
-      // (no more lines until the child clears it) and Meera says try again (once per attempt)
+    if(n>targetCount+LINE_SLACK){
+      // the figure's worth of lines PLUS the slack is drawn and it still doesn't
+      // match — the attempt is submitted: freeze drawing (no more lines until the
+      // child clears it) and Meera says try again (once per attempt)
       if(!attemptScored){ attemptScored=true; failCount++; Sfx.retry();
         drawLocked=true; field.lock(true);
         if(failCount>=2){ autoReveal(); return; }              // 2 wrong attempts → Meera shows the pattern
@@ -3366,7 +3370,6 @@ SCENES.discover=()=>{
     handHint.style.setProperty("--hx1",(lf.stars[hb].x/aspect*100).toFixed(2)+"%");
     handHint.style.setProperty("--hy1",(lf.stars[hb].y*100).toFixed(2)+"%");
     s.appendChild(handHint);
-    setSay(FIND+" Tap two stars, one after the other — a line will join them!");
   }
 
   // ---- after 2 wrong attempts: draw the constellation for the child, then ask the questions ----
@@ -3649,6 +3652,7 @@ SCENES.discover=()=>{
   // prompt to move on — button sits in the bottom-right corner
   function showNext(){
     const last=step>=HUNT_SEQ.length-1;
+    skipBtn.style.display="none";                 // Next takes over the bottom-right corner
     const cont=mkBtn(last?"Finish ✓":"Next ➜","pulse",()=>gotoStep(step+1));   // last step → gotoStep plays Meera's video, then reward
     const wrap=document.createElement("div"); wrap.className="discover-next"; wrap.appendChild(cont);
     s.appendChild(wrap);
@@ -3664,7 +3668,7 @@ SCENES.discover=()=>{
 const SHARED_LAYOUT={
   // {cx,w} are fractions of the field width (0..aspect); {cy,h} are fractions of height (0..1)
   cassiopeia:{cx:0.50, cy:0.34, w:0.58, h:0.16},   // middle band, centre (top cut the reveal figure)
-  scorpius:  {cx:0.40, cy:0.63, w:0.24, h:0.40},   // lower-left (clear of Meera, right of her, below Cassiopeia)
+  scorpius:  {cx:0.48, cy:0.49, w:0.24, h:0.40},   // centre (clear of Meera, tucked under Cassiopeia)
   orion:     {cx:0.84, cy:0.64, w:0.26, h:0.42}    // lower-right — each constellation in its own zone
 };
 let _sharedFieldCache=null;
