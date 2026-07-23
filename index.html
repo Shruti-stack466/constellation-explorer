@@ -101,6 +101,35 @@ body{
 .snd-toggle:not(.on){filter:grayscale(.7) brightness(.8)}
 .snd-toggle:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 
+/* ⚙ settings gear (top chrome) — opens the settings popover */
+.settings-gear{display:flex;align-items:center;justify-content:center;cursor:pointer;
+  width:48px;height:48px;border-radius:50%;
+  background:var(--indigo-card);border:1px solid var(--indigo-line);color:var(--text);
+  transition:transform .2s ease}
+.settings-gear .gear-ico{font-size:22px;line-height:1}
+.settings-gear:hover{transform:rotate(25deg)}
+.settings-gear:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* settings popover — houses Sound + Home (§8: sound lives inside Settings) */
+.settings-menu{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;
+  background:rgba(6,9,26,.62);backdrop-filter:blur(4px)}
+.settings-menu.hidden{display:none}
+.settings-card{width:min(300px,90vw);display:flex;flex-direction:column;gap:12px;
+  padding:22px 20px;border-radius:20px;border:1px solid var(--indigo-line);
+  background:linear-gradient(180deg,rgba(40,48,104,.96),rgba(18,22,54,.98));
+  box-shadow:0 24px 60px rgba(0,0,0,.55)}
+.settings-title{margin:0 0 4px;font-family:var(--font);font-weight:800;font-size:20px;color:var(--text);text-align:center}
+.settings-row{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:12px 16px;cursor:pointer;
+  border:1px solid var(--indigo-line);border-radius:16px;background:rgba(255,255,255,.04);color:var(--text);
+  font-family:var(--font);font-weight:700;font-size:16px;transition:background .15s,border-color .15s}
+.settings-row:hover{background:rgba(255,212,94,.10);border-color:var(--gold)}
+.settings-row:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.settings-row .sr-ico{font-size:22px;line-height:1}
+.settings-row .sr-label{flex:1;text-align:left}
+.settings-row .sr-state{font-weight:800;color:var(--gold)}
+.settings-row.off .sr-state{color:var(--muted)}
+.settings-done{align-self:center;margin-top:4px;min-height:56px;border-radius:18px;padding:14px 32px}
+
 /* ---------- scene host ---------- */
 #screen{flex:1;display:flex;flex-direction:column;position:relative;min-height:0}
 .scene{flex:1;display:flex;flex-direction:column;animation:fade .5s ease}
@@ -855,8 +884,8 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 
 /* ---- foreground content (title / characters / button) ---- */
 .home-content{position:relative;z-index:5;flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:clamp(10px,2.4vh,28px);
-  padding:clamp(18px,5vh,46px) 20px;text-align:center;min-height:0}
+  align-items:center;justify-content:space-between;gap:clamp(10px,2.4vh,28px);
+  padding:clamp(40px,10vh,96px) 20px clamp(28px,6vh,56px);text-align:center;min-height:0}
 
 /* clean, cinematic space-game titling — no panel, works straight on the galaxy.
    MISSION label · two-line Michroma title (flies in from space) · Montserrat subtitle */
@@ -910,7 +939,7 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   gap:clamp(10px,1.1vw,15px);cursor:pointer;
   font-family:'Montserrat',var(--font);font-weight:600;text-transform:uppercase;
   font-size:clamp(13px,1.45vw,17px);color:#F4F2FF;
-  width:min(360px,86vw);height:78px;border-radius:999px;
+  width:min(260px,88vw);height:60px;border-radius:18px;
   border:1px solid rgba(200,180,255,.55);
   background:
     radial-gradient(130% 100% at 50% 132%, rgba(255,198,108,.30), rgba(255,198,108,0) 58%),
@@ -1381,12 +1410,14 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   color:#FFF4DC;opacity:.9;
   text-shadow:0 2px 8px rgba(0,0,0,.55);
 }
-/* Glow-Box Mystery styled launch gate — mirrors the activity's own entry screen:
-   Orbitron logotype flying in from space, then a soft-glow "Let's go" button */
-/* clean cinematic science-mystery titling — Space Grotesk, no glass panel */
-.gbg-eyebrow{display:flex;align-items:center;justify-content:center;gap:clamp(12px,1.6vw,22px);margin:0 0 54px;
+/* Glow-Box loading fallback. The real iframe replaces it as soon as it is ready. */
+.gbg-content{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:2;
+  display:flex;flex-direction:column;align-items:center;width:min(calc(100% - 32px),1320px);
+  text-align:center;font-family:'Exo 2',var(--font);}
+.gbg-eyebrow{display:flex;align-items:center;justify-content:center;gap:clamp(10px,1.6vw,22px);
+  width:100%;margin:0 0 clamp(28px,6vh,54px);white-space:nowrap;
   font-family:'Orbitron',var(--font);font-weight:500;letter-spacing:.22em;text-transform:uppercase;
-  font-size:clamp(15px,1.5vw,23px);color:#C7CBFF;text-shadow:0 0 14px rgba(150,165,255,.5);
+  font-size:clamp(13px,1.5vw,23px);color:#C7CBFF;text-shadow:0 0 14px rgba(150,165,255,.5);
   animation:fromSpace 1.4s cubic-bezier(.2,.8,.25,1) .15s both;}
 .gbg-eyebrow::before,.gbg-eyebrow::after{content:"";height:1px;width:clamp(40px,9vw,140px);
   box-shadow:0 0 8px rgba(150,175,255,.8)}
@@ -1394,27 +1425,24 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
 .gbg-eyebrow::after{background:linear-gradient(90deg,rgba(180,195,255,.85),transparent)}
 .gbg-title{margin:0;font-family:'Orbitron',var(--font);font-weight:600;color:#F4F1FF;
   letter-spacing:.18em;line-height:1.02;text-align:center;white-space:nowrap;text-transform:uppercase;
-  font-size:clamp(46px,5.4vw,88px);
+  max-width:100%;font-size:clamp(46px,5.4vw,88px);
   text-shadow:0 0 22px rgba(196,208,255,.55),0 0 46px rgba(150,165,255,.4),0 0 74px rgba(140,95,255,.32),0 2px 12px rgba(0,0,0,.5);
   animation:fromSpace 1.5s cubic-bezier(.2,.8,.25,1) .3s both;}
-@media (max-width:760px){.gbg-title{white-space:normal;font-size:clamp(34px,10vw,60px);letter-spacing:.12em}}
-/* thin glowing divider with a small star in the centre */
-.gbg-divider{display:flex;align-items:center;justify-content:center;gap:14px;margin:38px 0 0;
+.gbg-divider{display:flex;align-items:center;justify-content:center;gap:14px;margin:clamp(24px,4vh,38px) 0 0;
   width:min(400px,74vw);color:#C6CBFF;font-size:14px;line-height:1;
   text-shadow:0 0 10px rgba(150,170,255,.9);
   animation:fromSpace 1.3s cubic-bezier(.2,.8,.25,1) .55s both;}
 .gbg-divider::before,.gbg-divider::after{content:"";height:1px;flex:1}
 .gbg-divider::before{background:linear-gradient(90deg,transparent,rgba(160,175,255,.6))}
 .gbg-divider::after{background:linear-gradient(90deg,rgba(160,175,255,.6),transparent)}
-/* subtitle: high contrast, inside a very soft dark translucent pill for readability */
-.gbg-sub{margin:26px 0 0;font-family:'Exo 2',var(--font);font-weight:400;color:#E9E5FF;
-  font-size:clamp(22px,2vw,34px);line-height:1.35;letter-spacing:.035em;text-align:center;max-width:90vw;
+.gbg-sub{margin:clamp(18px,3vh,26px) 0 0;font-family:'Exo 2',var(--font);font-weight:400;color:#E9E5FF;
+  font-size:clamp(19px,2vw,34px);line-height:1.4;letter-spacing:.035em;text-align:center;max-width:min(90vw,780px);
   text-shadow:0 2px 10px rgba(0,0,0,.62),0 1px 4px rgba(0,0,0,.5);
   animation:fromSpace 1.3s cubic-bezier(.2,.8,.25,1) .75s both;}
-/* CTA: dark blue-violet glowing capsule, sparkle on the left, subtle slow pulse */
-.gbg-btn{display:inline-flex;align-items:center;justify-content:center;gap:14px;cursor:pointer;margin-top:42px;
-  width:560px;max-width:92vw;height:76px;padding:0 34px;border-radius:999px;
-  font-family:'Orbitron',var(--font);font-weight:500;font-size:24px;text-transform:uppercase;letter-spacing:.16em;
+.gbg-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;
+  width:min(268px,100%);min-height:60px;height:60px;margin-top:clamp(28px,5vh,48px);
+  padding:0 24px;border-radius:18px;touch-action:manipulation;
+  font-family:'Orbitron',var(--font);font-weight:500;font-size:clamp(14px,3.6vw,16px);text-transform:uppercase;letter-spacing:.06em;
   color:#F4F1FF;border:2px solid rgba(145,195,255,.92);
   background:
     radial-gradient(circle at 50% 115%, rgba(142,88,255,.35), transparent 46%),
@@ -1424,15 +1452,40 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
   animation:gbgIn .5s ease-out 2.3s both, gbgGlow 4s ease-in-out 3s infinite;
   transition:transform .2s ease,box-shadow .25s ease,border-color .2s ease;}
 .gbg-btn .gbg-spark{font-size:.86em;color:#DCE0FF;text-shadow:0 0 10px rgba(150,175,255,.9)}
-.gbg-btn .gbg-arrow{font-size:.95em;color:#DCE0FF;text-shadow:0 0 10px rgba(150,175,255,.9)}
+.gbg-btn .gbg-arrow{font-size:.95em;color:#DCE0FF;text-shadow:0 0 10px rgba(150,175,255,.9);
+  transition:transform .2s ease;}
 .gbg-btn:hover{transform:translateY(-2px);border-color:rgba(190,205,255,1);
   box-shadow:0 6px 30px rgba(120,160,255,.6),0 0 52px rgba(140,95,255,.42),inset 0 1px 0 rgba(255,255,255,.14),inset 0 -12px 26px rgba(90,60,180,.32);}
-.gbg-btn:active{transform:translateY(0) scale(.99);}
-.gbg-btn:focus-visible{outline:2px solid rgba(190,205,255,.95);outline-offset:3px;}
-@keyframes gbgIn{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+.gbg-btn:hover .gbg-arrow{transform:translateX(3px)}
+.gbg-btn:active{transform:translateY(0) scale(.98);}
+.gbg-btn:focus-visible{outline:3px solid #F4F1FF;outline-offset:4px;
+  box-shadow:0 0 0 7px rgba(125,183,255,.35),0 0 34px rgba(125,183,255,.65),0 0 60px rgba(140,95,255,.46);}
+.gbg-btn:disabled{cursor:wait;opacity:.72;transform:none;}
+@keyframes gbgIn{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
 @keyframes gbgGlow{
   0%,100%{box-shadow:0 0 18px rgba(105,165,255,.4),0 0 40px rgba(132,86,255,.30),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -12px 26px rgba(90,60,180,.26)}
   50%{box-shadow:0 0 28px rgba(120,175,255,.6),0 0 60px rgba(140,95,255,.46),inset 0 1px 0 rgba(255,255,255,.14),inset 0 -12px 28px rgba(90,60,180,.32)}}
+@media (max-width:820px) and (orientation:portrait){
+  .gbg-content{top:50%;width:min(calc(100% - 32px),620px)}
+  .gbg-eyebrow{gap:8px;font-size:clamp(11px,3.2vw,15px);letter-spacing:.14em}
+  .gbg-eyebrow::before,.gbg-eyebrow::after{width:clamp(18px,6vw,40px)}
+  .gbg-title{white-space:normal;font-size:clamp(30px,9vw,52px);letter-spacing:clamp(.06em,1.6vw,.12em);
+    line-height:1.08;text-wrap:balance}
+  .gbg-sub{max-width:88vw;font-size:clamp(18px,5vw,24px);text-wrap:balance}
+  .gbg-btn{width:min(268px,86vw);min-height:60px;height:60px;padding:0 22px;font-size:clamp(14px,4vw,16px)}
+}
+@media (max-height:560px) and (orientation:landscape){
+  .gbg-content{top:50%;width:min(calc(100% - 40px),1040px)}
+  .gbg-eyebrow{margin-bottom:14px;font-size:clamp(11px,1.6vw,15px)}
+  .gbg-title{font-size:clamp(30px,6.2vw,54px);letter-spacing:.12em}
+  .gbg-divider{margin-top:12px}
+  .gbg-sub{margin-top:10px;font-size:clamp(16px,2.3vw,21px)}
+  .gbg-btn{width:min(240px,72vw);min-height:48px;height:48px;margin-top:16px;padding:0 20px;
+    font-size:clamp(13px,1.8vw,15px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .gbg-btn:hover .gbg-arrow{transform:none}
+}
 </style>
 
 <div id="app">
@@ -1441,11 +1494,29 @@ svg.field{width:100%;height:100%;display:block;touch-action:manipulation}
     <div class="coins hidden" id="coins" aria-live="polite" aria-label="Sky Stars score">
       <span class="ico" aria-hidden="true">⭐</span><span class="coin-label">Sky Stars</span><span id="coinval">0</span><span class="coin-rank" id="coinrank" aria-hidden="true">☆☆☆☆☆</span>
     </div>
-    <button class="snd-toggle on" id="narrToggle" aria-pressed="true" title="Turn sound on or off" aria-label="Turn sound on or off">
-      <span class="snd-ico" aria-hidden="true">🔊</span>
+    <button class="settings-gear" id="settingsBtn" title="Settings" aria-label="Open settings" aria-haspopup="dialog">
+      <span class="gear-ico" aria-hidden="true">⚙</span>
     </button>
   </div>
   <div id="screen" aria-live="polite"></div>
+
+  <!-- Settings popover — sound + home live here (§8 Navigation: never on the landing) -->
+  <div id="settingsMenu" class="settings-menu hidden" role="dialog" aria-modal="true" aria-label="Settings" hidden>
+    <div class="settings-card" role="document">
+      <h2 class="settings-title">Settings</h2>
+      <button class="settings-row" id="setSound" type="button" aria-pressed="true">
+        <span class="sr-ico" aria-hidden="true">🔊</span>
+        <span class="sr-label">Sound</span>
+        <span class="sr-state" id="setSoundState">On</span>
+      </button>
+      <button class="settings-row" id="setHome" type="button">
+        <span class="sr-ico" aria-hidden="true">🏠</span>
+        <span class="sr-label">Home</span>
+        <span class="sr-state" aria-hidden="true">➜</span>
+      </button>
+      <button class="settings-done btn" id="setClose" type="button">Done</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -2376,16 +2447,7 @@ SCENES.start=()=>{
   content.appendChild(btn);
   scene.appendChild(content);
 
-  /* small circular audio toggle (top chrome is hidden on this screen) */
-  const audioBtn=document.createElement("button");
-  audioBtn.className="home-audio"+(state.narrationOn?"":" off");
-  audioBtn.setAttribute("aria-label","Turn sound on or off");
-  audioBtn.setAttribute("aria-pressed",String(state.narrationOn));
-  audioBtn.innerHTML='<span aria-hidden="true">'+(state.narrationOn?"🔊":"🔇")+'</span>';
-  audioBtn.onclick=()=>{ toggleNarration(); const on=state.narrationOn;
-    audioBtn.classList.toggle("off",!on); audioBtn.setAttribute("aria-pressed",String(on));
-    audioBtn.firstChild.textContent=on?"🔊":"🔇"; };
-  scene.appendChild(audioBtn);
+  /* §1 Landing: no sound toggle here — sound now lives in the ⚙ Settings menu (shown during gameplay). */
 
   const flash=document.createElement("div"); flash.className="home-flash"; scene.appendChild(flash);
   screen.appendChild(scene);
@@ -2756,17 +2818,16 @@ SCENES.hunt=()=>{
   const controls=document.createElement("div"); controls.className="hunt-controls"; s.appendChild(controls);
   const navDock=document.createElement("div"); navDock.className="hunt-nav"; s.appendChild(navDock);
 
-  // ---- full-screen HUD overlay: Sky Stars score + small audio toggle (top-right) ----
+  // ---- full-screen HUD overlay: Sky Stars score + settings gear (top-right) ----
   const hud=document.createElement("div"); hud.className="hunt-hud";
   const stars=document.createElement("div"); stars.className="hunt-stars"; stars.setAttribute("aria-live","polite"); stars.setAttribute("aria-label","Sky Stars score");
   stars.innerHTML='<span class="ico" aria-hidden="true">⭐</span><span class="hl">Sky Stars</span><span class="hv">0</span>';
   hud.appendChild(stars);
-  const audioBtn=document.createElement("button"); audioBtn.className="hunt-audio"+(state.narrationOn?"":" off");
-  audioBtn.setAttribute("aria-label","Turn sound on or off"); audioBtn.setAttribute("aria-pressed",String(state.narrationOn));
-  audioBtn.innerHTML='<span aria-hidden="true">'+(state.narrationOn?"🔊":"🔇")+'</span>';
-  audioBtn.onclick=()=>{ toggleNarration(); const on=state.narrationOn;
-    audioBtn.classList.toggle("off",!on); audioBtn.setAttribute("aria-pressed",String(on)); audioBtn.firstChild.textContent=on?"🔊":"🔇"; };
-  hud.appendChild(audioBtn); s.appendChild(hud);
+  const gearBtn=document.createElement("button"); gearBtn.className="settings-gear";
+  gearBtn.type="button"; gearBtn.setAttribute("aria-label","Open settings"); gearBtn.setAttribute("aria-haspopup","dialog");
+  gearBtn.innerHTML='<span class="gear-ico" aria-hidden="true">⚙</span>';
+  gearBtn.onclick=openSettings;
+  hud.appendChild(gearBtn); s.appendChild(hud);
   function updateHud(bump){
     const hv=stars.querySelector(".hv"); if(hv) hv.textContent=state.starCoins;
     if(bump){ stars.classList.remove("bump"); void stars.offsetWidth; stars.classList.add("bump"); }
@@ -3220,11 +3281,11 @@ SCENES.discover=()=>{
     b.setAttribute("aria-label",label); b.title=label; b.onclick=onClick; return b;
   }
   function segDiv(){ const d=document.createElement("span"); d.className="seg-div"; d.setAttribute("aria-hidden","true"); return d; }
-  const sndBtn=document.createElement("button"); sndBtn.type="button"; sndBtn.className="discover-sound"+(state.narrationOn?"":" snd-off");
-  sndBtn.innerHTML='<span aria-hidden="true">'+(state.narrationOn?"🔊":"🔇")+'</span>';
-  sndBtn.setAttribute("aria-label","Turn sound on or off"); sndBtn.title="Turn sound on or off";
-  sndBtn.onclick=()=>{ toggleNarration(); sndBtn.firstChild.textContent=state.narrationOn?"🔊":"🔇"; sndBtn.classList.toggle("snd-off",!state.narrationOn); };
-  s.appendChild(sndBtn);
+  const gearBtn=document.createElement("button"); gearBtn.type="button"; gearBtn.className="discover-sound";
+  gearBtn.innerHTML='<span aria-hidden="true">⚙</span>';
+  gearBtn.setAttribute("aria-label","Open settings"); gearBtn.title="Settings"; gearBtn.setAttribute("aria-haspopup","dialog");
+  gearBtn.onclick=()=>openSettings();
+  s.appendChild(gearBtn);
 
   // Skip this constellation activity → jump to the next one (or the ending after the last).
   const skipBtn=document.createElement("button"); skipBtn.type="button"; skipBtn.className="discover-skip";
@@ -3968,8 +4029,7 @@ function shapesMatch(refStars,refEdges, drawnStars,drawnEdges, tol){
 /* ---------- SCENE 8: FINAL SCENES (3 narrated closing pictures) ---------- */
 SCENES.reward=()=>{
   state.currentScene="reward";
-  // closing video → a Continue button (a real click is needed so Activity 2's
-  // intro video is allowed to autoplay WITH sound inside the iframe)
+  // Closing video, then hand off to the Glow Box entry screen.
   videoScene("videos/video 12.mp4","Continue ➜",showLightSourceGate);
 };
 function showLightSourceGate(){
@@ -4013,17 +4073,19 @@ function showLightSourceGate(){
     const pl=vid.play&&vid.play(); if(pl&&pl.catch) pl.catch(()=>{});   // ignore autoplay-block errors
   }
 
-  // foreground: Glow-Box title / tagline / Check the Bulb button
-  const c=document.createElement("div");
-  c.style.cssText="position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:2;display:flex;flex-direction:column;align-items:center;width:min(94vw,1320px);padding:0 22px;text-align:center";
-  c.innerHTML='<div class="gbg-eyebrow">MISSION 2 &nbsp;•&nbsp; CIRCUIT QUEST</div>'+
-              '<h1 class="gbg-title">GLOW BOX MYSTERY</h1>'+
+  // Matching fallback shown only while the real Glow Box iframe loads.
+  const c=document.createElement("section");
+  c.className="gbg-content";
+  c.setAttribute("aria-labelledby","gbg-title");
+  c.setAttribute("aria-describedby","gbg-description");
+  c.innerHTML='<div class="gbg-eyebrow">Mission 2 &nbsp;•&nbsp; Circuit Quest</div>'+
+              '<h1 class="gbg-title" id="gbg-title">Glow Box Mystery</h1>'+
               '<div class="gbg-divider" aria-hidden="true">✦</div>'+
-              '<p class="gbg-sub">Investigate what makes the park lamp glow?</p>';
-  const btn=document.createElement("button"); btn.type="button"; btn.className="gbg-btn";
-  btn.innerHTML='<span class="gbg-spark" aria-hidden="true">✦</span>START INVESTIGATION<span class="gbg-arrow" aria-hidden="true">→</span>';
-  btn.setAttribute("aria-label","Start investigation");
-  btn.addEventListener("click", openLightSource);   // real click keeps the iframe's audio/video autoplay unlocked
+              '<p class="gbg-sub" id="gbg-description">Investigate what makes the park lamp glow.</p>';
+  const btn=document.createElement("button"); btn.type="button"; btn.className="gbg-btn"; btn.id="gbg-start";
+  btn.innerHTML='<span class="gbg-spark" aria-hidden="true">✦</span>Start Quest<span class="gbg-arrow" aria-hidden="true">→</span>';
+  btn.setAttribute("aria-label","Start the Glow Box quest");
+  btn.addEventListener("click",openLightSource);
   c.appendChild(btn);
   s.appendChild(c); screen.appendChild(s);
 
@@ -4040,37 +4102,73 @@ function showLightSourceGate(){
     })();
   }
 
-  preloadLightSource();     // Activity 2 loads invisibly BEHIND the gate while the child reads it
+  preloadLightSource();
 }
 /* Embed Activity 2 (The Glow-Box Mystery) as a full-screen iframe so there's no page reload
-   (keeps audio/video autoplay unlocked). It messages back "ls-restart" when done.
-   The iframe is created invisible while the Continue gate shows: the page parses and
-   buffers its intro video but plays NOTHING until we post "ls-start" on the child's
-   click — so Continue reveals Activity 2 instantly, with no black loading break. */
+   and no duplicate entry screen. The matching parent gate is only a loading fallback;
+   once the iframe reports ready, its real home screen replaces the fallback in place. */
 let lsWanted=false;
+let lsReady=false;
+let lsStartSent=false;
 function preloadLightSource(){
   let f=document.getElementById("ls-frame");
   if(f) return f;
   f=document.createElement("iframe");
   f.id="ls-frame"; f.src="glow-box.html"; f.allow="autoplay; fullscreen";
-  f.style.cssText="position:fixed;inset:0;width:100%;height:100%;border:0;z-index:99999;background:#000;opacity:0;pointer-events:none;transition:opacity .35s ease";
+  f.title="Glow Box Mystery activity";
+  const reduceMotion=!!(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  f.style.cssText="position:fixed;inset:0;width:100%;height:100%;border:0;z-index:99999;background:#050311;opacity:0;pointer-events:none;transition:"+
+    (reduceMotion?"none":"opacity .25s ease");
   document.body.appendChild(f);
   return f;
 }
-function openLightSource(){
-  lsWanted=true;
-  const f=preloadLightSource();                              // normally already loaded behind the gate
-  f.style.pointerEvents="auto"; f.style.opacity="1";
+function revealLightSource(f){
+  if(!f) return;
+  const reduceMotion=!!(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  screen.setAttribute("aria-hidden","true");
+  f.style.pointerEvents="auto";
+  requestAnimationFrame(()=>{
+    f.style.opacity="1";
+    f.focus();
+  });
+  setTimeout(()=>{
+    if(f.isConnected && f.style.opacity==="1") screen.innerHTML="";
+  },reduceMotion?0:300);
+}
+function requestLightSourceStart(f){
+  if(!f || lsStartSent) return;
+  lsStartSent=true;
   try{ f.contentWindow.postMessage("ls-start","*"); }catch(e){}
 }
+function openLightSource(){
+  lsWanted=true;
+  const btn=document.getElementById("gbg-start");
+  if(btn){
+    btn.disabled=true;
+    btn.setAttribute("aria-busy","true");
+    btn.setAttribute("aria-label","Opening the Glow Box quest");
+    btn.innerHTML='<span class="gbg-spark" aria-hidden="true">✦</span>Opening Quest…';
+  }
+  const f=preloadLightSource();
+  if(lsReady) requestLightSourceStart(f);
+}
 window.addEventListener("message",e=>{
-  if(e.data==="ls-ready" && lsWanted){                       // iframe finished loading AFTER the click → start it now
-    const f=document.getElementById("ls-frame");
-    if(f){ try{ f.contentWindow.postMessage("ls-start","*"); }catch(err){} }
+  const f=document.getElementById("ls-frame");
+  if(!f || e.source!==f.contentWindow) return;
+  if(e.data==="ls-ready"){
+    lsReady=true;
+    if(lsWanted) requestLightSourceStart(f);
+    else revealLightSource(f);
+  }
+  if(e.data==="ls-started" && lsWanted){
+    revealLightSource(f);
   }
   if(e.data==="ls-restart"){
     lsWanted=false;
-    const f=document.getElementById("ls-frame"); if(f) f.remove();
+    lsReady=false;
+    lsStartSent=false;
+    f.remove();
+    screen.removeAttribute("aria-hidden");
     state=NEW_STATE(); show("start");
   }
 });
@@ -4162,18 +4260,45 @@ function mkBtn(label,cls,onClick){
   b.className="btn "+(cls||""); b.textContent=label; b.onclick=onClick; return b;
 }
 
+function syncSoundUI(){
+  const on=state.narrationOn;
+  const row=document.getElementById("setSound");
+  if(row){
+    row.classList.toggle("off",!on);
+    row.setAttribute("aria-pressed",String(on));
+    const ico=row.querySelector(".sr-ico"); if(ico) ico.textContent=on?"🔊":"🔇";
+    const st=document.getElementById("setSoundState"); if(st) st.textContent=on?"On":"Off";
+  }
+}
 function toggleNarration(){
   state.narrationOn=!state.narrationOn;
-  const t=document.getElementById("narrToggle");
-  if(t){
-    t.classList.toggle("on",state.narrationOn);
-    t.setAttribute("aria-pressed",String(state.narrationOn));
-    const ico=t.querySelector(".snd-ico"); if(ico) ico.textContent=state.narrationOn?"🔊":"🔇";
-  }
+  syncSoundUI();
   if(!state.narrationOn){ Speech.stop(); stopHuntAudio(); stopLineAudio(); }
   else Speech.speak("Narration on.");
 }
-document.getElementById("narrToggle").onclick=toggleNarration;
+function openSettings(){
+  const m=document.getElementById("settingsMenu"); if(!m) return;
+  syncSoundUI();
+  m.classList.remove("hidden"); m.removeAttribute("hidden");
+  const first=document.getElementById("setSound"); if(first) first.focus();
+}
+function closeSettings(){
+  const m=document.getElementById("settingsMenu"); if(!m) return;
+  m.classList.add("hidden"); m.setAttribute("hidden","");
+  const g=document.getElementById("settingsBtn");
+  if(g && g.offsetParent!==null) g.focus();
+}
+(function wireSettings(){
+  const gear=document.getElementById("settingsBtn"); if(gear) gear.onclick=openSettings;
+  const snd=document.getElementById("setSound");   if(snd)  snd.onclick=toggleNarration;
+  const home=document.getElementById("setHome");   if(home) home.onclick=()=>{ closeSettings(); show("start"); };
+  const close=document.getElementById("setClose"); if(close) close.onclick=closeSettings;
+  const menu=document.getElementById("settingsMenu");
+  if(menu) menu.addEventListener("click",e=>{ if(e.target===menu) closeSettings(); });
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape"){ const m=document.getElementById("settingsMenu"); if(m && !m.classList.contains("hidden")) closeSettings(); }
+  });
+})();
 
 /* ---- background asset preloader: warms the cache while the title screen shows,
    so every scene's image/video is ready before the child reaches it ---- */

@@ -142,7 +142,7 @@
       linear-gradient(180deg, rgba(55,45,125,.95), rgba(18,13,56,.97));
     color:#F4F6FF;font-family:var(--font-ui);font-weight:500;font-size:clamp(14px,1.6vw,19px);
     letter-spacing:.1em;text-transform:uppercase;
-    border:2px solid rgba(125,183,255,.9);border-radius:999px;padding:13px 40px;
+    border:2px solid rgba(125,183,255,.9);border-radius:18px;padding:13px 30px;
     box-shadow:0 0 18px rgba(125,183,255,.4),0 0 40px rgba(157,140,255,.25),
       inset 0 1px 0 rgba(255,255,255,.12);
     cursor:pointer;
@@ -254,6 +254,59 @@
     display:flex;align-items:center;justify-content:center;z-index:5;}
   .comp .cimg{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(0,0,0,.35));}
 
+  /* ---------- Meet the parts onboarding ---------- */
+  .parts-intro-active #kabir,.parts-intro-active #meera,
+  .parts-intro-active .char-ring{opacity:0;}
+  .parts-panel{position:relative;width:100%;height:100%;padding:clamp(18px,3vw,34px);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(18px,3vh,30px);
+    background:linear-gradient(180deg,rgba(12,24,52,.78),rgba(6,13,32,.88));
+    border:2px solid var(--launchpad-border);border-radius:28px;
+    box-shadow:0 0 26px rgba(125,183,255,.28),0 0 60px rgba(90,120,255,.14),
+      inset 0 1px 0 rgba(255,255,255,.08),inset 0 0 46px rgba(30,60,140,.18);
+    -webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);animation:benchIn .45s ease-out;}
+  .parts-panel::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:linear-gradient(rgba(125,183,255,.05) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(125,183,255,.05) 1px,transparent 1px);
+    background-size:46px 46px;
+    -webkit-mask-image:radial-gradient(110% 100% at 50% 50%,#000 50%,transparent 98%);
+    mask-image:radial-gradient(110% 100% at 50% 50%,#000 50%,transparent 98%);}
+  .parts-grid{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+    align-items:center;width:min(92%,780px);gap:clamp(18px,4vw,70px);}
+  .parts-card{position:relative;min-width:0;border:0;background:transparent;color:var(--text-primary);
+    display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px;
+    font:inherit;text-align:center;transform:scale(1);transform-origin:center;
+    transition:transform .24s cubic-bezier(.2,.8,.25,1),filter .24s ease;z-index:1;}
+  button.parts-card{cursor:pointer;touch-action:manipulation;}
+  button.parts-card:hover{filter:drop-shadow(0 0 15px rgba(125,183,255,.55));}
+  button.parts-card:focus-visible{outline:3px solid #F4F1FF;outline-offset:4px;border-radius:18px;}
+  .parts-card.active{filter:drop-shadow(0 0 18px rgba(125,183,255,.65));z-index:5;}
+  .parts-visual{position:relative;width:100%;max-width:190px;aspect-ratio:1/1;
+    display:flex;align-items:center;justify-content:center;transform:scale(1);
+    transition:transform .24s cubic-bezier(.2,.8,.25,1);pointer-events:none;}
+  .parts-card.active .parts-visual{transform:scale(1.5);}
+  .parts-image{width:100%;height:100%;object-fit:contain;
+    filter:drop-shadow(0 5px 10px rgba(0,0,0,.4));}
+  .parts-face{position:absolute;left:50%;top:48%;width:38%;height:auto;transform:translate(-50%,-50%);
+    opacity:0;pointer-events:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));
+    transition:opacity .16s ease;}
+  .parts-card.active .parts-face{opacity:1;}
+  .parts-name{font-family:var(--font-ui);font-weight:600;font-size:clamp(12px,1.3vw,16px);
+    letter-spacing:.08em;text-transform:uppercase;color:#EAF1FF;
+    text-shadow:0 0 10px rgba(125,183,255,.45);}
+  .parts-met{min-height:18px;font-size:clamp(11px,1vw,13px);font-weight:800;color:var(--success-green);
+    opacity:0;transition:opacity .2s ease;}
+  .parts-card.visited .parts-met{opacity:1;}
+  .parts-prompt{position:relative;z-index:2;margin:0;color:var(--text-secondary);font-weight:800;
+    font-size:clamp(15px,1.5vw,19px);text-align:center;}
+  .parts-speech{position:relative;z-index:2;width:min(92%,760px);min-height:92px;
+    display:flex;align-items:center;justify-content:center;padding:14px 22px;border-radius:20px;
+    background:linear-gradient(180deg,rgba(16,30,64,.96),rgba(8,16,38,.97));
+    border:2px solid rgba(157,140,255,.65);
+    box-shadow:0 0 20px rgba(157,140,255,.28),var(--shadow-card);
+    color:var(--text-primary);font-size:clamp(14px,1.35vw,18px);font-weight:700;line-height:1.45;text-align:center;}
+  .parts-speech strong{color:var(--current-yellow);font-weight:900;}
+  .parts-speech-name{font-family:var(--font-ui);color:#CFC6FF;letter-spacing:.05em;}
+
   /* the bulb is dark until current flows */
   #bulb .cimg{filter:brightness(.55) saturate(.55) drop-shadow(0 4px 8px rgba(0,0,0,.35));transition:filter .4s;}
   #bulb.lit .cimg{filter:brightness(1.05) saturate(1.1) drop-shadow(0 0 16px rgba(255,224,110,.9));}
@@ -303,12 +356,11 @@
   @keyframes fall{to{transform:translateY(105vh) rotate(600deg);opacity:.4;}}
 
   /* ---------- Entry gate (the "Check the Bulb" hand-over from the bridge) ----------
-     Night-sky opening styled to match the Constellation Explorer home scene
-     (deep navy→indigo, drifting nebulae, twinkling + big glowing stars, fireflies,
-     occasional shooting stars) — but with NO moon. The title/tagline/button keep
-     the Glow-Box typography below, untouched. */
+     Night-sky opening styled to match the Constellation Explorer home scene. */
   #entry{position:absolute;inset:0;z-index:70;display:flex;flex-direction:column;
-    align-items:center;justify-content:flex-start;
+    align-items:center;justify-content:center;overflow:hidden;
+    padding:max(24px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right))
+      max(24px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
     background:
       radial-gradient(90% 70% at 78% 20%, rgba(198,62,172,.30), transparent 55%),
       radial-gradient(80% 65% at 12% 68%, rgba(126,62,205,.27), transparent 60%),
@@ -325,7 +377,8 @@
   #entry .eb-vidtint{position:absolute;inset:0;z-index:1;pointer-events:none;
     background:linear-gradient(180deg,rgba(5,3,17,.45) 0%,transparent 24%,transparent 52%,rgba(5,3,17,.60) 100%);}
   #entry .eb-content{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:2;
-    display:flex;flex-direction:column;align-items:center;width:min(94vw,1320px);padding:0 22px;text-align:center;}   /* hero centred, ~46% down */
+    display:flex;flex-direction:column;align-items:center;
+    width:min(calc(100% - 32px),1320px);text-align:center;}
   #entry .estars{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
   /* drifting nebula / cloud glow layers — deep violet, crimson-magenta, reddish pink
      and cool cyan space clouds, like the poster */
@@ -392,36 +445,32 @@
     transform:translateY(-50%);background:#fff;box-shadow:0 0 8px 2px #fff;}
   @keyframes ebShoot{0%{opacity:0;transform:translate(0,0) rotate(20deg) scaleX(.3)}
     12%{opacity:1}100%{opacity:0;transform:translate(58vw,24vh) rotate(20deg) scaleX(1)}}
-  /* heading: heavy squared sci-fi logotype (Star-Wars-poster style), plain white.
-     It flies in from deep space — tiny, blurred and far away, growing onto the screen. */
-  /* clean cinematic science-mystery titling — Space Grotesk, no glass panel */
   #entry .eb-content{font-family:'Exo 2',var(--font-body);}
-  /* mission label — Orbitron, with a thin glowing rule on each side, ~54px above the title */
-  #entry .eb-eyebrow{display:flex;align-items:center;justify-content:center;gap:clamp(12px,1.6vw,22px);margin:0 0 54px;
+  /* Mission label with a thin glowing rule on each side. */
+  #entry .eb-eyebrow{display:flex;align-items:center;justify-content:center;gap:clamp(10px,1.6vw,22px);
+    width:100%;margin:0 0 clamp(28px,6vh,54px);white-space:nowrap;
     font-family:'Orbitron',var(--font-body);font-weight:500;letter-spacing:.22em;text-transform:uppercase;
-    font-size:clamp(15px,1.5vw,23px);color:#C7CBFF;
+    font-size:clamp(13px,1.5vw,23px);color:#C7CBFF;
     text-shadow:0 0 14px rgba(150,165,255,.5);
     animation:fromSpace 1.4s cubic-bezier(.2,.8,.25,1) .15s both;}
   #entry .eb-eyebrow::before,#entry .eb-eyebrow::after{content:"";height:1px;width:clamp(40px,9vw,140px);box-shadow:0 0 8px rgba(150,175,255,.8)}
   #entry .eb-eyebrow::before{background:linear-gradient(90deg,transparent,rgba(180,195,255,.85))}
   #entry .eb-eyebrow::after{background:linear-gradient(90deg,rgba(180,195,255,.85),transparent)}
-  /* headline "GLOW BOX MYSTERY" — Orbitron, uppercase, one line */
   #entry h1{margin:0;font-family:'Orbitron',var(--font-heading);font-weight:600;color:#F4F1FF;
     font-size:clamp(46px,5.4vw,88px);letter-spacing:.18em;line-height:1.02;text-align:center;white-space:nowrap;text-transform:uppercase;
+    max-width:100%;
     text-shadow:0 0 22px rgba(196,208,255,.55),0 0 46px rgba(150,165,255,.4),0 0 74px rgba(140,95,255,.32),0 2px 12px rgba(0,0,0,.5);
     animation:fromSpace 1.5s cubic-bezier(.2,.8,.25,1) .3s both;}
-  @media (max-width:760px){#entry h1{white-space:normal;font-size:clamp(34px,10vw,60px);letter-spacing:.12em;}}
-  /* thin glowing divider with a small star in the centre, ~38px below the title */
-  #entry .eb-divider{display:flex;align-items:center;justify-content:center;gap:14px;margin:38px 0 0;
+  /* Thin glowing divider with a small star in the centre. */
+  #entry .eb-divider{display:flex;align-items:center;justify-content:center;gap:14px;margin:clamp(24px,4vh,38px) 0 0;
     width:min(400px,74vw);color:#C6CBFF;font-size:14px;line-height:1;
     text-shadow:0 0 10px rgba(150,170,255,.9);
     animation:fromSpace 1.3s cubic-bezier(.2,.8,.25,1) .55s both;}
   #entry .eb-divider::before,#entry .eb-divider::after{content:"";height:1px;flex:1}
   #entry .eb-divider::before{background:linear-gradient(90deg,transparent,rgba(160,175,255,.6))}
   #entry .eb-divider::after{background:linear-gradient(90deg,rgba(160,175,255,.6),transparent)}
-  /* subtitle: Exo 2, no panel — dark text shadow carries readability, ~26px below the divider */
-  #entry p{margin:26px 0 0;font-family:'Exo 2',var(--font-body);font-weight:400;color:#E9E5FF;
-    font-size:clamp(22px,2vw,34px);line-height:1.35;letter-spacing:.035em;text-align:center;max-width:90vw;
+  #entry p{margin:clamp(18px,3vh,26px) 0 0;font-family:'Exo 2',var(--font-body);font-weight:400;color:#E9E5FF;
+    font-size:clamp(19px,2vw,34px);line-height:1.4;letter-spacing:.035em;text-align:center;max-width:min(90vw,780px);
     text-shadow:0 2px 10px rgba(0,0,0,.62),0 1px 4px rgba(0,0,0,.5);
     animation:fromSpace 1.3s cubic-bezier(.2,.8,.25,1) .75s both;}
   @keyframes fromSpace{
@@ -429,10 +478,11 @@
     60%{opacity:1;filter:blur(0)}
     82%{transform:scale(1.05)}
     100%{opacity:1;transform:scale(1);filter:blur(0)}}
-  /* CTA: dark blue-violet glowing capsule, sparkle on the left, subtle slow pulse */
-  #entry .btn{width:560px;max-width:92vw;height:76px;padding:0 34px;border-radius:999px;margin-top:42px;
-    display:inline-flex;align-items:center;justify-content:center;gap:14px;
-    font-family:'Orbitron',var(--font-body);font-weight:500;font-size:24px;text-transform:uppercase;letter-spacing:.16em;
+  /* Compact mission CTA with a soft blue-violet glow. */
+  #entry .btn{width:min(268px,100%);min-height:60px;height:60px;padding:0 24px;border-radius:18px;
+    margin-top:clamp(28px,5vh,48px);
+    display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    font-family:'Orbitron',var(--font-body);font-weight:500;font-size:clamp(14px,3.6vw,16px);text-transform:uppercase;letter-spacing:.06em;
     color:#F4F1FF;border:2px solid rgba(145,195,255,.92);
     background:
       radial-gradient(circle at 50% 115%, rgba(142,88,255,.35), transparent 46%),
@@ -440,12 +490,17 @@
     box-shadow:0 0 22px rgba(105,165,255,.5),0 0 50px rgba(132,86,255,.38),
       inset 0 1px 0 rgba(255,255,255,.12),inset 0 -12px 26px rgba(90,60,180,.28);
     animation:btnIn .5s ease-out 2.3s both, entryGlow 4s ease-in-out 3s infinite;
-    transition:transform .2s ease,box-shadow .25s ease,border-color .2s ease;}
+    transition:transform .2s ease,box-shadow .25s ease,border-color .2s ease;
+    touch-action:manipulation;}
   #entry .btn .eb-spark{font-size:.86em;color:#DCE0FF;text-shadow:0 0 10px rgba(150,175,255,.9)}
-  #entry .btn .eb-arrow{font-size:.95em;color:#DCE0FF;text-shadow:0 0 10px rgba(150,175,255,.9)}
+  #entry .btn .eb-arrow{font-size:.95em;color:#DCE0FF;text-shadow:0 0 10px rgba(150,175,255,.9);
+    transition:transform .2s ease;}
   #entry .btn:hover{transform:translateY(-2px);border-color:rgba(190,205,255,1);
     box-shadow:0 6px 30px rgba(120,160,255,.6),0 0 52px rgba(140,95,255,.42),inset 0 1px 0 rgba(255,255,255,.14),inset 0 -12px 26px rgba(90,60,180,.32);}
-  #entry .btn:active{transform:translateY(0) scale(.99);}
+  #entry .btn:hover .eb-arrow{transform:translateX(3px);}
+  #entry .btn:active{transform:translateY(0) scale(.98);}
+  #entry .btn:focus-visible{outline:3px solid #F4F1FF;outline-offset:4px;
+    box-shadow:0 0 0 7px rgba(125,183,255,.35),0 0 34px rgba(125,183,255,.65),0 0 60px rgba(140,95,255,.46);}
   /* very soft, slow, non-bouncy pulse: just the blue-violet glow breathing */
   @keyframes entryGlow{
     0%,100%{box-shadow:0 0 18px rgba(105,165,255,.4),0 0 40px rgba(132,86,255,.30),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -12px 26px rgba(90,60,180,.26)}
@@ -609,13 +664,24 @@
     #headline{top:max(10px,env(safe-area-inset-top));font-size:clamp(14px,3.8vw,19px);padding:9px 16px;}
     #navbar{top:auto;bottom:max(12px,env(safe-area-inset-bottom));left:8px;right:8px;gap:6px;}
     .navbtn{min-height:38px;padding:6px 12px;font-size:14px;}
-    .btn{min-height:48px;padding:10px 24px;font-size:clamp(16px,5vw,20px);}
+    .btn{min-height:56px;padding:12px 26px;font-size:clamp(16px,5vw,20px);}
     .choice-btn{min-height:46px;padding:9px 16px;font-size:clamp(14px,4vw,17px);}
     #wirepile{left:1.5%;top:2%;}
     #wirepile img{width:clamp(44px,13vw,64px);}
     .cert-card{width:min(92vw,640px);border-radius:28px;padding:28px 22px;}
-    #entry{padding:0 22px;}
-    #entry p{max-width:88vw;}
+    #entry .eb-content{top:50%;width:min(calc(100% - 32px),620px);}
+    #entry .eb-eyebrow{gap:8px;font-size:clamp(11px,3.2vw,15px);letter-spacing:.14em;}
+    #entry .eb-eyebrow::before,#entry .eb-eyebrow::after{width:clamp(18px,6vw,40px);}
+    #entry h1{white-space:normal;font-size:clamp(30px,9vw,52px);letter-spacing:clamp(.06em,1.6vw,.12em);
+      line-height:1.08;text-wrap:balance;}
+    #entry p{max-width:88vw;font-size:clamp(18px,5vw,24px);text-wrap:balance;}
+    #entry .btn{width:min(268px,86vw);min-height:60px;height:60px;padding:0 22px;font-size:clamp(14px,4vw,16px);}
+    .parts-panel{padding:16px 10px;gap:14px;border-radius:24px;}
+    .parts-grid{width:100%;gap:8px;}
+    .parts-card{padding:5px;gap:4px;}
+    .parts-visual{max-width:120px;}
+    .parts-speech{width:96%;min-height:108px;padding:10px 12px;font-size:clamp(13px,3.4vw,16px);}
+    .parts-prompt{font-size:clamp(13px,3.4vw,16px);}
   }
 
   @media (max-height: 560px) and (orientation: landscape){
@@ -632,10 +698,24 @@
     .navbtn{min-height:38px;padding:6px 12px;font-size:13px;}
     .btn{min-height:46px;padding:9px 24px;font-size:clamp(15px,2.2vw,19px);}
     .cert-card{width:min(76vw,600px);padding:24px 28px;border-radius:28px;}
+    #entry .eb-content{top:50%;width:min(calc(100% - 40px),1040px);}
+    #entry .eb-eyebrow{margin-bottom:14px;font-size:clamp(11px,1.6vw,15px);}
+    #entry h1{font-size:clamp(30px,6.2vw,54px);letter-spacing:.12em;}
+    #entry .eb-divider{margin-top:12px;}
+    #entry p{margin-top:10px;font-size:clamp(16px,2.3vw,21px);}
+    #entry .btn{width:min(240px,72vw);min-height:48px;height:48px;margin-top:16px;padding:0 20px;
+      font-size:clamp(13px,1.8vw,15px);}
+    .parts-panel{padding:10px 20px;gap:8px;border-radius:22px;}
+    .parts-grid{width:min(78%,680px);gap:clamp(20px,5vw,64px);}
+    .parts-visual{max-width:112px;}
+    .parts-card{padding:2px;gap:2px;}
+    .parts-speech{min-height:58px;padding:7px 18px;font-size:clamp(12px,1.5vw,15px);line-height:1.3;}
+    .parts-prompt{font-size:13px;}
   }
 
   @media (prefers-reduced-motion: reduce){
     *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}
+    #entry .btn:hover .eb-arrow{transform:none;}
   }
 </style>
 </head>
@@ -712,13 +792,13 @@
     <video class="eb-video" id="eb-video" muted loop playsinline autoplay aria-hidden="true"></video>
     <div class="eb-vidtint"></div>
     <div class="eb-shade"></div>
-    <div class="eb-content">
-      <div class="eb-eyebrow">MISSION 2 &nbsp;•&nbsp; CIRCUIT QUEST</div>
-      <h1>GLOW BOX MYSTERY</h1>
+    <section class="eb-content" aria-labelledby="entry-title" aria-describedby="entry-description">
+      <div class="eb-eyebrow">Mission 2 &nbsp;•&nbsp; Circuit Quest</div>
+      <h1 id="entry-title">Glow Box Mystery</h1>
       <div class="eb-divider" aria-hidden="true">✦</div>
-      <p>Investigate what makes the park lamp glow?</p>
-      <button class="btn" id="entry-btn" aria-label="Start investigation"><span class="eb-spark" aria-hidden="true">✦</span>START INVESTIGATION<span class="eb-arrow" aria-hidden="true">→</span></button>
-    </div>
+      <p id="entry-description">Investigate what makes the park lamp glow.</p>
+      <button class="btn" id="entry-btn" type="button" aria-label="Start the Glow Box quest"><span class="eb-spark" aria-hidden="true">✦</span>Start Quest<span class="eb-arrow" aria-hidden="true">→</span></button>
+    </section>
   </div>
 </div>
 
@@ -743,6 +823,7 @@ const IMG = {
   switchOn:V("switch on.png"),
   wire:    V("wires.png"),
   hand:    V("hand icon transparent.png"),
+  face:    V("wobble-face.png"),
 };
 /* room photo removed — #room-bg is now a pure-CSS nebula layer (cosmic HUD reskin) */
 
@@ -1826,6 +1907,138 @@ $("#cert-done").addEventListener("click", ()=>{
   else { window.location.reload(); }
 });
 
+/* ============ Two-screen component introduction ============ */
+const PART_INTROS = [
+  {
+    id:"battery",
+    name:"Battery",
+    image:IMG.battery,
+    speech:'Hi! I’m the battery. I give the circuit energy. Match my <strong>+ and – sides</strong> correctly.',
+  },
+  {
+    id:"bulb",
+    name:"LED",
+    image:IMG.bulb,
+    speech:'Hi! I’m the LED. I glow when electricity moves through me. Connect my <strong>+ leg towards +</strong> and my <strong>– leg towards –</strong>.',
+  },
+  {
+    id:"switch",
+    name:"Switch",
+    image:IMG.switch,
+    speech:'Hi! I’m the switch. I open and close the path. <strong>Closed path: glow. Open path: no glow.</strong>',
+  },
+];
+let metParts = new Set();
+
+function makePartCard(part, interactive){
+  const card=document.createElement(interactive ? "button" : "div");
+  card.className="parts-card";
+  card.dataset.part=part.id;
+  if(interactive){
+    card.type="button";
+    card.setAttribute("aria-label","Meet the "+part.name);
+    card.setAttribute("aria-pressed","false");
+  }
+
+  const visual=document.createElement("span");
+  visual.className="parts-visual";
+  const image=document.createElement("img");
+  image.className="parts-image";
+  image.src=part.image;
+  image.alt=interactive ? "" : part.name;
+  const face=document.createElement("img");
+  face.className="parts-face";
+  face.src=IMG.face;
+  face.alt="";
+  face.setAttribute("aria-hidden","true");
+  visual.append(image,face);
+
+  const name=document.createElement("span");
+  name.className="parts-name";
+  name.textContent=part.name;
+  const met=document.createElement("span");
+  met.className="parts-met";
+  met.textContent="Met";
+  card.append(visual,name,met);
+  return card;
+}
+
+function buildPartsPanel(interactive){
+  stageEl.innerHTML="";
+  const panel=document.createElement("div");
+  panel.className="parts-panel";
+  const grid=document.createElement("div");
+  grid.className="parts-grid";
+  PART_INTROS.forEach(part=>{
+    const card=makePartCard(part,interactive);
+    if(interactive) card.addEventListener("click",()=>meetPart(part,card,panel));
+    grid.appendChild(card);
+  });
+  panel.appendChild(grid);
+
+  if(interactive){
+    const prompt=document.createElement("p");
+    prompt.className="parts-prompt";
+    prompt.textContent="Tap the battery, LED, and switch to hear what each one does.";
+    const speech=document.createElement("div");
+    speech.className="parts-speech";
+    speech.id="parts-speech";
+    speech.setAttribute("aria-live","polite");
+    speech.textContent="Choose a part to meet it.";
+    panel.append(prompt,speech);
+  }else{
+    const prompt=document.createElement("p");
+    prompt.className="parts-prompt";
+    prompt.textContent="The battery, LED, and switch work together to light the lamp.";
+    panel.appendChild(prompt);
+  }
+  stageEl.appendChild(panel);
+}
+
+function startPartsIntro(){
+  stage=-2;
+  board=null;
+  metParts.clear();
+  clearAction();
+  clearChoices();
+  hideConcept();
+  hideHeadline();
+  clearDlgTimer();
+  dlgBox.classList.add("hide");
+  speakingIs("");
+  gameEl.classList.add("parts-intro-active");
+  const navbar=$("#navbar");
+  if(navbar) navbar.style.display="none";
+  showHeadline("Meet the parts that light the lamp!",true);
+  buildPartsPanel(false);
+  setAction("Meet the parts",startPartsExplore);
+}
+
+function startPartsExplore(){
+  stage=-1;
+  metParts.clear();
+  clearAction();
+  showHeadline("Tap each part to meet it!",true);
+  buildPartsPanel(true);
+}
+
+function meetPart(part,card,panel){
+  panel.querySelectorAll(".parts-card").forEach(item=>{
+    const active=item===card;
+    item.classList.toggle("active",active);
+    item.setAttribute("aria-pressed",String(active));
+  });
+  card.classList.add("visited");
+  metParts.add(part.id);
+  const speech=panel.querySelector("#parts-speech");
+  speech.innerHTML='<span><strong class="parts-speech-name">'+part.name+':</strong> '+part.speech+"</span>";
+  card.setAttribute("aria-label",part.name+" met");
+  snd.click();
+  if(metParts.size===PART_INTROS.length && !actionbar.querySelector("button")){
+    setAction("Build the circuit",startStage1);
+  }
+}
+
 /* ============ Active seven-stage learning flow ============ */
 function celebrateFirstGlow(){
   if(firstGlowDone || !board) return;
@@ -1973,6 +2186,10 @@ function afterCircuitRefresh(){
 }
 function startStage1(){
   stage = 1;
+  gameEl.classList.remove("parts-intro-active");
+  const navbar=$("#navbar");
+  if(navbar) navbar.style.display="";
+  clearAction();
   setChapter(0);
   nudgeIdx = 0;
   NUDGES[1].text = "Can you give it a way to go in and come back?";
@@ -2032,7 +2249,7 @@ function askTravellingThingQuestion(){
     {label:"Battery sparkle"},
   ], ()=>{
     setDialogue([
-      {who:"Kabir", text:"Yes! It is like a travelling glow thing.", kabir:"kabirHappy"},
+      {who:"Kabir", text:"It is travelling through wires and making the LED glow.", kabir:"kabirHappy"},
     ], ()=>{
       markStageDone();
       showConcept("Current =", "the travelling thing that moves through the wire.");
@@ -2374,23 +2591,32 @@ updatePile = function(){ _updatePile(); updateNav(); };
   })();
 })();
 let started = false;
-function startActivity(){
+function startActivity(skipEntryTransition=false){
   if(started) return;
   started = true;
   ac();
   loadVoices();
   const entry = $("#entry");
-  entry.classList.add("gone");
-  setTimeout(()=>{ entry.style.display="none"; }, 650);
-  startStage1();
+  if(skipEntryTransition){
+    entry.classList.add("gone");
+    entry.style.display="none";
+  }else{
+    entry.classList.add("gone");
+    setTimeout(()=>{ entry.style.display="none"; }, 650);
+  }
+  startPartsIntro();
 }
 $("#entry-btn").addEventListener("click", ()=>{ snd.click(); startActivity(); });
 
 /* Iframe contract with the constellation game (index.html): report ls-ready on
-   load and begin on ls-start — the parent's Continue click supplies the gesture. */
+   load. An early click on the parent's matching loading fallback can request a
+   direct start; acknowledge only after the duplicate entry screen is hidden. */
 if(window.self !== window.top){
   window.addEventListener("message", e=>{
-    if(e.data==="ls-start") startActivity();
+    if(e.data==="ls-start"){
+      startActivity(true);
+      try{ window.parent.postMessage("ls-started","*"); }catch(err){}
+    }
   });
   window.addEventListener("load", ()=>{
     try{ window.parent.postMessage("ls-ready","*"); }catch(e){}
